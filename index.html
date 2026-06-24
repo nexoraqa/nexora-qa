@@ -1119,7 +1119,7 @@ a { color:var(--purple-l); text-decoration:none; }
     </div>
 
     <!-- QA Filter Tabs -->
-    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;" id="hist-qa-tabs">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="hist-qa-tabs">
       <button onclick="setHistQAFilter('all')" id="hist-tab-all"
         style="padding:7px 16px;border-radius:20px;border:1px solid var(--purple);background:var(--purple);color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);">
         <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17" cy="9" r="2.7"/><path d="M16 14.2c2.6.3 4.5 2 4.5 5"/></svg></span> All QAs
@@ -1132,6 +1132,25 @@ a { color:var(--purple-l); text-decoration:none; }
         style="padding:7px 16px;border-radius:20px;border:1px solid var(--border-l);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);">
         <span class="si-dot si-dot-blue"></span> Shahd Mohamed
       </button>
+    </div>
+
+    <!-- Date/Period Filter -->
+    <div class="filter-bar" style="margin-bottom:20px;">
+      <select class="fsel" id="hist-f-date" onchange="toggleHistCustomDate();renderHistory()">
+        <option value="all">All Time</option>
+        <option value="today">Today</option>
+        <option value="this_week">This Week</option>
+        <option value="this_month">This Month</option>
+        <option value="last_month">Last Month</option>
+        <option value="last_3_months">Last 3 Months</option>
+        <option value="custom">Custom Range</option>
+      </select>
+      <div id="hist-date-custom" style="display:none;gap:6px;align-items:center;">
+        <input type="date" id="hist-date-from" onchange="renderHistory()" style="background:var(--card);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:7px 10px;color:var(--text);font-size:12px;outline:none;font-family:var(--font-b);">
+        <span style="color:var(--muted);font-size:11px;">to</span>
+        <input type="date" id="hist-date-to" onchange="renderHistory()" style="background:var(--card);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:7px 10px;color:var(--text);font-size:12px;outline:none;font-family:var(--font-b);">
+      </div>
+      <button class="btn-clear" onclick="clearHistDateFilter()">✕ Clear</button>
     </div>
 
     <!-- Summary KPIs -->
@@ -4170,6 +4189,45 @@ document.addEventListener('click', function(e) {
 
 // Modal backdrop listeners — in initModalListeners() called from DOMContentLoaded
 
+function toggleHistCustomDate() {
+  const val = document.getElementById('hist-f-date')?.value;
+  const custom = document.getElementById('hist-date-custom');
+  if (custom) custom.style.display = val === 'custom' ? 'flex' : 'none';
+}
+
+function clearHistDateFilter() {
+  const el = document.getElementById('hist-f-date');
+  if (el) el.value = 'all';
+  const from = document.getElementById('hist-date-from');
+  const to   = document.getElementById('hist-date-to');
+  const custom = document.getElementById('hist-date-custom');
+  if (from) from.value = '';
+  if (to)   to.value   = '';
+  if (custom) custom.style.display = 'none';
+  renderHistory();
+}
+
+function evalMatchesHistDate(e) {
+  const period = document.getElementById('hist-f-date')?.value || 'all';
+  if (period === 'all') return true;
+  if (period === 'today') {
+    const now = new Date();
+    const ts = Number(e.uid);
+    const d = !isNaN(ts) && ts > 1e12 ? new Date(ts) : new Date(e.date);
+    return d.toDateString() === now.toDateString();
+  }
+  if (period === 'custom') {
+    const from = document.getElementById('hist-date-from')?.value;
+    const to   = document.getElementById('hist-date-to')?.value;
+    const ts = Number(e.uid);
+    const d = !isNaN(ts) && ts > 1e12 ? new Date(ts) : new Date(e.date);
+    if (from && d < new Date(from+'T00:00:00')) return false;
+    if (to   && d > new Date(to+'T23:59:59'))   return false;
+    return true;
+  }
+  return evalMatchesDate(e, period);
+}
+
 function renderHistory() {
   let data;
   if (window._tlTeam) {
@@ -4180,6 +4238,9 @@ function renderHistory() {
   } else {
     data = _evalHistory.filter(e => e.qa === CURRENT_QA);
   }
+
+  // Apply date/period filter
+  data = data.filter(e => evalMatchesHistDate(e));
 
   document.getElementById('hist-total').textContent = data.length;
 
