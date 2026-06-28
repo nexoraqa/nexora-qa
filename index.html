@@ -1325,6 +1325,29 @@ a { color:var(--purple-l); text-decoration:none; }
 
 
 
+
+    <!-- TL Operations Tab Content -->
+    <div id="hist-tab-operation" style="display:none;">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div class="card-title" style="margin-bottom:0;">TL Operation Evaluations</div>
+          <div style="font-size:12px;color:var(--muted);" id="hist-op-count">0 evaluations</div>
+        </div>
+        <!-- TL filter for operation -->
+        <div style="margin-bottom:14px;">
+          <select id="hist-op-tl-filter" onchange="renderOperationHistory()" class="fsel">
+            <option value="all">All TLs</option>
+          </select>
+        </div>
+        <div id="hist-op-list">
+          <div style="text-align:center;padding:40px;color:var(--muted);">No TL operation evaluations yet</div>
+        </div>
+      </div>
+    </div><!-- /hist-tab-operation -->
+
+  </div>
+
+
   <!-- ══════════════════════════════════════
        AT RISK RADAR PAGE
        ══════════════════════════════════════ -->
@@ -1634,27 +1657,6 @@ a { color:var(--purple-l); text-decoration:none; }
     </div>
 
     </div><!-- /hist-tab-qa -->
-
-    <!-- TL Operations Tab Content -->
-    <div id="hist-tab-operation" style="display:none;">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
-          <div class="card-title" style="margin-bottom:0;">TL Operation Evaluations</div>
-          <div style="font-size:12px;color:var(--muted);" id="hist-op-count">0 evaluations</div>
-        </div>
-        <!-- TL filter for operation -->
-        <div style="margin-bottom:14px;">
-          <select id="hist-op-tl-filter" onchange="renderOperationHistory()" class="fsel">
-            <option value="all">All TLs</option>
-          </select>
-        </div>
-        <div id="hist-op-list">
-          <div style="text-align:center;padding:40px;color:var(--muted);">No TL operation evaluations yet</div>
-        </div>
-      </div>
-    </div><!-- /hist-tab-operation -->
-
-  </div>
 
   <!-- ══════════════════════════════════════
        UPLOAD PAGE
