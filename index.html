@@ -8155,6 +8155,8 @@ function loadFromGoogleSheets() {
         try { renderRadar(); } catch(e) {}
         try { buildIntelligence(); } catch(e) {}
         try { updateHistoryBadge(); } catch(e) {}
+        try { if(document.getElementById('page-monitor')?.classList.contains('active')) renderMonitor(); } catch(e) {}
+        try { if(document.getElementById('page-profiles')?.classList.contains('active')) renderProfiles(); } catch(e) {}
         console.log(`✅ Loaded ${added} new evals from Google Sheets`);
       }
       } // end evalsData block
