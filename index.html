@@ -4897,6 +4897,7 @@ function closeHeatmapModal() {
 }
 
 function renderMonitor() {
+  try {
   const fp = document.getElementById('mon-f-proj')?.value    || 'all';
   const ft = document.getElementById('mon-f-tl')?.value      || 'all';
   const fc = document.getElementById('mon-f-country')?.value || 'all';
@@ -4922,6 +4923,10 @@ function renderMonitor() {
   if(el_i) el_i.textContent = int;
   if(el_m) el_m.textContent = mon;
   if(el_r) el_r.textContent = uniqueRisk;
+  } catch(err) {
+    const pg = document.getElementById('page-monitor');
+    if(pg) pg.innerHTML += '<div style="color:red;font-size:14px;padding:20px;background:#300;border-radius:8px;margin:20px;">❌ renderMonitor ERROR: ' + err.message + '<br>' + err.stack + '</div>';
+  }
 }
 
 function switchMonTab(tab) {
@@ -5473,7 +5478,7 @@ const COUNTRY_COLORS = { Qatar:'var(--gold)', India:'var(--orange)', Jordan:'var
 function renderProfiles() { profShowCountries(); }
 
 function profShowCountries() {
-  _profCountry = null; _profTL = null;
+  try {
   document.getElementById('prof-level-country').style.display = '';
   document.getElementById('prof-level-tl').style.display      = 'none';
   document.getElementById('prof-level-agents').style.display  = 'none';
@@ -5514,6 +5519,10 @@ function profShowCountries() {
       </div>
     </div>`;
   }).join('');
+  } catch(err) {
+    const pg = document.getElementById('page-profiles');
+    if(pg) pg.innerHTML += '<div style="color:red;font-size:14px;padding:20px;background:#300;border-radius:8px;margin:20px;">❌ profShowCountries ERROR: ' + err.message + '<br>' + err.stack + '</div>';
+  }
 }
 
 function profSelectCountry(country) {
