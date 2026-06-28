@@ -4726,6 +4726,9 @@ function clearHistory() {
 }
 
 function nav(id, el) {
+  // Reset scroll to top
+  const mainEl = document.querySelector('.main');
+  if(mainEl) mainEl.scrollTop = 0;
   // Hide all pages
   ['home','dashboard','monitor','calc','history','profiles','reports','coaching','upload','settings','agent','tl-home','operation'].forEach(p => {
     const pg = document.getElementById('page-'+p);
