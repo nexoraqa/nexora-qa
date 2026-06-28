@@ -173,7 +173,7 @@ a { color:var(--purple-l); text-decoration:none; }
   padding:28px 28px 40px; min-height:calc(100vh - var(--topbar-h));
   overflow-y:auto; height:calc(100vh - var(--topbar-h));
 }
-.page { display:none; animation:fadeIn .2s ease; }
+.page { display:none; }
 .page.active { display:block; }
 .back-btn { background:var(--card);border:1px solid var(--border-l);color:var(--text-2);border-radius:var(--radius-s);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-b);transition:all var(--transition);margin-bottom:20px; }
 .back-btn:hover { color:var(--text);border-color:var(--purple); }
@@ -1329,8 +1329,6 @@ a { color:var(--purple-l); text-decoration:none; }
        AT RISK RADAR PAGE
        ══════════════════════════════════════ -->
   <div class="page" id="page-monitor">
-
-    <div id="monitor-debug" style="background:red;color:white;font-size:16px;font-weight:bold;padding:16px;border-radius:8px;margin-bottom:16px;">🔴 PAGE-MONITOR IS RENDERING</div>
 
     <!-- Header + Single Filter Bar -->
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
@@ -4797,10 +4795,12 @@ function nav(id, el) {
     if (opTab) opTab.style.display = role === 'manager' ? '' : 'none';
   }
   if(id === 'monitor') {
+    // Pre-lock monitor TL filter for TL role before rendering
     if (window._tlTeam) {
       const monTL = document.getElementById('mon-f-tl');
       if (monTL) { monTL.value = window._tlTeam; monTL.disabled = true; monTL.style.opacity = '.6'; monTL.style.cursor = 'not-allowed'; }
     } else {
+      // Sync from Dashboard filters
       const dProj = document.getElementById('f-proj')?.value;
       const dTL   = document.getElementById('f-tl')?.value;
       const dC    = document.getElementById('f-country')?.value;
@@ -4812,8 +4812,6 @@ function nav(id, el) {
       if (monC    && dC)    monC.value    = dC;
     }
     renderMonitor();
-    // Retry after 2 seconds in case data was still loading
-    if (_evalHistory.length === 0) setTimeout(() => { if(document.getElementById('page-monitor')?.classList.contains('active')) renderMonitor(); }, 2000);
   }
   if(id === 'profiles') {
     if (window._tlTeam) {
@@ -4821,8 +4819,6 @@ function nav(id, el) {
       if (profTL) { profTL.value = window._tlTeam; profTL.disabled = true; profTL.style.opacity = '.6'; profTL.style.cursor = 'not-allowed'; }
     }
     renderProfiles();
-    // Retry after 2 seconds in case data was still loading
-    if (_evalHistory.length === 0) setTimeout(() => { if(document.getElementById('page-profiles')?.classList.contains('active')) renderProfiles(); }, 2000);
   }
   if(id === 'calc') resetCalc();
   document.getElementById('sidebar').classList.remove('open');
@@ -4899,7 +4895,6 @@ function closeHeatmapModal() {
 }
 
 function renderMonitor() {
-  try {
   const fp = document.getElementById('mon-f-proj')?.value    || 'all';
   const ft = document.getElementById('mon-f-tl')?.value      || 'all';
   const fc = document.getElementById('mon-f-country')?.value || 'all';
@@ -4925,10 +4920,6 @@ function renderMonitor() {
   if(el_i) el_i.textContent = int;
   if(el_m) el_m.textContent = mon;
   if(el_r) el_r.textContent = uniqueRisk;
-  } catch(err) {
-    const pg = document.getElementById('page-monitor');
-    if(pg) pg.innerHTML += '<div style="color:red;font-size:14px;padding:20px;background:#300;border-radius:8px;margin:20px;">❌ renderMonitor ERROR: ' + err.message + '<br>' + err.stack + '</div>';
-  }
 }
 
 function switchMonTab(tab) {
@@ -5480,7 +5471,7 @@ const COUNTRY_COLORS = { Qatar:'var(--gold)', India:'var(--orange)', Jordan:'var
 function renderProfiles() { profShowCountries(); }
 
 function profShowCountries() {
-  try {
+  _profCountry = null; _profTL = null;
   document.getElementById('prof-level-country').style.display = '';
   document.getElementById('prof-level-tl').style.display      = 'none';
   document.getElementById('prof-level-agents').style.display  = 'none';
@@ -5521,10 +5512,6 @@ function profShowCountries() {
       </div>
     </div>`;
   }).join('');
-  } catch(err) {
-    const pg = document.getElementById('page-profiles');
-    if(pg) pg.innerHTML += '<div style="color:red;font-size:14px;padding:20px;background:#300;border-radius:8px;margin:20px;">❌ profShowCountries ERROR: ' + err.message + '<br>' + err.stack + '</div>';
-  }
 }
 
 function profSelectCountry(country) {
@@ -7792,7 +7779,7 @@ function renderTLHome(user) {
       const status = a.o>=90?iconCheck()+' Pass':a.o>=80?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Critical';
       const agentPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory)).filter(p => p.agent === a.n);
       const topError = agentPatterns.length ? agentPatterns[0].error : null;
-      return `<div onclick="hideTLAgentHover(); openProfile('${a.n.replace(/'/g,"\\'")}')"
+      return `<div onclick="openProfile('${a.n.replace(/'/g,"\\'")}')"
         onmouseenter="showTLAgentHover(event, '${a.n.replace(/'/g,"\\'")}', '${a.o}', '${a.o>=90?'pass':a.o>=80?'risk':'critical'}', '${topError||''}')"
         onmouseleave="hideTLAgentHover()"
         style="display:flex;align-items:center;gap:10px;padding:9px;border-radius:var(--radius-s);background:var(--bg);cursor:pointer;transition:all .2s;" onmouseover="this.style.background='var(--card-hover)'" onmouseout="this.style.background='var(--bg)'">
@@ -8058,8 +8045,11 @@ function switchUser() {
 }
 
 /* ── App version — bump to force-clear incompatible localStorage ── */
-const APP_VERSION = '2.0';
+const APP_VERSION = '2.5';
 if (localStorage.getItem('nexora_version') !== APP_VERSION) {
+  localStorage.removeItem('nexora_qa_eval_history');
+  localStorage.removeItem('nexora_eval_history');
+  localStorage.removeItem('nexora_staging');
   localStorage.setItem('nexora_version', APP_VERSION);
 }
 
@@ -8160,9 +8150,6 @@ function loadFromGoogleSheets() {
         try { renderRadar(); } catch(e) {}
         try { buildIntelligence(); } catch(e) {}
         try { updateHistoryBadge(); } catch(e) {}
-        // Re-render monitor and profiles if currently active
-        try { if(document.getElementById('page-monitor')?.classList.contains('active')) renderMonitor(); } catch(e) {}
-        try { if(document.getElementById('page-profiles')?.classList.contains('active')) renderProfiles(); } catch(e) {}
         console.log(`✅ Loaded ${added} new evals from Google Sheets`);
       }
       } // end evalsData block
