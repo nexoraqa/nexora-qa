@@ -4799,12 +4799,10 @@ function nav(id, el) {
     if (opTab) opTab.style.display = role === 'manager' ? '' : 'none';
   }
   if(id === 'monitor') {
-    // Pre-lock monitor TL filter for TL role before rendering
     if (window._tlTeam) {
       const monTL = document.getElementById('mon-f-tl');
       if (monTL) { monTL.value = window._tlTeam; monTL.disabled = true; monTL.style.opacity = '.6'; monTL.style.cursor = 'not-allowed'; }
     } else {
-      // Sync from Dashboard filters
       const dProj = document.getElementById('f-proj')?.value;
       const dTL   = document.getElementById('f-tl')?.value;
       const dC    = document.getElementById('f-country')?.value;
@@ -4816,6 +4814,8 @@ function nav(id, el) {
       if (monC    && dC)    monC.value    = dC;
     }
     renderMonitor();
+    // Retry after 2 seconds in case data was still loading
+    if (_evalHistory.length === 0) setTimeout(() => { if(document.getElementById('page-monitor')?.classList.contains('active')) renderMonitor(); }, 2000);
   }
   if(id === 'profiles') {
     if (window._tlTeam) {
@@ -4823,6 +4823,8 @@ function nav(id, el) {
       if (profTL) { profTL.value = window._tlTeam; profTL.disabled = true; profTL.style.opacity = '.6'; profTL.style.cursor = 'not-allowed'; }
     }
     renderProfiles();
+    // Retry after 2 seconds in case data was still loading
+    if (_evalHistory.length === 0) setTimeout(() => { if(document.getElementById('page-profiles')?.classList.contains('active')) renderProfiles(); }, 2000);
   }
   if(id === 'calc') resetCalc();
   document.getElementById('sidebar').classList.remove('open');
