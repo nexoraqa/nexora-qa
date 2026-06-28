@@ -171,9 +171,12 @@ a { color:var(--purple-l); text-decoration:none; }
 .main {
   margin-left:var(--sidebar-w); margin-top:var(--topbar-h);
   padding:28px 28px 40px; min-height:calc(100vh - var(--topbar-h));
+  overflow-y:auto; height:calc(100vh - var(--topbar-h));
 }
 .page { display:none; animation:fadeIn .2s ease; }
 .page.active { display:block; }
+.back-btn { background:var(--card);border:1px solid var(--border-l);color:var(--text-2);border-radius:var(--radius-s);padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:var(--font-b);transition:all var(--transition);margin-bottom:20px; }
+.back-btn:hover { color:var(--text);border-color:var(--purple); }
 @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
 
 /* ============================================================
@@ -624,10 +627,13 @@ a { color:var(--purple-l); text-decoration:none; }
   <nav class="nav">
     <div class="nav-item active" onclick="nav('home',this)">        <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></span> Home</div>
     <div class="nav-item"        onclick="nav('dashboard',this)">   <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span> Dashboard</div>
+    <div class="nav-item" id="nav-tl-home" style="display:none;" onclick="nav('tl-home',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span> My Team</div>
     <div class="nav-item"        onclick="nav('monitor',this)">     <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-8 4 16 2-8h8"/></svg></span> QA Monitor</div>
     <div class="nav-item"        onclick="nav('calc',this)">        <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span> Score Calculator</div>
     <div class="nav-item"        onclick="nav('history',this)">     <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span> Eval History</div>
     <div class="nav-item"        onclick="nav('profiles',this)">    <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span> Agent Profiles</div>
+    <div class="nav-item"        onclick="nav('coaching',this)" id="nav-coaching">  <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span> Coaching <span id="coaching-badge" style="display:none;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:4px;font-family:var(--font-mono);">0</span></div>
+    <div class="nav-item" id="nav-operation" style="display:none;" onclick="nav('operation',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><rect x="5" y="6" width="14" height="15" rx="1.5"/><path d="M9 12h6M9 16h6"/></svg></span> Operation Form</div>
     <div class="nav-item"        onclick="nav('reports',this)">     <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h6M9 17h6"/></svg></span> Reports</div>
     <div class="nav-item"        onclick="nav('upload',this)">      <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span> Upload Data</div>
     <div class="nav-item"        onclick="nav('settings',this)">    <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V19a2 2 0 11-4 0v-.09A1.65 1.65 0 009.5 17.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9.5a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span> Settings</div>
@@ -1118,6 +1124,19 @@ a { color:var(--purple-l); text-decoration:none; }
       </div>
     </div>
 
+    <!-- Main Tabs: QA / TL Operations -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;" id="hist-main-tabs">
+      <button onclick="setHistMainTab('qa')" id="htab-qa" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid var(--purple);background:none;color:var(--purple);font-family:var(--font-b);margin-bottom:-1px;">
+        📋 QA Evaluations
+      </button>
+      <button onclick="setHistMainTab('operation')" id="htab-operation" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;" id="htab-op-btn">
+        📊 TL Operations
+      </button>
+    </div>
+
+    <!-- QA Tab Content -->
+    <div id="hist-tab-qa">
+
     <!-- QA Filter Tabs -->
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;" id="hist-qa-tabs">
       <button onclick="setHistQAFilter('all')" id="hist-tab-all"
@@ -1241,6 +1260,9 @@ a { color:var(--purple-l); text-decoration:none; }
       <div id="hm-modal-body"></div>
     </div>
   </div>
+
+  <!-- TL Agent Hover Popup -->
+  <div id="tl-agent-hover" style="display:none;position:fixed;z-index:999;background:var(--card);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:12px 14px;box-shadow:0 8px 24px #000000aa;pointer-events:none;min-width:200px;max-width:260px;"></div>
 
   <!-- Agent Hover Trend Popup -->
   <div id="hover-trend-popup" style="display:none;position:fixed;z-index:997;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:0 16px 40px #000000aa;pointer-events:none;min-width:220px;"></div>
@@ -1615,6 +1637,27 @@ a { color:var(--purple-l); text-decoration:none; }
       </div>
     </div>
 
+    </div><!-- /hist-tab-qa -->
+
+    <!-- TL Operations Tab Content -->
+    <div id="hist-tab-operation" style="display:none;">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div class="card-title" style="margin-bottom:0;">TL Operation Evaluations</div>
+          <div style="font-size:12px;color:var(--muted);" id="hist-op-count">0 evaluations</div>
+        </div>
+        <!-- TL filter for operation -->
+        <div style="margin-bottom:14px;">
+          <select id="hist-op-tl-filter" onchange="renderOperationHistory()" class="fsel">
+            <option value="all">All TLs</option>
+          </select>
+        </div>
+        <div id="hist-op-list">
+          <div style="text-align:center;padding:40px;color:var(--muted);">No TL operation evaluations yet</div>
+        </div>
+      </div>
+    </div><!-- /hist-tab-operation -->
+
   </div>
 
   <!-- ══════════════════════════════════════
@@ -1702,9 +1745,18 @@ a { color:var(--purple-l); text-decoration:none; }
        ══════════════════════════════════════ -->
   <div class="page" id="page-reports">
 
+    <!-- Report Tabs — at top -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;">
+      <button onclick="setReportTab('leaderboard')" id="rtab-leaderboard" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid var(--purple);background:none;color:var(--purple);font-family:var(--font-b);margin-bottom:-1px;">🏆 Leaderboard</button>
+      <button onclick="setReportTab('mom')" id="rtab-mom" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;">📅 Month-over-Month</button>
+      <button onclick="setReportTab('operation')" id="rtab-operation" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;">📋 TL Operations</button>
+    </div>
+
+    <!-- Tab: Leaderboard -->
+    <div id="rep-tab-leaderboard">
+
     <!-- Quick Export Cards -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;" id="report-card-monthly">      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;">
         <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),#43d692);"></div>
         <div style="font-size:22px;margin-bottom:8px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span></div>
         <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Monthly QA Summary</div>
@@ -1771,12 +1823,230 @@ a { color:var(--purple-l); text-decoration:none; }
         <div style="font-size:13px;">Automated scheduled reports — Coming soon</div>
       </div>
     </div>
+    </div><!-- /rep-tab-leaderboard -->
+
+    <!-- Tab: Month-over-Month -->
+    <div id="rep-tab-mom" style="display:none;">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div class="card-title" style="margin-bottom:2px;">Month-over-Month Comparison</div>
+            <div style="font-size:11px;color:var(--muted);" id="mom-period-label">Loading...</div>
+          </div>
+          <select id="mom-view" onchange="renderMoM()" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:7px 12px;color:var(--text);font-size:12px;outline:none;font-family:var(--font-b);">
+            <option value="agents">By Agent</option>
+            <option value="projects">By Project</option>
+            <option value="tls">By TL</option>
+          </select>
+        </div>
+        <div id="mom-content"></div>
+      </div>
+    </div><!-- /rep-tab-mom -->
+
+    <!-- Tab: TL Operations -->
+    <div id="rep-tab-operation" style="display:none;">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px;">TL Operation Evaluations</div>
+        <div id="op-report-content">
+          <div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No operation evaluations yet — TLs need to submit via Operation Form</div>
+        </div>
+      </div>
+    </div><!-- /rep-tab-operation -->
 
   </div>
 
   <!-- ══════════════════════════════════════
        SETTINGS PAGE
        ══════════════════════════════════════ -->
+  <!-- Coaching Comment Popup — appears after eval submit if errors found -->
+  <div id="coaching-popup" style="display:none;position:fixed;inset:0;background:#00000088;z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="if(event.target===this)skipCoachingPopup()">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:500px;margin:16px;box-shadow:0 24px 60px #000000aa;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-family:var(--font-h);font-size:17px;font-weight:800;">Add Coaching Comment</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;" id="cp-agent-meta"></div>
+        </div>
+        <button onclick="skipCoachingPopup()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;">✕</button>
+      </div>
+
+      <!-- Error types detected -->
+      <div id="cp-errors" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
+
+      <!-- Comment text area -->
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Your Coaching Comment</div>
+      <textarea id="cp-comment" placeholder="Describe what needs to be coached, what the agent should improve, and any specific action..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:12px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:100px;outline:none;box-sizing:border-box;line-height:1.5;"></textarea>
+
+      <!-- Buttons -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
+        <button onclick="skipCoachingPopup()" style="background:var(--bg);border:1px solid var(--border-l);color:var(--muted);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);">Skip for now</button>
+        <button onclick="sendCoachingToTL()" style="background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);display:flex;align-items:center;justify-content:center;gap:6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Send to TL
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ COACHING PAGE ═══════════════ -->
+  <div class="page" id="page-coaching">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="back-btn" style="margin-bottom:0;" onclick="coachingGoBack()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> <span id="coaching-back-label">Back</span>
+        </button>
+        <div>
+          <div style="font-family:var(--font-h);font-size:20px;font-weight:800;">Coaching</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;" id="coaching-subtitle">Quality coaching workflow</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Priority tabs: CC → CB → NC -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button onclick="setCoachingTab('cc')" id="ctab-cc" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
+        <span class="si-dot si-dot-red"></span> CC Errors <span id="ctab-cc-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
+      <button onclick="setCoachingTab('cb')" id="ctab-cb" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
+        <span class="si-dot si-dot-orange"></span> CB Errors <span id="ctab-cb-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
+      <button onclick="setCoachingTab('nc')" id="ctab-nc" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
+        <span class="si-dot si-dot-gold"></span> NC Errors <span id="ctab-nc-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
+      <button onclick="setCoachingTab('all')" id="ctab-all" class="ctab active-ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--purple);background:var(--purple-dim);color:var(--purple);font-family:var(--font-b);">
+        All <span id="ctab-all-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
+    </div>
+
+    <!-- Coaching items list -->
+    <div id="coaching-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+
+    <!-- Coaching Detail Modal -->
+    <div id="coaching-modal" style="display:none;position:fixed;inset:0;background:#00000088;z-index:998;overflow-y:auto;backdrop-filter:blur(3px);">
+      <div style="max-width:560px;margin:40px auto;padding:16px;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+            <div>
+              <div style="font-family:var(--font-h);font-size:17px;font-weight:800;" id="cm-agent"></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;" id="cm-meta"></div>
+            </div>
+            <button onclick="closeCoachingModal()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
+          </div>
+
+          <!-- Status indicator -->
+          <div id="cm-status-bar" style="margin-bottom:16px;padding:10px 14px;border-radius:var(--radius-s);font-size:12px;font-weight:600;"></div>
+
+          <!-- QA Comment -->
+          <div style="margin-bottom:16px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">📋 QA Comment</div>
+            <div id="cm-qa-comment" style="background:var(--bg);border-radius:var(--radius-s);padding:12px;font-size:13px;color:var(--text);line-height:1.6;"></div>
+          </div>
+
+          <!-- TL Response -->
+          <div id="cm-tl-section" style="margin-bottom:16px;display:none;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">👥 TL Response</div>
+            <div id="cm-tl-comment" style="background:var(--bg);border-radius:var(--radius-s);padding:12px;font-size:13px;color:var(--text);line-height:1.6;"></div>
+          </div>
+
+          <!-- Agent Response -->
+          <div id="cm-agent-section" style="margin-bottom:16px;display:none;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">🧑 Agent Response</div>
+            <div id="cm-agent-comment" style="background:var(--bg);border-radius:var(--radius-s);padding:12px;font-size:13px;color:var(--text);line-height:1.6;"></div>
+          </div>
+
+          <!-- Action area — changes based on role + status -->
+          <div id="cm-action-area"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ OPERATION FORM PAGE ═══════════════ -->
+  <div class="page" id="page-operation">
+    <button class="back-btn" onclick="nav('tl-home', document.getElementById('nav-tl-home'))">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> My Team
+    </button>
+    <div style="max-width:680px;">
+      <div style="margin-bottom:24px;">
+        <div style="font-family:var(--font-h);font-size:20px;font-weight:800;">Operation Form</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px;">Evaluate your agent's operational performance</div>
+      </div>
+
+      <!-- Form -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title" style="margin-bottom:16px;">Evaluation Details</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">Agent Name</div>
+            <select id="op-agent" class="fsel" style="width:100%;" onchange="opUpdateAgent()">
+              <option value="">— Select Agent —</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">Project</div>
+            <select id="op-proj" class="fsel" style="width:100%;" onchange="opCalcScore()">
+              <option value="">— Select Project —</option>
+              <option value="MOPH_MCI">MOPH_MCI</option>
+              <option value="PHCC">PHCC</option>
+              <option value="MOPH">MOPH</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">Language</div>
+            <select id="op-lang" class="fsel" style="width:100%;">
+              <option value="Arabic">Arabic</option>
+              <option value="English">English</option>
+              <option value="Arabic / English">Arabic / English</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">Country (auto)</div>
+            <div id="op-country-display" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--muted);">—</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">TL (auto)</div>
+            <div id="op-tl-display" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--muted);">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NC Attributes -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title" style="margin-bottom:16px;color:var(--gold);">NC — Non-Critical Attributes</div>
+        <div id="op-nc-attrs" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <!-- CC Attributes -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title" style="margin-bottom:16px;color:var(--red);">CC — Critical to Customer</div>
+        <div id="op-cc-attrs" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <!-- CB Attributes -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title" style="margin-bottom:16px;color:var(--orange);">CB — Critical to Business</div>
+        <div id="op-cb-attrs" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <!-- Score preview -->
+      <div class="card" style="margin-bottom:16px;text-align:center;padding:20px;">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Operation Score</div>
+        <div style="font-family:var(--font-h);font-size:48px;font-weight:900;line-height:1;" id="op-score-preview">—</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px;" id="op-score-breakdown">Fill in the form above</div>
+      </div>
+
+      <!-- Submit -->
+      <button onclick="submitOperation()" style="width:100%;background:var(--orange);border:none;color:#fff;border-radius:var(--radius-s);padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font-b);">Submit Operation Evaluation</button>
+
+      <!-- Success message -->
+      <div id="op-success" style="display:none;margin-top:16px;background:var(--green-dim);border:1px solid var(--green);border-radius:var(--radius-s);padding:14px;text-align:center;font-size:13px;font-weight:700;color:var(--green);">
+        ✓ Operation evaluation submitted successfully!
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SETTINGS PAGE ═══════════════ -->
   <div class="page" id="page-settings">
     <div style="max-width:580px;">
       <div style="font-family:var(--font-h);font-size:20px;font-weight:800;margin-bottom:6px;">Settings</div>
@@ -1826,60 +2096,180 @@ a { color:var(--purple-l); text-decoration:none; }
   <!-- ══════════════════════════════════════
        AGENT PERSONAL DASHBOARD
        ══════════════════════════════════════ -->
-  <div class="page" id="page-agent">
-    <div style="max-width:500px;margin:0 auto;">
+  <!-- ═══════════════ TL HOME PAGE ═══════════════ -->
+  <div class="page" id="page-tl-home">
 
-      <!-- Welcome card -->
-      <div class="card" style="text-align:center;padding:32px 24px;margin-bottom:20px;">
-        <div id="agent-avatar-big" style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,var(--purple),var(--purple-l));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;margin:0 auto 16px;box-shadow:0 4px 20px #e8a23d40;"></div>
-        <div style="font-family:var(--font-h);font-size:20px;font-weight:800;" id="agent-welcome-name">—</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px;" id="agent-welcome-sub">—</div>
+    <button class="back-btn" onclick="nav('home')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Home
+    </button>
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div style="font-family:var(--font-h);font-size:20px;font-weight:800;" id="tl-home-title">My Team</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;" id="tl-home-sub">Team performance overview</div>
       </div>
-
-      <!-- Score card -->
-      <div class="card" style="margin-bottom:20px;">
-        <div class="card-title">My Latest Score</div>
-        <div style="text-align:center;padding:16px 0;">
-          <div style="font-family:var(--font-h);font-size:64px;font-weight:900;line-height:1;" id="agent-score">—</div>
-          <div style="margin-top:10px;" id="agent-score-pill"></div>
-          <div style="font-size:11px;color:var(--muted);margin-top:8px;" id="agent-score-date">No evaluations yet</div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
-          <div style="text-align:center;">
-            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">NC Score</div>
-            <div style="font-family:var(--font-h);font-size:20px;font-weight:800;color:var(--gold);" id="agent-nc">—</div>
-          </div>
-          <div style="text-align:center;">
-            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">CC</div>
-            <div style="font-size:18px;font-weight:800;" id="agent-cc">—</div>
-          </div>
-          <div style="text-align:center;">
-            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">CB</div>
-            <div style="font-size:18px;font-weight:800;" id="agent-cb">—</div>
-          </div>
-        </div>
+      <div id="tl-escalate-banner" style="display:none;background:var(--red-dim);border:1px solid var(--red);border-radius:var(--radius-s);padding:8px 14px;font-size:12px;font-weight:700;color:var(--red);display:flex;align-items:center;gap:8px;">
+        <span class="si-dot si-dot-red"></span> <span id="tl-escalate-text"></span>
       </div>
+    </div>
 
-      <!-- Errors this eval -->
-      <div class="card" id="agent-errors-card" style="margin-bottom:20px;display:none;">
-        <div class="card-title">Errors Flagged</div>
-        <div id="agent-errors-list"></div>
+    <!-- Team score summary KPIs -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+      <div class="card" style="text-align:center;padding:16px;">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Team Avg</div>
+        <div style="font-family:var(--font-mono);font-size:28px;font-weight:800;line-height:1;" id="tl-avg-score">—</div>
       </div>
-
-      <!-- Coaching plan -->
-      <div class="card" id="agent-coaching-card" style="margin-bottom:20px;display:none;">
-        <div class="card-title"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><rect x="5" y="6" width="14" height="15" rx="1.5"/><path d="M9 12h6M9 16h6"/></svg></span> My Coaching Plan</div>
-        <div id="agent-coaching-list"></div>
+      <div class="card" style="text-align:center;padding:16px;background:var(--green-dim);">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Passing</div>
+        <div style="font-family:var(--font-mono);font-size:28px;font-weight:800;color:var(--green);line-height:1;" id="tl-passing">0</div>
       </div>
+      <div class="card" style="text-align:center;padding:16px;background:var(--gold-dim);">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">At Risk</div>
+        <div style="font-family:var(--font-mono);font-size:28px;font-weight:800;color:var(--gold);line-height:1;" id="tl-at-risk">0</div>
+      </div>
+      <div class="card" style="text-align:center;padding:16px;background:var(--red-dim);">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Critical</div>
+        <div style="font-family:var(--font-mono);font-size:28px;font-weight:800;color:var(--red);line-height:1;" id="tl-critical">0</div>
+      </div>
+    </div>
 
-      <!-- All my evals summary -->
+    <!-- Two columns -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
+
+      <!-- LEFT — My Agents -->
       <div class="card">
-        <div class="card-title">My Evaluation History</div>
-        <div id="agent-history-list">
-          <div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">No evaluations submitted yet</div>
-        </div>
+        <div class="card-title" style="margin-bottom:14px;">My Agents</div>
+        <div id="tl-agents-grid" style="display:flex;flex-direction:column;gap:8px;"></div>
       </div>
 
+      <!-- RIGHT — Action Items -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Pending Coaching Reviews -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <span>Coaching Reviews</span>
+            <span id="tl-coaching-count" style="display:none;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;font-family:var(--font-mono);">0</span>
+          </div>
+          <div id="tl-coaching-list">
+            <div style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0;">No pending reviews</div>
+          </div>
+          <button onclick="nav('coaching', document.getElementById('nav-coaching'))" style="width:100%;margin-top:12px;background:var(--purple-dim);border:1px solid var(--purple);color:var(--purple);border-radius:var(--radius-s);padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">View All Coaching →</button>
+        </div>
+
+        <!-- Recent Team Evals -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Recent Team Evaluations</div>
+          <div id="tl-recent-evals">
+            <div style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0;">No evaluations yet</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ AGENT PAGE ═══════════════ -->
+  <div class="page" id="page-agent">
+
+    <button class="back-btn" onclick="nav('home')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Home
+    </button>
+
+    <!-- Welcome header -->
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+      <div id="agent-avatar-big" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--purple),var(--purple-l));display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0;box-shadow:0 4px 20px #e8a23d40;"></div>
+      <div>
+        <div style="font-family:var(--font-h);font-size:20px;font-weight:800;" id="agent-welcome-name">—</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;" id="agent-welcome-sub">—</div>
+      </div>
+    </div>
+
+    <!-- Two column layout -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
+
+      <!-- LEFT — My Performance -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Score card -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">My Latest Score</div>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px;">
+            <div style="font-family:var(--font-h);font-size:52px;font-weight:900;line-height:1;" id="agent-score">—</div>
+            <div>
+              <div id="agent-score-pill" style="margin-bottom:6px;"></div>
+              <div style="font-size:11px;color:var(--muted);" id="agent-score-date">No evaluations yet</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:12px;border-top:1px solid var(--border);">
+            <div style="text-align:center;background:var(--bg);border-radius:var(--radius-s);padding:8px;">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">NC</div>
+              <div style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:var(--gold);" id="agent-nc">—</div>
+            </div>
+            <div style="text-align:center;background:var(--bg);border-radius:var(--radius-s);padding:8px;">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">CC</div>
+              <div style="font-size:16px;font-weight:800;" id="agent-cc">—</div>
+            </div>
+            <div style="text-align:center;background:var(--bg);border-radius:var(--radius-s);padding:8px;">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">CB</div>
+              <div style="font-size:16px;font-weight:800;" id="agent-cb">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score trend -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Score Trend</div>
+          <div id="agent-trend-chart" style="height:80px;display:flex;align-items:flex-end;gap:3px;">
+            <div style="color:var(--muted);font-size:12px;padding:20px 0;">No data yet</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px;">
+            <div style="font-size:10px;color:var(--muted);" id="agent-trend-label-left"></div>
+            <div style="font-size:10px;color:var(--muted);" id="agent-trend-label-right"></div>
+          </div>
+        </div>
+
+        <!-- Top errors -->
+        <div class="card" id="agent-errors-card">
+          <div class="card-title" style="margin-bottom:12px;">My Top Errors</div>
+          <div id="agent-errors-list">
+            <div style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0;">No errors recorded yet</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT — My Coaching -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Pending coaching -->
+        <div class="card" id="agent-coaching-pending-card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <span>Pending Coaching</span>
+            <span id="agent-coaching-badge" style="display:none;background:var(--red);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;font-family:var(--font-mono);">0</span>
+          </div>
+          <div id="agent-coaching-pending-list">
+            <div style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0;">No pending coaching</div>
+          </div>
+          <button onclick="nav('coaching', document.getElementById('nav-coaching'))" style="width:100%;margin-top:12px;background:var(--purple-dim);border:1px solid var(--purple);color:var(--purple);border-radius:var(--radius-s);padding:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">View All Coaching →</button>
+        </div>
+
+        <!-- Recent evals -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Recent Evaluations</div>
+          <div id="agent-history-list">
+            <div style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0;">No evaluations yet</div>
+          </div>
+        </div>
+
+        <!-- Coaching plan (existing errors pattern) -->
+        <div class="card" id="agent-coaching-card" style="display:none;">
+          <div class="card-title" style="margin-bottom:12px;">My Coaching Plan</div>
+          <div id="agent-coaching-list"></div>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -2852,12 +3242,14 @@ let _eval = null; // stores computed evaluation data
 let _errors = []; // stores error list
 
 function computeScore() {
-  const ncErrors   = _selectedErrors.filter(e => e.type==='nc' && !e.isNA);
-  const naSelected = _selectedErrors.some(e => e.isNA);
-  const ncAttrs    = naSelected ? 5 : 6;
-  const ptEach     = 30 / ncAttrs;
-  const ncScore    = Math.max(0, 30 - ncErrors.length * ptEach);
-  const ncPct      = (ncScore/30)*100;
+  const allNcErrors = _selectedErrors.filter(e => e.type==='nc' && !e.isNA);
+  // Count unique NC ATTRIBUTES failed (not sub-attributes)
+  const failedNcAttrs = [...new Set(allNcErrors.map(e => e.attrName))];
+  const ncErrors    = failedNcAttrs; // length = number of failed attributes
+  const naSelected  = _selectedErrors.some(e => e.isNA);
+  const ptEach      = naSelected ? 6 : 5; // Hold N/A → 6pts per error, Hold present → 5pts per error
+  const ncScore     = Math.max(0, 30 - ncErrors.length * ptEach);
+  const ncPct       = (ncScore/30)*100;
   const cc = _selectedErrors.filter(e => e.type==='cc').length;
   const cb = _selectedErrors.filter(e => e.type==='cb').length;
   let overall, ccPct, cbPct;
@@ -2873,10 +3265,11 @@ function computeScore() {
     qa:    document.getElementById('c-qa').value,
     proj:  document.getElementById('c-proj').value,
     lang:  document.getElementById('c-lang').value,
+    country: document.getElementById('c-country')?.value || '',
     holdNA: naSelected,
     today: new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),
     overall, ncScore, ncPct, ccPct, cbPct, cc, cb,
-    ncCount: ncErrors.length,
+    ncCount: ncErrors.length, // number of unique attributes failed
   };
 }
 
@@ -3003,16 +3396,17 @@ function submitEval() {
   scoreEl.style.color = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
   document.getElementById('success-agent').textContent  = d.agent+' · '+d.proj;
   document.getElementById('success-detail').textContent = `${d.agent}'s evaluation (${d.overall.toFixed(1)}%) recorded on ${d.today}`;
-  // Coaching if needed
-  const needsCoaching = _errors.length>0 && (d.cc>0 || d.cb>0 || d.ncCount>=2);
+  // Hide old coaching box
   const coachBox = document.getElementById('success-coaching');
-  if (needsCoaching) {
-    coachBox.style.display='block';
-    coachBox.innerHTML = buildCoachHTML(d.agent, d.tl, d.qa, d.today);
-  } else {
-    coachBox.style.display='none';
-  }
+  if (coachBox) coachBox.style.display = 'none';
   showStep('success');
+  // Show coaching popup if errors found
+  const hasCC = d.cc > 0;
+  const hasCB = d.cb > 0;
+  const hasNC = (d.ncCount||0) > 2;
+  if (hasCC || hasCB || hasNC) {
+    setTimeout(() => showCoachingPopup(d, hasCC, hasCB, hasNC), 600);
+  }
 }
 
 function showStep(name) {
@@ -3686,7 +4080,7 @@ function loadFromStorage() {
 // ══════════════════════════════════════════════════════
 //  GOOGLE SHEETS INTEGRATION
 // ══════════════════════════════════════════════════════
-const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzlo5XVroOU-EtPcuRVCmyQPiRleR3NOfnsNAUC5tMeYoxCgGbpJkfJz2CoSZrb2qSR/exec';
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzBgm42c30Sbk7gEnPAjiW9h9ci576_psfqVL7SqBJ8XCLjYmWV5bJ0CQocPg2wRkIP/exec';
 
 function getAttrValue(errors, attrName) {
   // Find if this attribute has any error — Yes = no error, No = error, N/A = not applicable
@@ -3743,7 +4137,7 @@ function saveToGoogleSheets(eval_data, errors) {
 }
 
 function saveToHistory(d, errors) {
-  const time = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+  const time = new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
   // Store full error detail: type, attribute, sub-error, isNA
   const fullErrors = _selectedErrors.map(e => ({
     t:        e.type,
@@ -3774,6 +4168,8 @@ function saveToHistory(d, errors) {
   persistHistory();
   saveToGoogleSheets(_evalHistory[0], fullErrors);
   updateHistoryBadge();
+  // Auto-generate coaching items if errors found
+  try { autoGenerateCoaching(_evalHistory[0]); } catch(e) {}
   // Refresh all pages with new data
   try { filtered = [...getLiveAgents()]; } catch(e) {}
   try { updateHomeKPIs(); } catch(e) {}
@@ -3850,11 +4246,13 @@ function importEvalCSV(input) {
         Object.entries(cbMap).forEach(([col, info]) => {
           if(get(col)==='No') errors.push({t:'cb', v:info.v, attr:info.attr, isNA:false});
         });
-        const ncErrors = errors.filter(e=>e.t==='nc'&&!e.isNA);
+        const allNcErrors = errors.filter(e=>e.t==='nc'&&!e.isNA);
+        const failedNcAttrs = [...new Set(allNcErrors.map(e => e.attr||e.v))];
+        const ncErrors = failedNcAttrs; // count unique attributes only
         const cc = errors.filter(e=>e.t==='cc').length;
         const cb = errors.filter(e=>e.t==='cb').length;
-        const ncAttrs = holdNA ? 5 : 6;
-        const ncScore = Math.max(0, 30 - ncErrors.length * (30/ncAttrs));
+        const ptEach  = holdNA ? 6 : 5; // Hold N/A → 6pts per error, Hold present → 5pts per error
+        const ncScore = Math.max(0, 30 - ncErrors.length * ptEach);
         const overall = (cc>0||cb>0) ? ncScore : ncScore+70;
         _evalHistory.unshift({
           uid: uid || Date.now()+i,
@@ -4333,7 +4731,7 @@ function clearHistory() {
 
 function nav(id, el) {
   // Hide all pages
-  ['home','dashboard','monitor','calc','history','profiles','reports','upload','settings','agent'].forEach(p => {
+  ['home','dashboard','monitor','calc','history','profiles','reports','coaching','upload','settings','agent','tl-home','operation'].forEach(p => {
     const pg = document.getElementById('page-'+p);
     if(pg) pg.classList.remove('active');
   });
@@ -4346,6 +4744,24 @@ function nav(id, el) {
   document.getElementById('page-title').textContent = PAGE_TITLES[id] || id;
   // Init specific pages
   if(id === 'home')      updateHomeKPIs();
+  if(id === 'operation') {
+    initOperationForm(_currentUser);
+  }
+  if(id === 'tl-home') {
+    renderTLHome(_currentUser);
+  }
+  if(id === 'coaching') {
+    loadCoaching(); // always reload fresh from localStorage
+    _coachingTab = 'all'; // reset to All tab
+    setCoachingTab('all');
+    renderCoaching();
+    // Set back button label based on role
+    const role = _currentUser?.role || '';
+    const backLabel = document.getElementById('coaching-back-label');
+    if (backLabel) {
+      backLabel.textContent = role==='tl' ? 'My Team' : role==='agent' ? 'My Dashboard' : 'Home';
+    }
+  }
   if(id === 'settings') {
     const el = document.getElementById('set-total-agents');
     if(el) el.textContent = AGENTS.length;
@@ -4366,8 +4782,22 @@ function nav(id, el) {
     if (dC    && !dC.disabled    && monC)    dC.value    = monC;
     initDashboard();
   }
-  if(id === 'history') renderHistory();
-  if(id === 'reports') { renderLeaderboard(); }
+  if(id === 'history') {
+    const role = _currentUser?.role || '';
+    const opTab = document.getElementById('htab-operation');
+    if (opTab) opTab.style.display = (role === 'manager' || role === 'tl') ? '' : 'none';
+    setHistMainTab('qa');
+  }
+  if(id === 'reports') {
+    renderLeaderboard();
+    const role = _currentUser?.role || '';
+    // Hide MoM tab for agent role
+    const momTab = document.getElementById('rtab-mom');
+    if (momTab) momTab.style.display = role === 'agent' ? 'none' : '';
+    // Operation tab — manager only
+    const opTab = document.getElementById('rtab-operation');
+    if (opTab) opTab.style.display = role === 'manager' ? '' : 'none';
+  }
   if(id === 'monitor') {
     // Pre-lock monitor TL filter for TL role before rendering
     if (window._tlTeam) {
@@ -4812,6 +5242,53 @@ function renderLeaderboard() {
   }).join('');
 }
 
+function setReportTab(tab) {
+  const tabs = ['leaderboard','mom','operation'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('rtab-'+t);
+    const content = document.getElementById('rep-tab-'+t);
+    if (btn) {
+      btn.style.color       = t===tab ? 'var(--purple)' : 'var(--muted)';
+      btn.style.borderBottom= t===tab ? '2px solid var(--purple)' : '2px solid transparent';
+    }
+    if (content) content.style.display = t===tab ? 'block' : 'none';
+  });
+  if (tab === 'mom') try { renderMoM(); } catch(e) {}
+  if (tab === 'leaderboard') try { renderLeaderboard(); } catch(e) {}
+  if (tab === 'operation') renderOperationReport();
+}
+
+function renderOperationReport() {
+  const el = document.getElementById('op-report-content');
+  if (!el) return;
+  // Always read latest from localStorage
+  try { window._operationHistory = JSON.parse(localStorage.getItem('nexora_op_history')||'[]'); } catch(e) {}
+  const data = window._operationHistory || [];
+  if (!data.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No operation evaluations yet — TLs need to submit via Operation Form</div>';
+    return;
+  }
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:0;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+      <div>Agent</div>
+      <div style="text-align:right;padding-right:16px;">TL</div>
+      <div style="text-align:right;padding-right:16px;">Project</div>
+      <div style="text-align:right;padding-right:16px;">Date</div>
+      <div style="text-align:right;">Score</div>
+    </div>
+    ${data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(r => {
+      const col = r.overall>=90?'var(--green)':r.overall>=80?'var(--gold)':'var(--red)';
+      return `<div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:0;padding:9px 0;border-bottom:1px solid var(--border);align-items:center;">
+        <div style="font-size:13px;font-weight:600;">${r.agent}</div>
+        <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.tl||'—'}</div>
+        <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.proj||'—'}</div>
+        <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.date||'—'}</div>
+        <div style="text-align:right;font-family:var(--font-mono);font-size:14px;font-weight:800;color:${col};">${r.overall.toFixed(1)}%</div>
+      </div>`;
+    }).join('')}`;
+}
+
+
 function resetRepFilters() {
   ['rep-proj','rep-tl','rep-status'].forEach(id => {
     const el = document.getElementById(id);
@@ -5132,6 +5609,1010 @@ function profBack(level) {
     profSelectCountry(_profCountry);
   }
 }
+
+// ═══════════════════════════════════════════════════
+//  MONTH-OVER-MONTH COMPARISON
+// ═══════════════════════════════════════════════════
+function renderMoM() {
+  const el = document.getElementById('mom-content');
+  const labelEl = document.getElementById('mom-period-label');
+  if (!el) return;
+
+  const now       = new Date();
+  const thisMonth = now.getMonth();
+  const thisYear  = now.getFullYear();
+  const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+  const lastYear  = thisMonth === 0 ? thisYear - 1 : thisYear;
+
+  const monthName = (m, y) => new Date(y, m, 1).toLocaleDateString('en-GB', {month:'long', year:'numeric'});
+  if (labelEl) labelEl.textContent = `${monthName(lastMonth, lastYear)} → ${monthName(thisMonth, thisYear)}`;
+
+  // Get active filters
+  const fp = document.getElementById('f-proj')?.value    || 'all';
+  const ft = document.getElementById('f-tl')?.value      || 'all';
+  const fc = document.getElementById('f-country')?.value || 'all';
+
+  const inMonth = (e, m, y) => {
+    const ts = Number(e.uid);
+    const d  = !isNaN(ts) && ts > 1e12 ? new Date(ts) : new Date(e.date);
+    return d.getMonth() === m && d.getFullYear() === y;
+  };
+
+  const baseFilter = e => {
+    const eCountry = e.country || AGENT_META[e.agent]?.country || '';
+    return (fp==='all'||e.proj===fp) && (ft==='all'||e.tl===ft) && (fc==='all'||eCountry===fc);
+  };
+
+  const thisEvs = _evalHistory.filter(e => baseFilter(e) && inMonth(e, thisMonth, thisYear));
+  const lastEvs = _evalHistory.filter(e => baseFilter(e) && inMonth(e, lastMonth, lastYear));
+
+  if (!thisEvs.length && !lastEvs.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No data available for the last 2 months</div>';
+    return;
+  }
+
+  const view = document.getElementById('mom-view')?.value || 'agents';
+  const avg = arr => arr.length ? arr.reduce((s,e)=>s+(e.overall||0),0)/arr.length : null;
+
+  let rows = [];
+
+  if (view === 'agents') {
+    const agents = [...new Set([...thisEvs, ...lastEvs].map(e => e.agent))];
+    rows = agents.map(a => ({
+      label: a,
+      sub: AGENT_META[a]?.tl || '',
+      this: avg(thisEvs.filter(e=>e.agent===a)),
+      last: avg(lastEvs.filter(e=>e.agent===a)),
+    }));
+  } else if (view === 'projects') {
+    const projs = [...new Set([...thisEvs, ...lastEvs].map(e => e.proj).filter(Boolean))];
+    rows = projs.map(p => ({
+      label: p,
+      sub: '',
+      this: avg(thisEvs.filter(e=>e.proj===p)),
+      last: avg(lastEvs.filter(e=>e.proj===p)),
+    }));
+  } else {
+    const tls = [...new Set([...thisEvs, ...lastEvs].map(e => e.tl).filter(Boolean))];
+    rows = tls.map(t => ({
+      label: t,
+      sub: '',
+      this: avg(thisEvs.filter(e=>e.tl===t)),
+      last: avg(lastEvs.filter(e=>e.tl===t)),
+    }));
+  }
+
+  // Sort by biggest change (most improved or most declined)
+  rows = rows.filter(r => r.this !== null || r.last !== null)
+    .sort((a,b) => {
+      const da = a.this !== null && a.last !== null ? Math.abs(a.this - a.last) : 0;
+      const db = b.this !== null && b.last !== null ? Math.abs(b.this - b.last) : 0;
+      return db - da;
+    });
+
+  if (!rows.length) {
+    el.innerHTML = '<div style="text-align:center;padding:24px;color:var(--muted);font-size:13px;">No comparison data available</div>';
+    return;
+  }
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:0;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+      <div>Name</div>
+      <div style="text-align:right;padding-right:20px;">Last Month</div>
+      <div style="text-align:right;padding-right:20px;">This Month</div>
+      <div style="text-align:right;">Change</div>
+    </div>
+    ${rows.map(r => {
+      const diff    = r.this !== null && r.last !== null ? r.this - r.last : null;
+      const thisCol = r.this !== null ? (r.this>=90?'var(--green)':r.this>=80?'var(--gold)':'var(--red)') : 'var(--muted)';
+      const lastCol = r.last !== null ? (r.last>=90?'var(--green)':r.last>=80?'var(--gold)':'var(--red)') : 'var(--muted)';
+      let changeHtml = '<span style="color:var(--muted);">—</span>';
+      if (diff !== null) {
+        const sign  = diff > 0 ? '▲' : diff < 0 ? '▼' : '●';
+        const col   = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--muted)';
+        const absDiff = Math.abs(diff).toFixed(1);
+        changeHtml = `<span style="color:${col};font-weight:700;font-family:var(--font-mono);">${sign} ${absDiff}%</span>`;
+      }
+      return `<div style="display:grid;grid-template-columns:1fr auto auto auto;gap:0;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;">
+        <div>
+          <div style="font-size:13px;font-weight:600;">${r.label}</div>
+          ${r.sub ? `<div style="font-size:10px;color:var(--muted);margin-top:1px;">${r.sub}</div>` : ''}
+        </div>
+        <div style="text-align:right;padding-right:20px;font-family:var(--font-mono);font-size:13px;font-weight:700;color:${lastCol};">${r.last !== null ? r.last.toFixed(1)+'%' : '<span style="color:var(--muted);">—</span>'}</div>
+        <div style="text-align:right;padding-right:20px;font-family:var(--font-mono);font-size:13px;font-weight:700;color:${thisCol};">${r.this !== null ? r.this.toFixed(1)+'%' : '<span style="color:var(--muted);">—</span>'}</div>
+        <div style="text-align:right;">${changeHtml}</div>
+      </div>`;
+    }).join('')}`;
+}
+
+
+const COACHING_KEY = 'nexora_coaching_v1';
+let _coachingData  = [];
+let _coachingTab   = 'all';
+let _coachingModal = null;
+
+function loadCoaching() {
+  try { _coachingData = JSON.parse(localStorage.getItem(COACHING_KEY)||'[]'); } catch(e) { _coachingData = []; }
+}
+
+function saveCoaching() {
+  localStorage.setItem(COACHING_KEY, JSON.stringify(_coachingData));
+}
+
+// Sync a single coaching item to Google Sheets
+function syncCoachingItem(item) {
+  try {
+    const attrsToText = (arr) => {
+      if (!arr || arr.length === 0) return 'NO';
+      return arr.map(e => e.attr + (e.sub && e.sub !== e.attr ? ` → ${e.sub}` : '')).join(' | ');
+    };
+    const payload = {
+      action:      'save_coaching',
+      id:          item.id,
+      date:        item.date,
+      agent:       item.agent,
+      tl:          item.tl,
+      project:     item.project,
+      country:     item.country,
+      qaAuthor:    item.qaAuthor,
+      errorType:   item.errorType,
+      priority:    item.priority,
+      label:       item.label,
+      hasCC:       item.hasCC ? 'YES' : 'NO',
+      hasCB:       item.hasCB ? 'YES' : 'NO',
+      hasNC:       item.hasNC ? 'YES' : 'NO',
+      ccAttrs:     attrsToText(item.ccAttrs),
+      cbAttrs:     attrsToText(item.cbAttrs),
+      ncAttrs:     attrsToText(item.ncAttrs),
+      qaComment:   item.qaComment   || '',
+      tlResponse:  item.tlResponse  || '',
+      tlStatus:    item.tlStatus    || '',
+      agentComment:item.agentComment|| '',
+      agentAck:    item.agentAck ? 'YES' : 'NO',
+      status:      item.status      || '',
+      closedDate:  item.closedDate  || '',
+    };
+    fetch(GOOGLE_SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(err => console.warn('Coaching sync failed:', err));
+  } catch(e) {}
+}
+
+// Merge coaching from Google Sheets — adds items not already in localStorage
+function mergeCoachingFromSheets(sheetItems) {
+  if (!sheetItems || !sheetItems.length) return;
+  const existingIds = new Set(_coachingData.map(c => String(c.id)));
+  let added = 0;
+  sheetItems.forEach(row => {
+    if (!row.id || existingIds.has(String(row.id))) return;
+    _coachingData.push({
+      id:           String(row.id),
+      date:         row.date || '',
+      agent:        row.agent || '',
+      tl:           row.tl || '',
+      project:      row.project || '',
+      country:      row.country || '',
+      qaAuthor:     row.qaAuthor || '',
+      errorType:    row.errorType || 'nc',
+      priority:     row.priority || 'MEDIUM',
+      label:        row.label || '',
+      hasCC:        row.hasCC === true || row.hasCC === 'YES',
+      hasCB:        row.hasCB === true || row.hasCB === 'YES',
+      hasNC:        row.hasNC === true || row.hasNC === 'YES',
+      // attrs from sheet come as text strings now, store as-is for display
+      ccAttrs:      typeof row.ccAttrs === 'string' && row.ccAttrs !== 'NO' ? [{attr: row.ccAttrs, sub:''}] : (Array.isArray(row.ccAttrs) ? row.ccAttrs : []),
+      cbAttrs:      typeof row.cbAttrs === 'string' && row.cbAttrs !== 'NO' ? [{attr: row.cbAttrs, sub:''}] : (Array.isArray(row.cbAttrs) ? row.cbAttrs : []),
+      ncAttrs:      typeof row.ncAttrs === 'string' && row.ncAttrs !== 'NO' ? [{attr: row.ncAttrs, sub:''}] : (Array.isArray(row.ncAttrs) ? row.ncAttrs : []),
+      qaComment:    row.qaComment || '',
+      tlResponse:   row.tlResponse || '',
+      tlStatus:     row.tlStatus || '',
+      agentComment: row.agentComment || '',
+      agentAck:     row.agentAck === true || row.agentAck === 'YES',
+      status:       row.status || 'pending_comment',
+      closedDate:   row.closedDate || '',
+    });
+    added++;
+  });
+  if (added > 0) {
+    saveCoaching();
+    updateCoachingBadge();
+    console.log(`Coaching: loaded ${added} items from Google Sheets`);
+  }
+}
+
+// Auto-generate coaching from eval submission — ONE item per eval
+function autoGenerateCoaching(evalObj) {
+  if (!evalObj) return;
+  const hasCC = (evalObj.cc || 0) > 0;
+  const hasCB = (evalObj.cb || 0) > 0;
+  const hasNC = (evalObj.ncCount||0) > 2;
+  if (!hasCC && !hasCB && !hasNC) return; // no errors — no coaching needed
+
+  // Collect all sub-attributes per type
+  const ccAttrs = _selectedErrors.filter(e => e.type==='cc' && !e.isNA).map(e => ({ attr: e.attrName||'', sub: e.subError||'' }));
+  const cbAttrs = _selectedErrors.filter(e => e.type==='cb' && !e.isNA).map(e => ({ attr: e.attrName||'', sub: e.subError||'' }));
+  const ncAttrs = _selectedErrors.filter(e => e.type==='nc' && !e.isNA).map(e => ({ attr: e.attrName||'', sub: e.subError||'' }));
+
+  // Priority: if CC or CB exists → HIGH, NC only → MEDIUM
+  const priority = (hasCC || hasCB) ? 'HIGH' : 'MEDIUM';
+
+  // Build label
+  const types = [];
+  if (hasCC) types.push('CC');
+  if (hasCB) types.push('CB');
+  if (hasNC) types.push('NC');
+  const label = types.join(' + ') + ' Error' + (types.length > 1 ? 's' : '');
+
+  const item = {
+    id:          String(Date.now()) + String(Math.floor(Math.random()*1000)),
+    date:        new Date().toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}) + ' ' + new Date().toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'}),
+    agent:       evalObj.agent,
+    tl:          evalObj.tl || '',
+    project:     evalObj.proj || '',
+    country:     evalObj.country || '',
+    qaAuthor:    _currentUser?.name || 'QA',
+    errorType:   hasCC ? 'cc' : hasCB ? 'cb' : 'nc', // primary type for tab filtering
+    hasCC, hasCB, hasNC,
+    priority,
+    label,
+    ccAttrs,
+    cbAttrs,
+    ncAttrs,
+    qaComment:   '',
+    tlResponse:  '',
+    tlStatus:    '',
+    agentComment:'',
+    agentAck:    false,
+    status:      'pending_comment',
+  };
+
+  _coachingData.push(item);
+  saveCoaching();
+  updateCoachingBadge();
+}
+
+function updateCoachingBadge() {
+  loadCoaching();
+  const role = _currentUser?.role || '';
+  const name = _currentUser?.name || '';
+  let pending = 0;
+
+  if (role === 'manager') {
+    // Manager sees: items needing QA comment + disputed items
+    pending = _coachingData.filter(c =>
+      c.status === 'pending_comment' || c.status === 'disputed'
+    ).length;
+  } else if (role === 'qa') {
+    // QA sees: items they created that need comment OR were disputed back to them
+    pending = _coachingData.filter(c =>
+      c.qaAuthor === name && (c.status === 'pending_comment' || c.status === 'disputed')
+    ).length;
+  } else if (role === 'tl') {
+    // TL sees: items for their team waiting for their review
+    pending = _coachingData.filter(c =>
+      c.tl === name && c.status === 'pending_tl'
+    ).length;
+  } else if (role === 'agent') {
+    // Agent sees: items pending acknowledgement + items pending TL review (so they know it's coming)
+    pending = _coachingData.filter(c =>
+      c.agent === name && (c.status === 'pending_agent' || c.status === 'pending_tl')
+    ).length;
+  }
+
+  const badge = document.getElementById('coaching-badge');
+  if (badge) {
+    badge.textContent = pending;
+    badge.style.display = pending > 0 ? 'inline' : 'none';
+  }
+}
+
+function coachingGoBack() {
+  const role = _currentUser?.role || '';
+  if (role === 'tl') {
+    nav('tl-home');
+  } else if (role === 'agent') {
+    nav('agent');
+  } else {
+    nav('home');
+  }
+}
+
+
+function setHistMainTab(tab) {
+  // Update tab styles
+  ['qa','operation'].forEach(t => {
+    const btn = document.getElementById('htab-' + t);
+    if (btn) {
+      btn.style.color       = t === tab ? 'var(--purple)' : 'var(--muted)';
+      btn.style.borderBottom= t === tab ? '2px solid var(--purple)' : '2px solid transparent';
+    }
+    const content = document.getElementById('hist-tab-' + t);
+    if (content) content.style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'operation') renderOperationHistory();
+  if (tab === 'qa') renderHistory();
+}
+
+function renderOperationHistory() {
+  try { window._operationHistory = JSON.parse(localStorage.getItem('nexora_op_history')||'[]'); } catch(e) {}
+  const data = window._operationHistory || [];
+  const role = _currentUser?.role || '';
+  const name = _currentUser?.name || '';
+
+  // For TL — only show their own
+  let items = role === 'tl' ? data.filter(r => r.tl === name) : data;
+
+  // Populate TL filter (manager only)
+  const tlFilter = document.getElementById('hist-op-tl-filter');
+  if (tlFilter && role === 'manager') {
+    const tls = [...new Set(data.map(r => r.tl).filter(Boolean))];
+    tlFilter.innerHTML = '<option value="all">All TLs</option>' +
+      tls.map(t => `<option value="${t}">${t}</option>`).join('');
+    tlFilter.style.display = '';
+    const selectedTL = tlFilter.value;
+    if (selectedTL && selectedTL !== 'all') items = items.filter(r => r.tl === selectedTL);
+  } else if (tlFilter) {
+    tlFilter.style.display = 'none';
+  }
+
+  const countEl = document.getElementById('hist-op-count');
+  if (countEl) countEl.textContent = `${items.length} evaluation${items.length!==1?'s':''}`;
+
+  const listEl = document.getElementById('hist-op-list');
+  if (!listEl) return;
+
+  if (!items.length) {
+    listEl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted);">No TL operation evaluations yet</div>';
+    return;
+  }
+
+  listEl.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:0;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+      <div>Agent</div>
+      <div style="text-align:right;padding-right:16px;">TL</div>
+      <div style="text-align:right;padding-right:16px;">Project</div>
+      <div style="text-align:right;padding-right:16px;">Date</div>
+      <div style="text-align:right;">Score</div>
+    </div>
+    ${items.sort((a,b) => new Date(b.date) - new Date(a.date)).map(r => {
+      const col = r.overall>=90?'var(--green)':r.overall>=80?'var(--gold)':'var(--red)';
+      const status = r.overall>=90?iconCheck()+' Pass':r.overall>=80?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Fail';
+      return `<div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:0;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;">
+        <div>
+          <div style="font-size:13px;font-weight:600;">${r.agent}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${r.lang||''} · ${r.country||''}</div>
+        </div>
+        <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.tl||'—'}</div>
+        <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.proj||'—'}</div>
+        <div style="text-align:right;padding-right:16px;font-size:11px;color:var(--muted);">${r.date||'—'}</div>
+        <div style="text-align:right;">
+          <div style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:${col};">${Number(r.overall).toFixed(1)}%</div>
+          <div style="font-size:10px;color:${col};margin-top:2px;">${status}</div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+
+function setCoachingTab(tab) {
+  _coachingTab = tab;
+  ['cc','cb','nc','all'].forEach(t => {
+    const btn = document.getElementById('ctab-'+t);
+    if (!btn) return;
+    if (t === tab) {
+      btn.style.borderColor = t==='cc'?'var(--red)':t==='cb'?'var(--orange)':t==='nc'?'var(--gold)':'var(--purple)';
+      btn.style.background  = t==='cc'?'var(--red-dim)':t==='cb'?'var(--orange-dim)':t==='nc'?'var(--gold-dim)':'var(--purple-dim)';
+      btn.style.color       = t==='cc'?'var(--red)':t==='cb'?'var(--orange)':t==='nc'?'var(--gold)':'var(--purple)';
+    } else {
+      btn.style.borderColor = 'var(--border)';
+      btn.style.background  = 'var(--card)';
+      btn.style.color       = 'var(--muted)';
+    }
+  });
+  renderCoaching();
+}
+
+function renderCoaching() {
+  loadCoaching();
+  const role = _currentUser?.role || '';
+  const name = _currentUser?.name || '';
+
+  // Filter by role
+  let items = _coachingData.filter(c => {
+    if (role === 'manager') return true;
+    if (role === 'qa')      return c.qaAuthor === name;
+    if (role === 'tl')      return c.tl === name;
+    if (role === 'agent')   return c.agent === name;
+    return false;
+  });
+
+  // Update tab counts
+  document.getElementById('ctab-cc-count').textContent  = items.filter(c => c.hasCC).length;
+  document.getElementById('ctab-cb-count').textContent  = items.filter(c => c.hasCB).length;
+  document.getElementById('ctab-nc-count').textContent  = items.filter(c => c.hasNC).length;
+  document.getElementById('ctab-all-count').textContent = items.length;
+
+  // Filter by selected tab
+  if (_coachingTab === 'cc') items = items.filter(c => c.hasCC);
+  else if (_coachingTab === 'cb') items = items.filter(c => c.hasCB);
+  else if (_coachingTab === 'nc') items = items.filter(c => c.hasNC);
+
+  // Update subtitle
+  const sub = document.getElementById('coaching-subtitle');
+  if (sub) sub.textContent = role==='tl' ? 'Your team coaching items' : role==='agent' ? 'Your coaching items' : 'All coaching items';
+
+  const list = document.getElementById('coaching-list');
+  if (!list) return;
+
+  if (!items.length) {
+    list.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--muted);">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity:.3;margin-bottom:12px;"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <div style="font-size:13px;">No coaching items yet</div>
+      <div style="font-size:11px;margin-top:4px;">Items are created automatically when evaluations are submitted with errors</div>
+    </div>`;
+    return;
+  }
+
+  const statusConfig = {
+    pending_comment: { label:'Awaiting QA Comment',       color:'var(--muted)',   bg:'var(--bg)' },
+    pending_tl:      { label:'Pending TL Review',         color:'var(--orange)',  bg:'var(--orange-dim)' },
+    pending_agent:   { label:'Pending Acknowledgement',   color:'var(--blue-l)',  bg:'var(--blue-dim)' },
+    disputed:        { label:'⚠ Disputed — QA Action Required', color:'var(--red)', bg:'var(--red-dim)' },
+    closed:          { label:'✓ Closed',                  color:'var(--green)',   bg:'var(--green-dim)' },
+  };
+
+  list.innerHTML = items.sort((a,b) => {
+    // Sort: pending_tl and pending_agent first, disputed second, pending_comment third, closed last
+    const order = { pending_tl:0, pending_agent:0, disputed:1, pending_comment:2, closed:3 };
+    const oa = order[a.status] ?? 2;
+    const ob = order[b.status] ?? 2;
+    if (oa !== ob) return oa - ob;
+    // Within same status — HIGH priority first
+    const pa = a.priority==='HIGH'?0:1;
+    const pb = b.priority==='HIGH'?0:1;
+    return pa - pb;
+  }).map(c => {
+    const sc = statusConfig[c.status] || statusConfig['pending_comment'];
+    const typeColor = c.hasCC?'var(--red)':c.hasCB?'var(--orange)':'var(--gold)';
+
+    // Build error type dots
+    const dots = [
+      c.hasCC ? `<span class="si-dot si-dot-red"></span> CC` : '',
+      c.hasCB ? `<span class="si-dot si-dot-orange"></span> CB` : '',
+      c.hasNC ? `<span class="si-dot si-dot-gold"></span> NC` : '',
+    ].filter(Boolean).join(' &nbsp;');
+
+    // Build sub-attribute preview
+    const allAttrs = [
+      ...(c.ccAttrs||[]),
+      ...(c.cbAttrs||[]),
+      ...(c.ncAttrs||[]),
+    ];
+    const attrPreview = allAttrs.slice(0,3).map(e =>
+      `<div style="font-size:11px;color:var(--text-2);">• ${e.attr}${e.sub&&e.sub!==e.attr?` — ${e.sub}`:''}</div>`
+    ).join('') + (allAttrs.length>3?`<div style="font-size:11px;color:var(--muted);">+${allAttrs.length-3} more</div>`:'');
+
+    return `<div onclick="openCoachingModal('${c.id}')" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;"
+      onmouseover="this.style.borderColor='${typeColor}';this.style.transform='translateY(-1px)'"
+      onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${typeColor};"></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+        <div style="flex:1;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:700;">${dots}</div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:3px;">${c.agent}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${c.project} · ${c.tl} · ${c.date} · by ${c.qaAuthor}</div>
+          ${attrPreview}
+          ${c.qaComment ? `<div style="font-size:12px;color:var(--text-2);margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;border-left:2px solid var(--purple);">"${c.qaComment.slice(0,80)}${c.qaComment.length>80?'...':''}"</div>` : ''}
+        </div>
+        <div style="flex-shrink:0;text-align:right;">
+          <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:${sc.bg};color:${sc.color};white-space:nowrap;">${sc.label}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openCoachingModal(id) {
+  _coachingModal = _coachingData.find(c => String(c.id) === String(id));
+  if (!_coachingModal) return;
+  const c = _coachingModal;
+  const role = _currentUser?.role || '';
+  const name = _currentUser?.name || '';
+
+  document.getElementById('cm-agent').textContent = c.agent;
+  document.getElementById('cm-meta').textContent  = `${c.label} · ${c.project} · ${c.date} · by ${c.qaAuthor}`;
+
+  const statusConfig = {
+    pending_comment: { label:'Awaiting QA Comment',            color:'var(--muted)',   bg:'var(--bg)' },
+    pending_tl:      { label:'Pending TL Review',              color:'var(--orange)',  bg:'var(--orange-dim)' },
+    pending_agent:   { label:'Pending Agent Acknowledgement',  color:'var(--blue-l)',  bg:'var(--blue-dim)' },
+    disputed:        { label:'⚠ Disputed by TL — QA Action Required', color:'var(--red)', bg:'var(--red-dim)' },
+    closed:          { label:'✓ Closed — Agent Acknowledged',  color:'var(--green)',   bg:'var(--green-dim)' },
+  };
+  const sc = statusConfig[c.status] || statusConfig['pending_comment'];
+  document.getElementById('cm-status-bar').style.background = sc.bg;
+  document.getElementById('cm-status-bar').style.color      = sc.color;
+  document.getElementById('cm-status-bar').textContent      = sc.label;
+
+  document.getElementById('cm-qa-comment').innerHTML = (() => {
+    let html = '';
+    // Show sub-attributes grouped by type
+    if (c.ccAttrs?.length) {
+      html += `<div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;"><span class="si-dot si-dot-red"></span> CC Errors</div>
+        ${c.ccAttrs.map(e=>`<div style="font-size:12px;color:var(--text-2);">• ${e.attr}${e.sub&&e.sub!==e.attr?` — <span style="color:var(--red);font-weight:600;">${e.sub}</span>`:''}</div>`).join('')}</div>`;
+    }
+    if (c.cbAttrs?.length) {
+      html += `<div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;"><span class="si-dot si-dot-orange"></span> CB Errors</div>
+        ${c.cbAttrs.map(e=>`<div style="font-size:12px;color:var(--text-2);">• ${e.attr}${e.sub&&e.sub!==e.attr?` — <span style="color:var(--orange);font-weight:600;">${e.sub}</span>`:''}</div>`).join('')}</div>`;
+    }
+    if (c.ncAttrs?.length) {
+      html += `<div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;"><span class="si-dot si-dot-gold"></span> NC Errors</div>
+        ${c.ncAttrs.map(e=>`<div style="font-size:12px;color:var(--text-2);">• ${e.attr}${e.sub&&e.sub!==e.attr?` — <span style="color:var(--gold);font-weight:600;">${e.sub}</span>`:''}</div>`).join('')}</div>`;
+    }
+    if (c.qaComment) {
+      html += `<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px;font-size:13px;color:var(--text);line-height:1.6;">${c.qaComment}</div>`;
+    } else {
+      html += `<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px;font-size:12px;color:var(--muted);font-style:italic;">(No coaching comment added yet)</div>`;
+    }
+    return html;
+  })();
+
+  const tlSec = document.getElementById('cm-tl-section');
+  if (c.tlResponse) { tlSec.style.display=''; document.getElementById('cm-tl-comment').textContent = `${c.tlStatus==='disputed'?'Disputed: ':'Accepted: '}${c.tlResponse}`; }
+  else tlSec.style.display='none';
+
+  const agSec = document.getElementById('cm-agent-section');
+  if (c.agentComment) { agSec.style.display=''; document.getElementById('cm-agent-comment').textContent = c.agentComment; }
+  else agSec.style.display='none';
+
+  // Action area — based on role + status
+  const area = document.getElementById('cm-action-area');
+  area.innerHTML = '';
+
+  // QA — can add/edit comment when pending_comment or disputed
+  if ((role==='manager'||role==='qa') && (c.status==='pending_comment'||c.status==='disputed')) {
+    area.innerHTML = `
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">${c.status==='disputed'?'↩ Add Updated Comment':'Add Coaching Comment'}</div>
+      <textarea id="cm-qa-input" placeholder="Write your coaching comment here..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:80px;outline:none;box-sizing:border-box;">${c.qaComment||''}</textarea>
+      <button onclick="submitQAComment()" style="margin-top:10px;width:100%;background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Send to TL →</button>`;
+  }
+
+  // TL — can accept or dispute when pending_tl
+  else if (role==='tl' && c.status==='pending_tl' && c.tl===name) {
+    area.innerHTML = `
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Your Response</div>
+      <textarea id="cm-tl-input" placeholder="Add your comment (required)..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:80px;outline:none;box-sizing:border-box;"></textarea>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <button onclick="submitTLResponse('accepted')" style="background:var(--green-dim);border:1px solid var(--green);color:var(--green);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">${iconCheck()} Accept</button>
+        <button onclick="submitTLResponse('disputed')" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">${iconCross()} Dispute</button>
+      </div>`;
+  }
+
+  // Agent — can acknowledge when pending_agent
+  else if (role==='agent' && c.status==='pending_agent' && c.agent===name) {
+    area.innerHTML = `
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Your Acknowledgement</div>
+      <textarea id="cm-agent-input" placeholder="Add your comment (optional)..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:60px;outline:none;box-sizing:border-box;"></textarea>
+      <button onclick="submitAgentAck()" style="margin-top:10px;width:100%;background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">${iconCheck()} I Acknowledge This Coaching</button>`;
+  }
+
+  document.getElementById('coaching-modal').style.display = 'block';
+}
+
+function closeCoachingModal() {
+  document.getElementById('coaching-modal').style.display = 'none';
+  _coachingModal = null;
+}
+
+function submitQAComment() {
+  const comment = document.getElementById('cm-qa-input')?.value?.trim();
+  if (!comment) { alert('Please add a comment before sending.'); return; }
+  const idx = _coachingData.findIndex(c => String(c.id) === String(_coachingModal.id));
+  if (idx === -1) return;
+  _coachingData[idx].qaComment = comment;
+  _coachingData[idx].status    = 'pending_tl';
+  saveCoaching();
+  syncCoachingItem(_coachingData[idx]);
+  closeCoachingModal();
+  renderCoaching();
+  updateCoachingBadge();
+}
+
+function submitTLResponse(decision) {
+  const comment = document.getElementById('cm-tl-input')?.value?.trim();
+  if (!comment) { alert('Please add a comment before responding.'); return; }
+  const idx = _coachingData.findIndex(c => String(c.id) === String(_coachingModal.id));
+  if (idx === -1) return;
+  _coachingData[idx].tlResponse = comment;
+  _coachingData[idx].tlStatus   = decision;
+  _coachingData[idx].status     = decision === 'accepted' ? 'pending_agent' : 'disputed';
+  saveCoaching();
+  syncCoachingItem(_coachingData[idx]);
+  closeCoachingModal();
+  renderCoaching();
+  updateCoachingBadge();
+}
+
+function submitAgentAck() {
+  const comment = document.getElementById('cm-agent-input')?.value?.trim();
+  const idx = _coachingData.findIndex(c => String(c.id) === String(_coachingModal.id));
+  if (idx === -1) return;
+  _coachingData[idx].agentComment = comment || 'Acknowledged.';
+  _coachingData[idx].agentAck     = true;
+  _coachingData[idx].status       = 'closed';
+  _coachingData[idx].closedDate   = new Date().toLocaleDateString('en-GB');
+  saveCoaching();
+  syncCoachingItem(_coachingData[idx]);
+  closeCoachingModal();
+  renderCoaching();
+  updateCoachingBadge();
+}
+
+
+let _coachingPopupItems = []; // IDs of coaching items created for current eval
+
+function showCoachingPopup(d, hasCC, hasCB, hasNC) {
+  // Find ONLY the most recently created coaching item for this eval
+  const recentItems = _coachingData
+    .filter(c => c.agent === d.agent && c.status === 'pending_comment' && c.qaAuthor === (_currentUser?.name || 'QA'))
+    .sort((a, b) => Number(b.id) - Number(a.id)); // newest first by ID (timestamp)
+  _coachingPopupItems = recentItems.slice(0, 1).map(c => c.id); // only the latest one
+
+  // Set meta
+  document.getElementById('cp-agent-meta').textContent = `${d.agent} · ${d.proj} · ${d.today}`;
+
+  // Build error details from _selectedErrors
+  const ccErrors = _selectedErrors.filter(e => e.type === 'cc' && !e.isNA);
+  const cbErrors = _selectedErrors.filter(e => e.type === 'cb' && !e.isNA);
+  const ncErrors = _selectedErrors.filter(e => e.type === 'nc' && !e.isNA);
+
+  const errDiv = document.getElementById('cp-errors');
+  let html = '';
+
+  if (hasCC && ccErrors.length) {
+    html += `<div style="width:100%;background:var(--red-dim);border:1px solid var(--red);border-radius:var(--radius-s);padding:10px 12px;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;"><span class="si-dot si-dot-red"></span> CC Errors — Critical to Customer</div>
+      ${ccErrors.map(e => `<div style="font-size:12px;color:var(--text-2);padding:2px 0;">• ${e.attrName||e.subError}${e.subError && e.subError!==e.attrName ? ` — <span style="color:var(--text);font-weight:600;">${e.subError}</span>` : ''}</div>`).join('')}
+    </div>`;
+  }
+
+  if (hasCB && cbErrors.length) {
+    html += `<div style="width:100%;background:var(--orange-dim);border:1px solid var(--orange);border-radius:var(--radius-s);padding:10px 12px;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;"><span class="si-dot si-dot-orange"></span> CB Errors — Critical to Business</div>
+      ${cbErrors.map(e => `<div style="font-size:12px;color:var(--text-2);padding:2px 0;">• ${e.attrName||e.subError}${e.subError && e.subError!==e.attrName ? ` — <span style="color:var(--text);font-weight:600;">${e.subError}</span>` : ''}</div>`).join('')}
+    </div>`;
+  }
+
+  if (hasNC && ncErrors.length) {
+    html += `<div style="width:100%;background:var(--gold-dim);border:1px solid var(--gold);border-radius:var(--radius-s);padding:10px 12px;margin-bottom:8px;">
+      <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;"><span class="si-dot si-dot-gold"></span> NC Errors — Non-Critical (Failed)</div>
+      ${ncErrors.map(e => `<div style="font-size:12px;color:var(--text-2);padding:2px 0;">• ${e.attrName||e.subError}${e.subError && e.subError!==e.attrName ? ` — <span style="color:var(--text);font-weight:600;">${e.subError}</span>` : ''}</div>`).join('')}
+    </div>`;
+  }
+
+  errDiv.innerHTML = html;
+
+  // Clear previous comment
+  document.getElementById('cp-comment').value = '';
+
+  // Show popup
+  document.getElementById('coaching-popup').style.display = 'flex';
+  setTimeout(() => document.getElementById('cp-comment').focus(), 100);
+}
+
+function skipCoachingPopup() {
+  document.getElementById('coaching-popup').style.display = 'none';
+  _coachingPopupItems = [];
+}
+
+function sendCoachingToTL() {
+  const comment = document.getElementById('cp-comment').value.trim();
+  if (!comment) { alert('Please add a coaching comment before sending to TL.'); return; }
+
+  // Update all coaching items created for this eval with the comment
+  _coachingPopupItems.forEach(id => {
+    const idx = _coachingData.findIndex(c => String(c.id) === String(id));
+    if (idx !== -1) {
+      _coachingData[idx].qaComment = comment;
+      _coachingData[idx].status    = 'pending_tl';
+    }
+  });
+
+  saveCoaching();
+  // Sync each updated item directly
+  _coachingPopupItems.forEach(id => {
+    const item = _coachingData.find(c => String(c.id) === String(id));
+    if (item) syncCoachingItem(item);
+  });
+  updateCoachingBadge();
+  skipCoachingPopup();
+  // Refresh coaching page if it's open
+  try { if(document.getElementById('page-coaching').classList.contains('active')) renderCoaching(); } catch(e) {}
+
+  // Show brief confirmation
+  const detail = document.getElementById('success-detail');
+  if (detail) {
+    const orig = detail.textContent;
+    detail.style.color = 'var(--green)';
+    detail.textContent = '✓ Coaching sent to TL!';
+    setTimeout(() => { detail.textContent = orig; detail.style.color = ''; }, 2500);
+  }
+}
+
+
+// ═══════════════════════════════════════════════════
+//  OPERATION FORM (TL)
+// ═══════════════════════════════════════════════════
+const OP_NC_ATTRS = [
+  'Call Opening/Closure',
+  'Choice of Words / Avoid Slang / Technical Terms',
+  'Tone of Voice',
+  'Showing Empathy / handling objection',
+  'Active Listening',
+  'HOLD',
+];
+const OP_CC_ATTRS = [
+  'Customer Profile',
+  'Wrong Information',
+  'Missing Information',
+  'Ticket Escalation and Status',
+  'Transfer Process',
+  'Professionalism / Attitude',
+  'Ticket Description',
+];
+const OP_CB_ATTRS = [
+  'Ticket Creation and Categorization',
+  'Control the Call / Comprehension',
+  'Ticketing Tree',
+];
+
+function initOperationForm(user) {
+  // Populate agent dropdown with TL's agents
+  const agentSel = document.getElementById('op-agent');
+  if (!agentSel) return;
+  agentSel.innerHTML = '<option value="">— Select Agent —</option>';
+  const tlName = user.tl || user.name;
+  AGENTS.filter(a => a.tl === tlName).forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a.n;
+    opt.textContent = a.n;
+    agentSel.appendChild(opt);
+  });
+
+  // Set TL display
+  document.getElementById('op-tl-display').textContent = tlName;
+
+  // Build NC attributes
+  const ncEl = document.getElementById('op-nc-attrs');
+  ncEl.innerHTML = OP_NC_ATTRS.map((attr, i) => {
+    const isHold = attr === 'HOLD';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:500;">${attr}</div>
+      <div style="display:flex;gap:8px;">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;">
+          <input type="radio" name="op_nc_${i}" value="pass" checked onchange="opCalcScore()"> Pass
+        </label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--red);">
+          <input type="radio" name="op_nc_${i}" value="fail" onchange="opCalcScore()"> Fail
+        </label>
+        ${isHold ? `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--muted);">
+          <input type="radio" name="op_nc_${i}" value="na" onchange="opCalcScore()"> N/A
+        </label>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Build CC attributes
+  const ccEl = document.getElementById('op-cc-attrs');
+  ccEl.innerHTML = OP_CC_ATTRS.map((attr, i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:500;">${attr}</div>
+      <div style="display:flex;gap:8px;">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;">
+          <input type="radio" name="op_cc_${i}" value="pass" checked onchange="opCalcScore()"> Pass
+        </label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--red);">
+          <input type="radio" name="op_cc_${i}" value="fail" onchange="opCalcScore()"> Fail
+        </label>
+      </div>
+    </div>`).join('');
+
+  // Build CB attributes
+  const cbEl = document.getElementById('op-cb-attrs');
+  cbEl.innerHTML = OP_CB_ATTRS.map((attr, i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+      <div style="font-size:13px;font-weight:500;">${attr}</div>
+      <div style="display:flex;gap:8px;">
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;">
+          <input type="radio" name="op_cb_${i}" value="pass" checked onchange="opCalcScore()"> Pass
+        </label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:12px;color:var(--red);">
+          <input type="radio" name="op_cb_${i}" value="fail" onchange="opCalcScore()"> Fail
+        </label>
+      </div>
+    </div>`).join('');
+
+  opCalcScore();
+}
+
+function opUpdateAgent() {
+  const agentName = document.getElementById('op-agent')?.value;
+  const agentData = AGENTS.find(a => a.n === agentName);
+  const countryEl = document.getElementById('op-country-display');
+  if (countryEl) countryEl.textContent = agentData?.country || '—';
+  opCalcScore();
+}
+
+function opGetVal(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : 'pass';
+}
+
+function opCalcScore() {
+  // NC score — count unique failed attributes (not N/A)
+  let ncFailed = 0;
+  let holdNA = false;
+  OP_NC_ATTRS.forEach((attr, i) => {
+    const val = opGetVal(`op_nc_${i}`);
+    if (attr === 'HOLD' && val === 'na') { holdNA = true; return; }
+    if (val === 'fail') ncFailed++;
+  });
+  const ptEach = holdNA ? 6 : 5;
+  const ncScore = Math.max(0, 30 - ncFailed * ptEach);
+
+  // CC/CB
+  const ccFail = OP_CC_ATTRS.some((_, i) => opGetVal(`op_cc_${i}`) === 'fail');
+  const cbFail = OP_CB_ATTRS.some((_, i) => opGetVal(`op_cb_${i}`) === 'fail');
+
+  const overall = (ccFail || cbFail) ? ncScore : ncScore + 70;
+  const col = overall >= 90 ? 'var(--green)' : overall >= 80 ? 'var(--gold)' : 'var(--red)';
+
+  const scoreEl = document.getElementById('op-score-preview');
+  const breakEl = document.getElementById('op-score-breakdown');
+  if (scoreEl) { scoreEl.textContent = overall.toFixed(1) + '%'; scoreEl.style.color = col; }
+  if (breakEl) {
+    const status = overall>=90?'Pass':overall>=80?'At Risk':'Critical';
+    breakEl.textContent = `NC: ${ncScore}/30 · CC: ${ccFail?'Fail':'Pass'} · CB: ${cbFail?'Fail':'Pass'} · ${status}`;
+    breakEl.style.color = col;
+  }
+  return { overall, ncScore, ncFailed, ccFail, cbFail, holdNA };
+}
+
+function submitOperation() {
+  const agent = document.getElementById('op-agent')?.value;
+  const proj  = document.getElementById('op-proj')?.value;
+  const lang  = document.getElementById('op-lang')?.value;
+  const tlName = _currentUser?.tl || _currentUser?.name || '';
+
+  if (!agent) { alert('Please select an agent.'); return; }
+  if (!proj)  { alert('Please select a project.'); return; }
+
+  const scores = opCalcScore();
+  const now  = new Date();
+  const date = now.toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+  const time = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  const id   = Date.now();
+
+  // Build payload
+  const getAttrVal = (type, attrs, i) => {
+    const v = opGetVal(`op_${type}_${i}`);
+    return v === 'pass' ? 'Yes' : v === 'na' ? 'N/A' : 'No';
+  };
+
+  const payload = {
+    action: 'save_operation',
+    id, date, time,
+    agent, tl: tlName, project: proj,
+    country: AGENTS.find(a => a.n === agent)?.country || AGENT_META[agent]?.country || '',
+    language: lang,
+    assessor: _currentUser?.name || tlName,
+    overall: scores.overall.toFixed(1),
+    nc_call_opening:    getAttrVal('nc', OP_NC_ATTRS, 0),
+    nc_choice_of_words: getAttrVal('nc', OP_NC_ATTRS, 1),
+    nc_tone_of_voice:   getAttrVal('nc', OP_NC_ATTRS, 2),
+    nc_showing_empathy: getAttrVal('nc', OP_NC_ATTRS, 3),
+    nc_active_listening:getAttrVal('nc', OP_NC_ATTRS, 4),
+    nc_hold:            getAttrVal('nc', OP_NC_ATTRS, 5),
+    cc_customer_profile:    getAttrVal('cc', OP_CC_ATTRS, 0),
+    cc_wrong_information:   getAttrVal('cc', OP_CC_ATTRS, 1),
+    cc_missing_information: getAttrVal('cc', OP_CC_ATTRS, 2),
+    cc_ticket_escalation:   getAttrVal('cc', OP_CC_ATTRS, 3),
+    cc_transfer_process:    getAttrVal('cc', OP_CC_ATTRS, 4),
+    cc_professionalism:     getAttrVal('cc', OP_CC_ATTRS, 5),
+    cc_ticket_description:  getAttrVal('cc', OP_CC_ATTRS, 6),
+    cb_ticket_creation:     getAttrVal('cb', OP_CB_ATTRS, 0),
+    cb_control_the_call:    getAttrVal('cb', OP_CB_ATTRS, 1),
+    cb_ticketing_tree:      getAttrVal('cb', OP_CB_ATTRS, 2),
+  };
+
+  // Save to Google Sheets (Operation tab)
+  fetch(GOOGLE_SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(err => console.warn('Operation save failed:', err));
+
+  // Also save to localStorage for immediate display
+  const opRecord = {
+    id, date, time, agent, tl: tlName,
+    proj, country: AGENT_META[agent]?.country || '',
+    lang, assessor: _currentUser?.name || tlName,
+    overall: scores.overall,
+  };
+  if (!window._operationHistory) window._operationHistory = [];
+  window._operationHistory.unshift(opRecord);
+  try { localStorage.setItem('nexora_op_history', JSON.stringify(window._operationHistory.slice(0,200))); } catch(e) {}
+
+  // Show success
+  const succ = document.getElementById('op-success');
+  if (succ) { succ.style.display = 'block'; setTimeout(() => succ.style.display = 'none', 3000); }
+
+  // Refresh operation report if it's visible
+  try { if (document.getElementById('rep-tab-operation')?.style.display !== 'none') renderOperationReport(); } catch(e) {}
+  // Refresh operation history tab if visible
+  try { if (document.getElementById('hist-tab-operation')?.style.display !== 'none') renderOperationHistory(); } catch(e) {}
+
+  // Reset form
+  document.getElementById('op-agent').value = '';
+  document.querySelectorAll('#page-operation input[type="radio"]').forEach(r => {
+    if (r.value === 'pass') r.checked = true;
+    else r.checked = false;
+  });
+  opCalcScore();
+}
+
+
+function showTLAgentHover(e, name, score, statusKey, topError) {
+  const popup = document.getElementById('tl-agent-hover');
+  if (!popup) return;
+  const col = statusKey==='pass'?'var(--green)':statusKey==='risk'?'var(--gold)':'var(--red)';
+  const statusLabel = statusKey==='pass'?iconCheck()+' Pass':statusKey==='risk'?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Critical';
+  const evals = _evalHistory.filter(ev => ev.agent === name);
+  const totalEvals = evals.length;
+  const lastEval = evals[0];
+  popup.innerHTML = `
+    <div style="font-size:13px;font-weight:700;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span style="font-size:11px;color:var(--muted);">Overall Score</span>
+      <span style="font-family:var(--font-mono);font-size:15px;font-weight:800;color:${col};">${score}%</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span style="font-size:11px;color:var(--muted);">Status</span>
+      <span style="font-size:11px;font-weight:700;color:${col};">${statusLabel}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span style="font-size:11px;color:var(--muted);">Total Evals</span>
+      <span style="font-size:11px;font-weight:700;font-family:var(--font-mono);">${totalEvals}</span>
+    </div>
+    ${lastEval ? `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span style="font-size:11px;color:var(--muted);">Last Eval</span>
+      <span style="font-size:11px;color:var(--text-2);">${lastEval.date||'—'}</span>
+    </div>` : ''}
+    ${topError ? `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:10px;color:var(--muted);">Top Error: <span style="color:var(--orange);font-weight:600;">${topError}</span></div>` : ''}
+  `;
+  popup.style.display = 'block';
+  positionTLHover(e);
+}
+
+function positionTLHover(e) {
+  const popup = document.getElementById('tl-agent-hover');
+  if (!popup || popup.style.display === 'none') return;
+  const x = e.clientX + 16;
+  const y = e.clientY - 10;
+  const rect = popup.getBoundingClientRect();
+  popup.style.left = (x + rect.width > window.innerWidth ? x - rect.width - 32 : x) + 'px';
+  popup.style.top  = (y + rect.height > window.innerHeight ? y - rect.height : y) + 'px';
+}
+
+function hideTLAgentHover() {
+  const popup = document.getElementById('tl-agent-hover');
+  if (popup) popup.style.display = 'none';
+}
+
 
 function showAboutModal() {
   document.getElementById('about-modal').style.display = 'flex';
@@ -5571,7 +7052,7 @@ function buildJoinedAgents() {
       errors, caseNum:'',
       qa:      window._sessionQA||'Uploaded',
       date:    month||new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),
-      time:    new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
+      time:    new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
       holdNA:  false,
     });
   });
@@ -6040,22 +7521,22 @@ const ROLE_CONFIG = {
   manager: {
     label:'<span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19h18l-1.5-9-4 3-3.5-6-3.5 6-4-3L3 19z"/></svg></span> Manager', color:'var(--gold)', bg:'#f0b42922',
     desc:'Full access — all data, all QAs, all agents',
-    pages:['home','dashboard','monitor','calc','history','profiles','reports','upload','settings'],
+    pages:['home','dashboard','monitor','calc','history','profiles','reports','coaching','upload','settings'],
   },
   qa: {
     label:'<span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><rect x="5" y="6" width="14" height="15" rx="1.5"/><path d="M9 12h6M9 16h6"/></svg></span> QA Assessor', color:'var(--purple-l)', bg:'var(--purple-dim)',
     desc:'Submit evals, view own history, read QA Monitor',
-    pages:['home','dashboard','monitor','calc','history','profiles','reports','upload'],
+    pages:['home','dashboard','monitor','calc','history','profiles','reports','coaching','upload'],
   },
   tl: {
     label:'<span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span> Team Lead', color:'var(--blue-l)', bg:'var(--blue-dim)',
     desc:'Your team only — dashboard, profiles, monitor',
-    pages:['home','dashboard','monitor','history','profiles','reports'],
+    pages:['home','dashboard','tl-home','monitor','history','coaching','operation','reports'],
   },
   agent: {
     label:'<span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span> Agent', color:'var(--green)', bg:'var(--green-dim)',
     desc:'Your personal score card and coaching plan',
-    pages:['agent'],
+    pages:['agent','coaching'],
   },
 };
 
@@ -6128,9 +7609,9 @@ function applyRoleAccess(user) {
   const allNavItems = document.querySelectorAll('.nav-item');
   allNavItems.forEach(item => {
     const onclick = item.getAttribute('onclick') || '';
-    const pageMatch = onclick.match(/nav\('(\w+)'/);
+    const pageMatch = onclick.match(/nav\('([\w-]+)'/);
     const page = pageMatch ? pageMatch[1] : null;
-    if (!page) return;
+    if (!page) { item.style.display = 'flex'; return; } // items without nav() always show
     item.style.display = cfg.pages.includes(page) ? 'flex' : 'none';
   });
 
@@ -6194,14 +7675,16 @@ function applyRoleAccess(user) {
     document.getElementById('page-agent').classList.add('active');
     document.getElementById('page-title').textContent = 'My Dashboard';
   } else if (user.role === 'tl') {
-    // Go to dashboard, pre-filter to their team
-    nav('dashboard', document.querySelector('.nav-item[onclick*="dashboard"]'));
-    // Pre-select TL filter
+    renderTLHome(user);
+    // Show TL home page
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-tl-home').classList.add('active');
+    document.getElementById('page-title').textContent = 'My Team';
+    // Pre-filter dashboard/monitor to their team in background
     setTimeout(() => {
       const tlSel = document.getElementById('f-tl');
       if (tlSel) { tlSel.value = user.tl; applyFilters(); }
     }, 200);
-    // Show TL alert if any escalate agents in their team
     showTLAlert(user);
   } else {
     // Manager / QA land on home
@@ -6213,6 +7696,14 @@ function applyRoleAccess(user) {
   const isQA      = user.role === 'qa';
   const isTL      = user.role === 'tl';
   const isAgent   = user.role === 'agent';
+  // My Team nav — TL only
+  const navTLHome = document.getElementById('nav-tl-home');
+  if (navTLHome) navTLHome.style.display = isTL ? 'flex' : 'none';
+
+  // Operation Form nav — TL only
+  const navOp = document.getElementById('nav-operation');
+  if (navOp) navOp.style.display = isTL ? 'flex' : 'none';
+
   // Report cards — monthly/project/pattern are cross-team (manager/QA only)
   ['report-card-monthly'].forEach(id => {
     const el = document.getElementById(id);
@@ -6244,6 +7735,115 @@ function applyRoleAccess(user) {
   window._sessionRole    = user.role;
   window._sessionTL      = user.tl;
   window._sessionIsManager = user.role === 'manager';
+
+  // Update coaching badge for all roles
+  try { updateCoachingBadge(); } catch(e) {}
+}
+
+function renderTLHome(user) {
+  const tlName = user.tl || user.name;
+  document.getElementById('tl-home-title').textContent = tlName + "'s Team";
+  document.getElementById('tl-home-sub').textContent   = 'Team performance overview · ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  // Get team agents from eval history
+  const teamAgents = getLiveAgents().filter(a => a.tl === tlName);
+  const passing    = teamAgents.filter(a => a.o >= 90).length;
+  const atRisk     = teamAgents.filter(a => a.o >= 80 && a.o < 90).length;
+  const critical   = teamAgents.filter(a => a.o < 80).length;
+  const avg        = teamAgents.length ? (teamAgents.reduce((s,a)=>s+a.o,0)/teamAgents.length).toFixed(1) : '—';
+  const avgColor   = avg>='90'?'var(--green)':avg>='80'?'var(--gold)':'var(--red)';
+
+  // KPIs
+  const avgEl = document.getElementById('tl-avg-score');
+  avgEl.textContent = avg === '—' ? '—' : avg + '%';
+  avgEl.style.color = avgColor;
+  document.getElementById('tl-passing').textContent  = passing;
+  document.getElementById('tl-at-risk').textContent  = atRisk;
+  document.getElementById('tl-critical').textContent = critical;
+
+  // Escalation banner
+  const escalated = teamAgents.filter(a => a.o < 80);
+  const banner = document.getElementById('tl-escalate-banner');
+  const bannerText = document.getElementById('tl-escalate-text');
+  if (escalated.length > 0) {
+    banner.style.display = 'flex';
+    bannerText.textContent = `${escalated.length} agent${escalated.length>1?'s':''} in your team ${escalated.length>1?'are':'is'} below 80% — immediate action required`;
+  } else {
+    banner.style.display = 'none';
+  }
+
+  // Agent grid
+  const agentGrid = document.getElementById('tl-agents-grid');
+  if (teamAgents.length === 0) {
+    agentGrid.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0;">No evaluations submitted yet for your team</div>';
+  } else {
+    agentGrid.innerHTML = teamAgents.sort((a,b) => a.o-b.o).map(a => {
+      const col = a.o>=90?'var(--green)':a.o>=80?'var(--gold)':'var(--red)';
+      const init = a.n.split(' ').map(x=>x[0]).join('').slice(0,2);
+      const status = a.o>=90?iconCheck()+' Pass':a.o>=80?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Critical';
+      const agentPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory)).filter(p => p.agent === a.n);
+      const topError = agentPatterns.length ? agentPatterns[0].error : null;
+      return `<div onclick="hideTLAgentHover(); openProfile('${a.n.replace(/'/g,"\\'")}')"
+        onmouseenter="showTLAgentHover(event, '${a.n.replace(/'/g,"\\'")}', '${a.o}', '${a.o>=90?'pass':a.o>=80?'risk':'critical'}', '${topError||''}')"
+        onmouseleave="hideTLAgentHover()"
+        style="display:flex;align-items:center;gap:10px;padding:9px;border-radius:var(--radius-s);background:var(--bg);cursor:pointer;transition:all .2s;" onmouseover="this.style.background='var(--card-hover)'" onmouseout="this.style.background='var(--bg)'">
+        <div style="width:34px;height:34px;border-radius:9px;background:${col}22;border:1px solid ${col}44;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:${col};flex-shrink:0;">${init}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${a.n}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${a.proj}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-family:var(--font-mono);font-size:15px;font-weight:800;color:${col};">${a.o}%</div>
+          <div style="font-size:10px;color:${col};margin-top:2px;">${status}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Pending coaching reviews
+  loadCoaching();
+  const pendingReviews = _coachingData.filter(c => c.tl === tlName && c.status === 'pending_tl');
+  const coachCount = document.getElementById('tl-coaching-count');
+  const coachList  = document.getElementById('tl-coaching-list');
+  if (pendingReviews.length > 0) {
+    coachCount.textContent = pendingReviews.length;
+    coachCount.style.display = 'inline';
+    coachList.innerHTML = pendingReviews.map(c => {
+      const typeColor = c.hasCC?'var(--red)':c.hasCB?'var(--orange)':'var(--gold)';
+      const dots = [c.hasCC?'<span class="si-dot si-dot-red"></span>':'', c.hasCB?'<span class="si-dot si-dot-orange"></span>':'', c.hasNC?'<span class="si-dot si-dot-gold"></span>':''].filter(Boolean).join(' ');
+      return `<div onclick="openCoachingModal('${c.id}');nav('coaching',document.getElementById('nav-coaching'))" style="padding:10px;border-radius:var(--radius-s);background:var(--bg);margin-bottom:6px;cursor:pointer;border-left:3px solid ${typeColor};">
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px;">${dots} <span style="font-size:11px;font-weight:700;color:${typeColor};">${c.label}</span></div>
+        <div style="font-size:13px;font-weight:600;">${c.agent}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${c.date} · by ${c.qaAuthor}</div>
+      </div>`;
+    }).join('');
+  } else {
+    coachCount.style.display = 'none';
+    coachList.innerHTML = '<div style="color:var(--green);font-size:12px;text-align:center;padding:16px 0;">'+iconCheck()+' No pending reviews</div>';
+  }
+
+  // Recent team evals
+  const teamEvals = _evalHistory.filter(e => e.tl === tlName).slice(0, 8);
+  const recentEl  = document.getElementById('tl-recent-evals');
+  if (teamEvals.length > 0) {
+    recentEl.innerHTML = teamEvals.map(e => {
+      const col = e.overall>=90?'var(--green)':e.overall>=80?'var(--gold)':'var(--red)';
+      const badges = [
+        e.cc>0?`<span style="font-size:10px;background:var(--red-dim);color:var(--red);border-radius:4px;padding:1px 6px;">CC</span>`:'',
+        e.cb>0?`<span style="font-size:10px;background:var(--orange-dim);color:var(--orange);border-radius:4px;padding:1px 6px;">CB</span>`:'',
+        e.ncCount>2?`<span style="font-size:10px;background:var(--gold-dim);color:var(--gold);border-radius:4px;padding:1px 6px;">NC</span>`:'',
+      ].filter(Boolean).join(' ');
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.agent}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${e.date} · ${e.time} ${badges}</div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:${col};flex-shrink:0;">${e.overall.toFixed(1)}%</div>
+      </div>`;
+    }).join('');
+  } else {
+    recentEl.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0;">No evaluations submitted yet</div>';
+  }
 }
 
 function showTLAlert(user) {
@@ -6290,20 +7890,47 @@ function renderAgentDashboard(user) {
     document.getElementById('agent-score-date').textContent = 'No evaluation data found';
   }
 
-  // Errors from pattern engine
-  const myPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory)).filter(p => p.agent === user.name);
-  if (myPatterns.length > 0) {
-    document.getElementById('agent-errors-card').style.display = 'block';
-    document.getElementById('agent-errors-list').innerHTML = myPatterns.map(p => {
-      const typeColor = p.type==='cc'?'var(--red)':p.type==='cb'?'var(--orange)':'var(--gold)';
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div>
-          <div style="font-size:13px;font-weight:600;">${p.error}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${p.type.toUpperCase()} · Detected ${p.count}× </div>
-        </div>
-        <span style="font-size:10px;font-weight:700;color:${typeColor};background:${typeColor}22;padding:3px 9px;border-radius:6px;">${p.level.label}</span>
+  // ── Score Trend Chart ──────────────────────────────────────
+  const myEvalsSorted = _evalHistory.filter(e => e.agent === user.name).slice(0, 10).reverse();
+  const trendEl = document.getElementById('agent-trend-chart');
+  if (trendEl && myEvalsSorted.length > 1) {
+    const maxH = 80;
+    trendEl.innerHTML = myEvalsSorted.map((e, i) => {
+      const pct   = e.overall || 0;
+      const h     = Math.max(4, (pct/100) * maxH);
+      const col   = pct>=90?'var(--green)':pct>=80?'var(--gold)':'var(--red)';
+      const isLast = i === myEvalsSorted.length - 1;
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;" title="${e.date}: ${pct.toFixed(1)}%">
+        <div style="font-size:9px;color:${isLast?col:'var(--muted)'};">${isLast?pct.toFixed(0)+'%':''}</div>
+        <div style="width:100%;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${isLast?1:0.5};transition:all .3s;"></div>
       </div>`;
     }).join('');
+    trendEl.style.display = 'flex';
+    const leftDate  = myEvalsSorted[0]?.date || '';
+    const rightDate = myEvalsSorted[myEvalsSorted.length-1]?.date || '';
+    document.getElementById('agent-trend-label-left').textContent  = leftDate;
+    document.getElementById('agent-trend-label-right').textContent = rightDate;
+  } else if (trendEl) {
+    trendEl.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:20px 0;text-align:center;width:100%;">Need at least 2 evaluations to show trend</div>';
+  }
+
+  // ── Top Errors ─────────────────────────────────────────────
+  const myPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory)).filter(p => p.agent === user.name);
+  const errListEl  = document.getElementById('agent-errors-list');
+  if (myPatterns.length > 0) {
+    errListEl.innerHTML = myPatterns.slice(0,5).map(p => {
+      const typeColor = p.type==='cc'?'var(--red)':p.type==='cb'?'var(--orange)':'var(--gold)';
+      const dotClass  = p.type==='cc'?'si-dot-red':p.type==='cb'?'si-dot-orange':'si-dot-gold';
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.error}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;"><span class="si-dot ${dotClass}"></span> ${p.type.toUpperCase()} · ${p.count}× repeated</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;color:${typeColor};background:${typeColor}22;padding:2px 8px;border-radius:6px;flex-shrink:0;margin-left:8px;">${p.level.label}</span>
+      </div>`;
+    }).join('');
+  } else {
+    errListEl.innerHTML = '<div style="color:var(--green);font-size:12px;text-align:center;padding:16px 0;">'+iconCheck()+' No recurring errors — great job!</div>';
   }
 
   // ── Coaching plan ──────────────────────────────────────────
@@ -6340,7 +7967,6 @@ function renderAgentDashboard(user) {
     }).join('');
 
   } else if (myPatternErrors.length > 0) {
-    // No submitted evals yet — build coaching from EVAL_HISTORY pattern data
     document.getElementById('agent-score-date').textContent = 'Based on monitored evaluation data';
     
     // Show coaching if there are CC/CB errors or repeated NC
@@ -6383,6 +8009,31 @@ function renderAgentDashboard(user) {
         <div style="text-align:center;padding:14px;color:var(--muted);font-size:11px;">Submit an evaluation to see full history</div>`;
     }
   }
+
+  // ── Coaching pending acknowledgement ──────────────────────────
+  const pendingCoaching = _coachingData.filter(c => c.agent === user.name && c.status === 'pending_agent');
+  const coachPendCard = document.getElementById('agent-coaching-pending-card');
+  if (coachPendCard) {
+    if (pendingCoaching.length > 0) {
+      coachPendCard.style.display = 'block';
+      document.getElementById('agent-coaching-badge').textContent = pendingCoaching.length;
+      document.getElementById('agent-coaching-pending-list').innerHTML = pendingCoaching.map(c => {
+        const typeColor = c.hasCC?'var(--red)':c.hasCB?'var(--orange)':'var(--gold)';
+        const dots = [
+          c.hasCC?'<span class="si-dot si-dot-red"></span>':'',
+          c.hasCB?'<span class="si-dot si-dot-orange"></span>':'',
+          c.hasNC?'<span class="si-dot si-dot-gold"></span>':''
+        ].filter(Boolean).join(' ');
+        return `<div onclick="nav('coaching', document.getElementById('nav-coaching'))" style="padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;">
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px;">${dots} <span style="font-size:11px;font-weight:700;color:${typeColor};">${c.label}</span></div>
+          <div style="font-size:12px;color:var(--text-2);">${c.qaComment||'(QA comment pending)'}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">${c.date} · by ${c.qaAuthor}</div>
+        </div>`;
+      }).join('');
+    } else {
+      coachPendCard.style.display = 'none';
+    }
+  }
 }
 
 function switchUser() {
@@ -6415,10 +8066,15 @@ function loadFromGoogleSheets() {
   fetch(GOOGLE_SHEET_URL + '?t=' + Date.now())
     .then(r => r.json())
     .then(res => {
-      if (res.status !== 'success' || !res.data || !res.data.length) return;
-      const existingIds = new Set(_evalHistory.map(e => String(e.uid)));
-      let added = 0;
-      res.data.forEach(row => {
+      if (res.status !== 'success') return;
+
+      // Support both old format (res.data) and new format (res.evals)
+      const evalsData = res.evals || res.data || [];
+
+      if (evalsData.length) {
+        const existingIds = new Set(_evalHistory.map(e => String(e.uid)));
+        let added = 0;
+        evalsData.forEach(row => {
         if (!row.id || !row.agent) return;
         if (String(row.deleted||'').toUpperCase().trim() === 'YES') return; // skip soft-deleted
         if (existingIds.has(String(row.id))) return; // skip duplicates
@@ -6500,6 +8156,30 @@ function loadFromGoogleSheets() {
         try { updateHistoryBadge(); } catch(e) {}
         console.log(`✅ Loaded ${added} new evals from Google Sheets`);
       }
+      } // end evalsData block
+
+      // Merge coaching items from Google Sheets
+      if (res.coaching && res.coaching.length) {
+        try { mergeCoachingFromSheets(res.coaching); } catch(e) {}
+      }
+
+      // Store operation evals for Manager view
+      if (res.operation && res.operation.length) {
+        try {
+          window._operationHistory = res.operation.map(r => ({
+            id:      r.id,
+            date:    r.date,
+            time:    r.time,
+            agent:   r.agent,
+            tl:      r.tl,
+            proj:    r.project,
+            country: r.country,
+            lang:    r.language,
+            assessor:r.assessor,
+            overall: parseFloat(r.overall) || 0,
+          }));
+        } catch(e) {}
+      }
     })
     .catch(err => console.warn('Google Sheets load failed:', err));
 }
@@ -6574,6 +8254,22 @@ document.addEventListener('DOMContentLoaded', function() {
   try { updateReportSubtitle(); }  catch(e) {}
   try { updateUploadRowCount(); }  catch(e) {}
   try { showStagingStatus(); }     catch(e) {}
+  try { loadCoaching(); updateCoachingBadge(); } catch(e) {}
+  try { window._operationHistory = JSON.parse(localStorage.getItem('nexora_op_history')||'[]'); } catch(e) { window._operationHistory = []; }
+
+  // Auto-refresh coaching from Google Sheets every 30 seconds
+  setInterval(() => {
+    try {
+      fetch(GOOGLE_SHEET_URL + '?t=' + Date.now())
+        .then(r => r.json())
+        .then(res => {
+          if (res.coaching && res.coaching.length) {
+            mergeCoachingFromSheets(res.coaching);
+            updateCoachingBadge();
+          }
+        }).catch(() => {});
+    } catch(e) {}
+  }, 30000);
 });
 </script>
 </body>
