@@ -8051,11 +8051,8 @@ function switchUser() {
 }
 
 /* ── App version — bump to force-clear incompatible localStorage ── */
-const APP_VERSION = '2.5';
+const APP_VERSION = '2.0';
 if (localStorage.getItem('nexora_version') !== APP_VERSION) {
-  localStorage.removeItem('nexora_qa_eval_history');
-  localStorage.removeItem('nexora_eval_history');
-  localStorage.removeItem('nexora_staging');
   localStorage.setItem('nexora_version', APP_VERSION);
 }
 
