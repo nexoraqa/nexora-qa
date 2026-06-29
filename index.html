@@ -629,7 +629,7 @@ a { color:var(--purple-l); text-decoration:none; }
     <div class="nav-item active" onclick="nav('home',this)">        <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></span> Home</div>
     <div class="nav-item"        onclick="nav('dashboard',this)">   <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span> Dashboard</div>
     <div class="nav-item" id="nav-tl-home" style="display:none;" onclick="nav('tl-home',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></span> My Team</div>
-    <div class="nav-item"        onclick="nav('monitor',this)">     <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-8 4 16 2-8h8"/></svg></span> QA Monitor</div>
+    <div class="nav-item"        onclick="nav('monitor',this)">     <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-8 4 16 2-8h8"/></svg></span> QA Monitor <span id="monitor-badge" style="display:none;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:4px;font-family:var(--font-mono);">0</span></div>
     <div class="nav-item"        onclick="nav('calc',this)">        <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span> Score Calculator</div>
     <div class="nav-item"        onclick="nav('history',this)">     <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span> Eval History</div>
     <div class="nav-item"        onclick="nav('profiles',this)">    <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span> Agent Profiles</div>
@@ -2386,6 +2386,47 @@ a { color:var(--purple-l); text-decoration:none; }
         </div>
 
       </div>
+    </div>
+  </div>
+
+
+  <!-- Today's Summary Popup -->
+  <div id="today-summary-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:998;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="closeTodaySummary()">
+    <div onclick="event.stopPropagation()" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:380px;margin:16px;box-shadow:0 24px 60px #000000aa;animation:fadeIn .2s ease;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-family:var(--font-h);font-size:16px;font-weight:800;">Today's Summary</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="today-date-lbl"></div>
+        </div>
+        <button onclick="closeTodaySummary()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-family:var(--font-mono);font-size:26px;font-weight:700;color:var(--gold);" id="today-evals">0</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Evals Today</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-family:var(--font-mono);font-size:26px;font-weight:700;color:var(--purple);" id="today-coaching">0</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;">New Coaching</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid rgba(240,79,79,.3);border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-family:var(--font-mono);font-size:26px;font-weight:700;color:var(--red);" id="today-escalate">0</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Escalate</div>
+        </div>
+        <div style="background:var(--bg);border:1px solid rgba(240,120,48,.3);border-radius:10px;padding:14px;text-align:center;">
+          <div style="font-family:var(--font-mono);font-size:26px;font-weight:700;color:var(--orange);" id="today-pending">0</div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Pending Coaching</div>
+        </div>
+      </div>
+      <div id="today-escalate-agents" style="display:none;margin-bottom:12px;">
+        <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px;">⚠ Escalate Agents</div>
+        <div id="today-escalate-list"></div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="closeTodaySummary();nav('monitor',document.querySelectorAll('.nav-item')[2]);" style="flex:1;background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:var(--radius-s);padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">View QA Monitor</button>
+        <button onclick="closeTodaySummary()" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:var(--radius-s);padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Dismiss</button>
+      </div>
+      <div style="text-align:center;margin-top:10px;font-size:10px;color:var(--muted);" id="today-auto-dismiss"></div>
     </div>
   </div>
 
@@ -8020,6 +8061,9 @@ function applyRoleAccess(user) {
     nav('home', document.querySelector('.nav-item[onclick*="home"]'));
   }
 
+  // Show today's summary popup after a short delay
+  setTimeout(() => { try { showTodaySummary(user); updateNavBadges(); } catch(e) {} }, 1500);
+
   // ── Role-specific UI visibility ──────────────────────────────
   const isManager = user.role === 'manager';
   const isQA      = user.role === 'qa';
@@ -8525,8 +8569,15 @@ function loadFromGoogleSheets() {
         try { renderRadar(); } catch(e) {}
         try { buildIntelligence(); } catch(e) {}
         try { updateHistoryBadge(); } catch(e) {}
+        try { updateNavBadges(); } catch(e) {}
         try { if(document.getElementById('page-monitor')?.classList.contains('active')) renderMonitor(); } catch(e) {}
         try { if(document.getElementById('page-profiles')?.classList.contains('active')) renderProfiles(); } catch(e) {}
+        // Second pass after short delay to ensure all DOM is ready
+        setTimeout(() => {
+          try { buildIntelligence(); } catch(e) {}
+          try { updateHomeKPIs(); } catch(e) {}
+          try { updateNavBadges(); } catch(e) {}
+        }, 500);
         console.log(`✅ Loaded ${added} new evals from Google Sheets`);
       }
       } // end evalsData block
@@ -8674,6 +8725,103 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch(e) {}
   }, 30000);
 });
+
+// ── NAV BADGES ──────────────────────────────────────────────
+function updateNavBadges() {
+  // QA Monitor badge — escalate count
+  const allPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory));
+  const escalateCount = allPatterns.filter(p => p.level.key === 'escalate').length;
+  const monBadge = document.getElementById('monitor-badge');
+  if (monBadge) {
+    if (escalateCount > 0) { monBadge.textContent = escalateCount; monBadge.style.display = 'inline'; }
+    else { monBadge.style.display = 'none'; }
+  }
+  // Coaching badge — pending items
+  const pendingCoaching = _coachingData.filter(c => c.status === 'pending_tl' || c.status === 'open').length;
+  const coachBadge = document.getElementById('coaching-badge');
+  if (coachBadge) {
+    if (pendingCoaching > 0) { coachBadge.textContent = pendingCoaching; coachBadge.style.display = 'inline'; }
+    else { coachBadge.style.display = 'none'; }
+  }
+}
+
+// ── TODAY'S SUMMARY POPUP ───────────────────────────────────
+function showTodaySummary(user) {
+  const popup = document.getElementById('today-summary-popup');
+  if (!popup) return;
+
+  const today = new Date();
+  const todayStr = today.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const todayDate = today.toLocaleDateString('en-GB');
+
+  // Count today's evals
+  const todayEvals = _evalHistory.filter(e => {
+    if (!e.date) return false;
+    try { return new Date(e.date).toLocaleDateString('en-GB') === todayDate || e.date.includes(todayDate); } catch(err) { return false; }
+  }).length;
+
+  // Count today's coaching
+  const todayCoaching = _coachingData.filter(c => {
+    if (!c.date) return false;
+    try { return new Date(c.date).toLocaleDateString('en-GB') === todayDate || c.date.includes(todayDate); } catch(err) { return false; }
+  }).length;
+
+  // Escalate count
+  const allPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory));
+  const escalateAgents = allPatterns.filter(p => p.level.key === 'escalate');
+  const pendingCoach = _coachingData.filter(c => c.status === 'pending_tl' || c.status === 'open').length;
+
+  // Set role-specific content
+  const dateEl = document.getElementById('today-date-lbl');
+  if (dateEl) dateEl.textContent = todayStr;
+
+  const evalsEl = document.getElementById('today-evals');
+  const coachEl = document.getElementById('today-coaching');
+  const escEl   = document.getElementById('today-escalate');
+  const pendEl  = document.getElementById('today-pending');
+
+  if (evalsEl) evalsEl.textContent = todayEvals;
+  if (coachEl) coachEl.textContent = todayCoaching;
+  if (escEl)   escEl.textContent   = escalateAgents.length;
+  if (pendEl)  pendEl.textContent  = pendingCoach;
+
+  // Show escalate agents list if any
+  const escAgentDiv = document.getElementById('today-escalate-agents');
+  const escList     = document.getElementById('today-escalate-list');
+  if (escAgentDiv && escList) {
+    if (escalateAgents.length > 0) {
+      escAgentDiv.style.display = 'block';
+      escList.innerHTML = escalateAgents.slice(0,3).map(p =>
+        `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(240,79,79,.07);border:1px solid rgba(240,79,79,.15);border-radius:7px;margin-bottom:5px;">
+          <div><div style="font-size:12px;font-weight:600;">${p.agent}</div><div style="font-size:10px;color:var(--muted);">${p.error} — ${p.count}x</div></div>
+          <span style="font-size:10px;color:var(--red);font-weight:700;">ESCALATE</span>
+        </div>`
+      ).join('');
+    } else {
+      escAgentDiv.style.display = 'none';
+    }
+  }
+
+  // Role-specific dismiss text
+  const role = user?.role || 'manager';
+  const dismissEl = document.getElementById('today-auto-dismiss');
+  if (dismissEl) dismissEl.textContent = role === 'agent' ? 'Your personal dashboard is ready' : 'Auto-dismisses in 8 seconds';
+
+  popup.style.display = 'flex';
+
+  // Auto dismiss after 8 seconds
+  let countdown = 8;
+  const timer = setInterval(() => {
+    countdown--;
+    if (dismissEl) dismissEl.textContent = role === 'agent' ? '' : `Auto-dismisses in ${countdown} seconds`;
+    if (countdown <= 0) { clearInterval(timer); closeTodaySummary(); }
+  }, 1000);
+  popup._timer = timer;
+}
+
+function closeTodaySummary() {
+  const popup = document.getElementById('today-summary-popup');
+  if (popup) { popup.style.display = 'none'; if (popup._timer) clearInterval(popup._timer); }
+}
+
 </script>
-</body>
-</html>
