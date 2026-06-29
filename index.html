@@ -692,14 +692,6 @@ a { color:var(--purple-l); text-decoration:none; }
         <div class="card-title">Project Health</div>
         <div id="home-project-health"></div>
       </div>
-      <div class="card">
-        <div class="card-title">Quick Actions</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div onclick="nav('calc',document.querySelectorAll('.nav-item')[2])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;"><span style="font-size:20px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span></span><div><div style="font-size:13px;font-weight:600;">Score Calculator</div><div style="font-size:11px;color:var(--muted)">Evaluate an agent call</div></div></div>
-          <div onclick="nav('upload',document.querySelectorAll('.nav-item')[3])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;"><span style="font-size:20px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V8M7 13l5-5 5 5"/><path d="M4 19h16"/></svg></span></span><div><div style="font-size:13px;font-weight:600;">Upload Data</div><div style="font-size:11px;color:var(--muted)">Import Excel files</div></div></div>
-          <div onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;"><span style="font-size:20px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span></span><div><div style="font-size:13px;font-weight:600;">Analytics Dashboard</div><div style="font-size:11px;color:var(--muted)">View insights</div></div></div>
-        </div>
-      </div>
     </div>
 
     <!-- Pattern Intelligence Summary -->
@@ -732,6 +724,16 @@ a { color:var(--purple-l); text-decoration:none; }
       </div>
       <div id="home-team-alert" style="display:none;margin-top:12px;padding:10px 14px;background:#ff4d4d10;border-radius:8px;border:1px solid #ff4d4d33;">
         <div id="home-team-alert-text" style="font-size:12px;color:#ccc;"></div>
+      </div>
+    </div>
+
+    <!-- Quick Actions — moved to bottom -->
+    <div class="card" style="margin-top:4px;">
+      <div class="card-title">Quick Actions</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div onclick="nav('calc',document.querySelectorAll('.nav-item')[2])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'"><span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:var(--gold)18;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span><div><div style="font-size:13px;font-weight:600;">Score Calculator</div><div style="font-size:11px;color:var(--muted)">Evaluate an agent call</div></div></div>
+        <div onclick="nav('upload',document.querySelectorAll('.nav-item')[3])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'"><span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#4a86e818;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V8M7 13l5-5 5 5"/><path d="M4 19h16"/></svg></span><div><div style="font-size:13px;font-weight:600;">Upload Data</div><div style="font-size:11px;color:var(--muted)">Import Excel files</div></div></div>
+        <div onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border)'"><span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:var(--purple)18;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span><div><div style="font-size:13px;font-weight:600;">Analytics Dashboard</div><div style="font-size:11px;color:var(--muted)">View insights</div></div></div>
       </div>
     </div>
 
@@ -2391,7 +2393,7 @@ a { color:var(--purple-l); text-decoration:none; }
 
 
   <!-- Today's Summary Popup -->
-  <div id="today-summary-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:998;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="closeTodaySummary()">
+  <div id="today-summary-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="closeTodaySummary()">
     <div onclick="event.stopPropagation()" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:380px;margin:16px;box-shadow:0 24px 60px #000000aa;animation:fadeIn .2s ease;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div>
@@ -8059,11 +8061,12 @@ function applyRoleAccess(user) {
   } else {
     // Manager / QA land on home
     nav('home', document.querySelector('.nav-item[onclick*="home"]'));
-    // Force buildIntelligence immediately using localStorage data (before Sheets loads)
+    // Force all home page elements immediately using localStorage data
     setTimeout(() => {
       try { filtered = [...getLiveAgents()]; } catch(e) {}
       try { updateHomeKPIs(); } catch(e) {}
       try { buildIntelligence(); } catch(e) {}
+      try { renderDashboard(); } catch(e) {}
       try { updateNavBadges(); } catch(e) {}
     }, 100);
   }
