@@ -6360,16 +6360,34 @@ function openCoachingModal(id) {
     let html = '';
     // Show sub-attributes grouped by type
     if (c.ccAttrs?.length) {
-      html += `<div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;"><span class="si-dot si-dot-red"></span> CC Errors</div>
-        ${c.ccAttrs.map(e=>`<div style="font-size:12px;color:var(--text-2);">• ${e.attr}${e.sub&&e.sub!==e.attr?` — <span style="color:var(--red);font-weight:600;">${e.sub}</span>`:''}</div>`).join('')}</div>`;
+      html += `<div style="margin-bottom:10px;">
+        <div style="font-size:9px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span class="si-dot si-dot-red"></span> Critical to Customer (CC)</div>
+        ${c.ccAttrs.map(e=>`
+          <div style="padding:8px 10px;background:rgba(240,79,79,.07);border:1px solid rgba(240,79,79,.15);border-radius:7px;margin-bottom:4px;">
+            <div style="font-size:11px;font-weight:700;color:var(--red);">${e.attr}</div>
+            ${e.sub && e.sub !== e.attr ? `<div style="font-size:11px;color:var(--text);margin-top:3px;">↳ <span style="font-weight:600;">${e.sub}</span></div>` : ''}
+          </div>`).join('')}
+      </div>`;
     }
     if (c.cbAttrs?.length) {
-      html += `<div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;"><span class="si-dot si-dot-orange"></span> CB Errors</div>
-        ${c.cbAttrs.map(e=>`<div style="font-size:12px;color:var(--text-2);">• ${e.attr}${e.sub&&e.sub!==e.attr?` — <span style="color:var(--orange);font-weight:600;">${e.sub}</span>`:''}</div>`).join('')}</div>`;
+      html += `<div style="margin-bottom:10px;">
+        <div style="font-size:9px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span class="si-dot si-dot-orange"></span> Critical to Business (CB)</div>
+        ${c.cbAttrs.map(e=>`
+          <div style="padding:8px 10px;background:rgba(240,120,48,.07);border:1px solid rgba(240,120,48,.15);border-radius:7px;margin-bottom:4px;">
+            <div style="font-size:11px;font-weight:700;color:var(--orange);">${e.attr}</div>
+            ${e.sub && e.sub !== e.attr ? `<div style="font-size:11px;color:var(--text);margin-top:3px;">↳ <span style="font-weight:600;">${e.sub}</span></div>` : ''}
+          </div>`).join('')}
+      </div>`;
     }
     if (c.ncAttrs?.length) {
-      html += `<div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;"><span class="si-dot si-dot-gold"></span> NC Errors</div>
-        ${c.ncAttrs.map(e=>`<div style="font-size:12px;color:var(--text-2);">• ${e.attr}${e.sub&&e.sub!==e.attr?` — <span style="color:var(--gold);font-weight:600;">${e.sub}</span>`:''}</div>`).join('')}</div>`;
+      html += `<div style="margin-bottom:10px;">
+        <div style="font-size:9px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span class="si-dot si-dot-gold"></span> Non-Critical (NC)</div>
+        ${c.ncAttrs.map(e=>`
+          <div style="padding:8px 10px;background:rgba(232,162,61,.07);border:1px solid rgba(232,162,61,.15);border-radius:7px;margin-bottom:4px;">
+            <div style="font-size:11px;font-weight:700;color:var(--gold);">${e.attr}</div>
+            ${e.sub && e.sub !== e.attr ? `<div style="font-size:11px;color:var(--text);margin-top:3px;">↳ <span style="font-weight:600;">${e.sub}</span></div>` : ''}
+          </div>`).join('')}
+      </div>`;
     }
     if (c.qaComment) {
       html += `<div style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px;font-size:13px;color:var(--text);line-height:1.6;">${c.qaComment}</div>`;
@@ -7070,17 +7088,35 @@ function openProfile(name, e) {
   document.getElementById('prof-cc').style.color         = a.cc===100?'var(--green)':'var(--red)';
   document.getElementById('prof-cb').innerHTML         = a.cb===100?iconCheck()+' Pass':iconCross()+' Fail';
   document.getElementById('prof-cb').style.color         = a.cb===100?'var(--green)':'var(--red)';
-  // Errors
+  // Errors — full sub-attributes from eval history
   const errEl = document.getElementById('prof-errors');
-  if(a.errors.length) {
-    errEl.innerHTML = a.errors.map(e =>
-      '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:6px;border-left:3px solid var(--red);">'
-      +'<span style="color:var(--red);font-size:10px;">•</span><span style="font-size:12px;color:#ccc;">'+e+'</span></div>'
+  const agentEvalsFull = _evalHistory.filter(ev => ev.agent === a.n);
+  const allSubErrors = [];
+  agentEvalsFull.forEach(ev => { (ev.errors||[]).forEach(err => { if(!err.isNA) allSubErrors.push(err); }); });
+  const subMap = {};
+  allSubErrors.forEach(err => {
+    const key = err.v || err.attr || 'Unknown';
+    const type = err.t || 'nc';
+    if (!subMap[key]) subMap[key] = { name:key, type, count:0, attr:err.attrName||err.attr||'' };
+    subMap[key].count++;
+  });
+  const subList = Object.values(subMap).sort((a,b)=>b.count-a.count).slice(0,8);
+  const typeColor = t => t==='cc'?'var(--red)':t==='cb'?'var(--orange)':'var(--gold)';
+  const typeBg    = t => t==='cc'?'rgba(240,79,79,.12)':t==='cb'?'rgba(240,120,48,.12)':'rgba(232,162,61,.12)';
+  if (subList.length) {
+    errEl.innerHTML = subList.map(e =>
+      `<div style="display:flex;align-items:flex-start;gap:10px;padding:9px 12px;background:var(--bg);border-radius:8px;margin-bottom:5px;border-left:3px solid ${typeColor(e.type)};">
+        <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:${typeBg(e.type)};color:${typeColor(e.type)};white-space:nowrap;flex-shrink:0;margin-top:1px;">${e.type.toUpperCase()} ×${e.count}</span>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);">${e.name}</div>
+          ${e.attr && e.attr !== e.name ? `<div style="font-size:10px;color:var(--muted);margin-top:1px;">in ${e.attr}</div>` : ''}
+        </div>
+      </div>`
     ).join('');
   } else {
-    errEl.innerHTML = '<div style="padding:12px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--green);">'+iconCheck()+'No critical errors detected this month</div>';
+    errEl.innerHTML = '<div style="padding:12px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--green);">'+iconCheck()+'No errors detected for this agent</div>';
   }
-  // Coaching
+    // Coaching
   const coachEl = document.getElementById('prof-coaching');
   coachEl.innerHTML = a.needsCoaching
     ? '<div style="padding:12px;background:#ff8c0022;border:1px solid #ff8c0044;border-radius:8px;font-size:12px;color:var(--orange);"><span class="si-dot si-dot-gold"></span> Coaching plan required — score below threshold or critical error detected this month</div>'
