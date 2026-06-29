@@ -4793,10 +4793,17 @@ function clearHistory() {
   document.body.style.overflow = 'hidden';
 }
 
+// Store scroll positions per page
+const _pageScroll = {};
+
 function nav(id, el) {
-  // Reset scroll to top
+  // Save current page scroll position before leaving
   const mainEl = document.querySelector('.main');
-  if(mainEl) mainEl.scrollTop = 0;
+  const currentActive = document.querySelector('.page.active');
+  if (mainEl && currentActive) {
+    const currentId = currentActive.id.replace('page-', '');
+    _pageScroll[currentId] = mainEl.scrollTop;
+  }
   // Hide all pages
   ['home','dashboard','monitor','calc','history','profiles','reports','coaching','upload','settings','agent','tl-home','operation'].forEach(p => {
     const pg = document.getElementById('page-'+p);
@@ -4809,8 +4816,14 @@ function nav(id, el) {
   if(target) target.classList.add('active');
   if(el) el.classList.add('active');
   document.getElementById('page-title').textContent = PAGE_TITLES[id] || id;
+  // Restore scroll: back buttons (no el) restore position, nav items scroll to top
+  if (mainEl) {
+    const isBackNav = !el;
+    const savedScroll = isBackNav ? (_pageScroll[id] || 0) : 0;
+    setTimeout(() => { mainEl.scrollTop = savedScroll; }, 0);
+  }
   // Init specific pages
-  if(id === 'home')      updateHomeKPIs();
+  if(id === 'home')      { updateHomeKPIs(); try { buildIntelligence(); } catch(e) {} }
   if(id === 'operation') {
     initOperationForm(_currentUser);
   }
