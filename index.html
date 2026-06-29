@@ -2423,7 +2423,7 @@ a { color:var(--purple-l); text-decoration:none; }
         <div id="today-escalate-list"></div>
       </div>
       <div style="display:flex;gap:8px;">
-        <button onclick="closeTodaySummary();nav('monitor',document.querySelectorAll('.nav-item')[2]);" style="flex:1;background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:var(--radius-s);padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">View QA Monitor</button>
+        <button onclick="closeTodaySummary();setTimeout(()=>nav('monitor',document.querySelector('.nav-item[onclick*=monitor]')),100);" style="flex:1;background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:var(--radius-s);padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">🔴 View QA Monitor</button>
         <button onclick="closeTodaySummary()" style="flex:1;background:var(--surface);border:1px solid var(--border);color:var(--muted);border-radius:var(--radius-s);padding:10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Dismiss</button>
       </div>
       <div style="text-align:center;margin-top:10px;font-size:10px;color:var(--muted);" id="today-auto-dismiss"></div>
@@ -8059,10 +8059,31 @@ function applyRoleAccess(user) {
   } else {
     // Manager / QA land on home
     nav('home', document.querySelector('.nav-item[onclick*="home"]'));
+    // Force buildIntelligence immediately using localStorage data (before Sheets loads)
+    setTimeout(() => {
+      try { filtered = [...getLiveAgents()]; } catch(e) {}
+      try { updateHomeKPIs(); } catch(e) {}
+      try { buildIntelligence(); } catch(e) {}
+      try { updateNavBadges(); } catch(e) {}
+    }, 100);
   }
 
-  // Show today's summary popup after a short delay
-  setTimeout(() => { try { showTodaySummary(user); updateNavBadges(); } catch(e) {} }, 1500);
+  // Show today's summary popup — only for Manager/QA if escalate agents exist
+  setTimeout(() => {
+    try { updateNavBadges(); } catch(e) {}
+    try {
+      const role = user.role;
+      if (role === 'manager' || role === 'qa') {
+        // Only show if there are escalate agents
+        const allP = buildPatterns(evalHistoryToPatternData(_evalHistory));
+        const hasEscalate = allP.some(p => p.level.key === 'escalate');
+        if (hasEscalate) showTodaySummary(user);
+      } else {
+        // TL and Agent — always show summary
+        showTodaySummary(user);
+      }
+    } catch(e) {}
+  }, 1600);
 
   // ── Role-specific UI visibility ──────────────────────────────
   const isManager = user.role === 'manager';
@@ -8808,6 +8829,8 @@ function showTodaySummary(user) {
   if (dismissEl) dismissEl.textContent = role === 'agent' ? 'Your personal dashboard is ready' : 'Auto-dismisses in 8 seconds';
 
   popup.style.display = 'flex';
+  popup.style.alignItems = 'center';
+  popup.style.justifyContent = 'center';
 
   // Auto dismiss after 8 seconds
   let countdown = 8;
