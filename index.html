@@ -8239,17 +8239,59 @@ function renderAgentDashboard(user) {
       document.getElementById('agent-coaching-list').innerHTML = tasks || '<div style="color:var(--muted);font-size:13px;padding:10px 0;">No coaching tasks generated</div>';
     }
     // History list from submitted evals
-    document.getElementById('agent-history-list').innerHTML = myEvals.slice(0,5).map((e,i) => {
+    document.getElementById('agent-history-list').innerHTML = myEvals.slice(0,10).map((e,i) => {
       const col = e.overall>=90?'var(--green)':e.overall>=80?'var(--gold)':'var(--red)';
-      const errSummary = e.errors.length > 0
-        ? e.errors.slice(0,2).map(err=>`<span style="font-size:10px;background:${err.t==='nc'?'var(--gold-dim)':err.t==='cc'?'var(--red-dim)':'var(--orange-dim)'};color:${err.t==='nc'?'var(--gold)':err.t==='cc'?'var(--red)':'var(--orange)'};border-radius:4px;padding:2px 6px;">${err.t.toUpperCase()}</span>`).join(' ')
-        : '<span style="font-size:10px;color:var(--green);">'+iconCheck()+'Clean</span>';
-      return `<div style="padding:12px 0;border-bottom:1px solid var(--border);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <div style="font-size:12px;color:var(--muted);">${fmtDate(e.date)} · ${fmtTime(e.time)}</div>
-          <span style="font-family:var(--font-h);font-size:18px;font-weight:800;color:${col};">${e.overall.toFixed(1)}%</span>
+      const statusLabel = e.overall>=90?iconCheck()+' Pass':e.overall>=80?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Critical';
+      const ncErrors = (e.errors||[]).filter(err=>err.t==='nc'&&!err.isNA);
+      const ccErrors = (e.errors||[]).filter(err=>err.t==='cc');
+      const cbErrors = (e.errors||[]).filter(err=>err.t==='cb');
+      const holdNA   = (e.errors||[]).some(err=>err.isNA);
+      const ncScore  = e.ncScore!=null ? e.ncScore.toFixed(1) : (Math.max(0,30-ncErrors.length*(holdNA?6:5))).toFixed(1);
+      // Find coaching item for this eval
+      const coachItem = _coachingData.find(c => c.agent===e.agent && c.evalId && String(c.evalId)===String(e.uid));
+      const tlNote = coachItem ? `<div style="margin-top:8px;padding:8px 10px;background:var(--purple-dim);border-left:3px solid var(--purple);border-radius:0 6px 6px 0;font-size:11px;">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">TL Response</div>
+        <div style="color:var(--purple-l);font-weight:600;">${coachItem.status==='accepted'?'✓ Accepted':coachItem.status==='disputed'?'⚠ Disputed':'Pending TL Review'}</div>
+      </div>` : '';
+      const errDetails = e.errors&&e.errors.length>0 ? `
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:4px;">
+          ${ncErrors.length?`<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">NC Errors (${ncErrors.length})</div>
+          ${ncErrors.map(err=>`<div style="font-size:11px;padding:4px 8px;background:var(--gold-dim);border-radius:4px;color:var(--gold);">• ${err.v||err.attr}</div>`).join('')}`:''}
+          ${ccErrors.length?`<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:4px 0 2px;">CC Errors (${ccErrors.length})</div>
+          ${ccErrors.map(err=>`<div style="font-size:11px;padding:4px 8px;background:var(--red-dim);border-radius:4px;color:var(--red);">• ${err.v||err.attr}</div>`).join('')}`:''}
+          ${cbErrors.length?`<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:4px 0 2px;">CB Errors (${cbErrors.length})</div>
+          ${cbErrors.map(err=>`<div style="font-size:11px;padding:4px 8px;background:var(--orange-dim);border-radius:4px;color:var(--orange);">• ${err.v||err.attr}</div>`).join('')}`:''}
+        </div>` : '<div style="font-size:11px;color:var(--green);margin-top:6px;">'+iconCheck()+' No errors — clean evaluation</div>';
+      return `<div style="border-bottom:1px solid var(--border);">
+        <div onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.agent-eval-arrow').textContent=this.nextElementSibling.style.display==='none'?'▼':'▲';"
+          style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;cursor:pointer;">
+          <div>
+            <div style="font-size:12px;color:var(--muted);">${fmtDate(e.date)} · ${fmtTime(e.time)}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px;">by ${e.qa||'QA'} <span class="agent-eval-arrow" style="font-size:9px;margin-left:6px;">▼</span></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:var(--font-mono);font-size:18px;font-weight:800;color:${col};">${e.overall.toFixed(1)}%</div>
+            <div style="font-size:10px;color:${col};">${statusLabel}</div>
+          </div>
         </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;">${errSummary}</div>
+        <div style="display:none;padding:0 0 12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;">
+            <div style="background:var(--bg);border-radius:6px;padding:8px;text-align:center;">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">NC</div>
+              <div style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:var(--gold);">${ncScore}/30</div>
+            </div>
+            <div style="background:var(--bg);border-radius:6px;padding:8px;text-align:center;">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">CC</div>
+              <div style="font-size:14px;font-weight:800;color:${ccErrors.length?'var(--red)':'var(--green)'};">${ccErrors.length?iconCross()+' Fail':iconCheck()+' Pass'}</div>
+            </div>
+            <div style="background:var(--bg);border-radius:6px;padding:8px;text-align:center;">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">CB</div>
+              <div style="font-size:14px;font-weight:800;color:${cbErrors.length?'var(--orange)':'var(--green)'};">${cbErrors.length?iconCross()+' Fail':iconCheck()+' Pass'}</div>
+            </div>
+          </div>
+          ${errDetails}
+          ${tlNote}
+        </div>
       </div>`;
     }).join('');
 
