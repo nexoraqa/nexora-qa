@@ -4947,6 +4947,7 @@ function nav(id, el) {
   }
   // Init specific pages
   if(id === 'home')      { updateHomeKPIs(); try { buildIntelligence(); } catch(e) {} }
+  if(id === 'monitor')   { try { clearMonitorBadge(); } catch(e) {} }
   if(id === 'operation') {
     initOperationForm(_currentUser);
   }
@@ -8752,21 +8753,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ── NAV BADGES ──────────────────────────────────────────────
 function updateNavBadges() {
-  // QA Monitor badge — escalate count
   const allPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory));
   const escalateCount = allPatterns.filter(p => p.level.key === 'escalate').length;
   const monBadge = document.getElementById('monitor-badge');
+
   if (monBadge) {
-    if (escalateCount > 0) { monBadge.textContent = escalateCount; monBadge.style.display = 'inline'; }
-    else { monBadge.style.display = 'none'; }
+    // Only show badge if escalate count is HIGHER than last time user checked
+    const lastSeen = parseInt(localStorage.getItem('nexora_last_seen_escalate') || '0');
+    if (escalateCount > lastSeen) {
+      monBadge.textContent = escalateCount - lastSeen; // show only NEW ones
+      monBadge.style.display = 'inline';
+    } else {
+      monBadge.style.display = 'none';
+    }
   }
-  // Coaching badge — pending items
+
+  // Coaching badge — always show pending (TL needs to act)
   const pendingCoaching = _coachingData.filter(c => c.status === 'pending_tl' || c.status === 'open').length;
   const coachBadge = document.getElementById('coaching-badge');
   if (coachBadge) {
     if (pendingCoaching > 0) { coachBadge.textContent = pendingCoaching; coachBadge.style.display = 'inline'; }
     else { coachBadge.style.display = 'none'; }
   }
+}
+
+function clearMonitorBadge() {
+  // Called when user navigates to QA Monitor — mark current count as seen
+  const allPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory));
+  const escalateCount = allPatterns.filter(p => p.level.key === 'escalate').length;
+  localStorage.setItem('nexora_last_seen_escalate', String(escalateCount));
+  const monBadge = document.getElementById('monitor-badge');
+  if (monBadge) monBadge.style.display = 'none';
 }
 
 // ── TODAY'S SUMMARY POPUP ───────────────────────────────────
