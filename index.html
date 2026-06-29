@@ -1617,34 +1617,13 @@ a { color:var(--purple-l); text-decoration:none; }
       <button onclick="setReportTab('leaderboard')" id="rtab-leaderboard" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid var(--purple);background:none;color:var(--purple);font-family:var(--font-b);margin-bottom:-1px;">🏆 Leaderboard</button>
       <button onclick="setReportTab('mom')" id="rtab-mom" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;">📅 Month-over-Month</button>
       <button onclick="setReportTab('operation')" id="rtab-operation" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;">📋 TL Operations</button>
+      <button onclick="setReportTab('smart')" id="rtab-smart" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;">✨ Smart Reports</button>
     </div>
 
     <!-- Tab: Leaderboard -->
     <div id="rep-tab-leaderboard">
 
-    <!-- Quick Export Cards -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;" id="report-card-monthly">      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),#43d692);"></div>
-        <div style="font-size:22px;margin-bottom:8px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span></div>
-        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Monthly QA Summary</div>
-        <div id="report-sub-summary" style="font-size:11px;color:var(--muted);margin-bottom:12px;">— evaluations · — projects · — agents</div>
-        <button class="btn-icon" style="width:100%;padding:8px;border-radius:8px;" onclick="downloadMonthlySummary()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/></svg></span> Download CSV</button>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),#ffd700);"></div>
-        <div style="font-size:22px;margin-bottom:8px;">🏥</div>
-        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Project Health Report</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">MOPH_MCI, PHCC, MOPH · June 2026</div>
-        <button class="btn-icon" style="width:100%;padding:8px;border-radius:8px;" onclick="downloadProjectHealth()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/></svg></span> Download CSV</button>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--purple-l));"></div>
-        <div style="font-size:22px;margin-bottom:8px;">🧠</div>
-        <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Pattern Analysis Report</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All patterns · TL heatmap · Actions</div>
-        <button class="btn-icon" style="width:100%;padding:8px;border-radius:8px;" onclick="downloadPatternReport()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/></svg></span> Download CSV</button>
-      </div>
-    </div>
+
 
     <!-- Agent Leaderboard — Full Table -->
     <div class="card">
@@ -1719,6 +1698,49 @@ a { color:var(--purple-l); text-decoration:none; }
         </div>
       </div>
     </div><!-- /rep-tab-operation -->
+
+    <!-- Tab: Smart Reports -->
+    <div id="rep-tab-smart" style="display:none;">
+      <div style="margin-bottom:16px;">
+        <div style="font-family:var(--font-h);font-size:18px;font-weight:800;margin-bottom:4px;">✨ Smart Reports</div>
+        <div style="font-size:12px;color:var(--muted);">Download your QA data as CSV reports</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="card" style="position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),#43d692);"></div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="font-size:28px;">📊</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Monthly QA Summary</div>
+              <div id="report-sub-summary" style="font-size:11px;color:var(--muted);">All evaluations · all projects · all agents</div>
+            </div>
+            <button onclick="downloadMonthlySummary()" style="background:var(--green-dim);border:1px solid var(--green);color:var(--green);border-radius:var(--radius-s);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);white-space:nowrap;">↓ CSV</button>
+          </div>
+        </div>
+        <div class="card" style="position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),#ffd700);"></div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="font-size:28px;">🏥</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Project Health Report</div>
+              <div style="font-size:11px;color:var(--muted);">MOPH_MCI · PHCC · MOPH</div>
+            </div>
+            <button onclick="downloadProjectHealth()" style="background:var(--gold-dim);border:1px solid var(--gold);color:var(--gold);border-radius:var(--radius-s);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);white-space:nowrap;">↓ CSV</button>
+          </div>
+        </div>
+        <div class="card" style="position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),var(--purple-l));"></div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="font-size:28px;">🧠</div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Pattern Analysis Report</div>
+              <div style="font-size:11px;color:var(--muted);">All patterns · TL heatmap · Actions</div>
+            </div>
+            <button onclick="downloadPatternReport()" style="background:var(--purple-dim);border:1px solid var(--purple);color:var(--purple-l);border-radius:var(--radius-s);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);white-space:nowrap;">↓ CSV</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /rep-tab-smart -->
 
   </div>
 
@@ -3653,7 +3675,12 @@ function buildPatterns(histData) {
   });
   return flagged.sort((a,b) => {
     const o = {escalate:0, intervene:1, monitor:2};
-    return o[a.level.key] - o[b.level.key] || b.count - a.count;
+    const levelDiff = o[a.level.key] - o[b.level.key];
+    if (levelDiff !== 0) return levelDiff;
+    if (b.count !== a.count) return b.count - a.count;
+    // Same count — priority: CC > CB > NC
+    const tp = {cc:0, cb:1, nc:2};
+    return (tp[a.type]??2) - (tp[b.type]??2);
   });
 }
 
@@ -5376,7 +5403,7 @@ function renderLeaderboard() {
 }
 
 function setReportTab(tab) {
-  const tabs = ['leaderboard','mom','operation'];
+  const tabs = ['leaderboard','mom','operation','smart'];
   tabs.forEach(t => {
     const btn = document.getElementById('rtab-'+t);
     const content = document.getElementById('rep-tab-'+t);
@@ -6240,12 +6267,27 @@ function renderCoaching() {
           ${attrPreview}
           ${c.qaComment ? `<div style="font-size:12px;color:var(--text-2);margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;border-left:2px solid var(--purple);">"${c.qaComment.slice(0,80)}${c.qaComment.length>80?'...':''}"</div>` : ''}
         </div>
-        <div style="flex-shrink:0;text-align:right;">
+        <div style="flex-shrink:0;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
           <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:${sc.bg};color:${sc.color};white-space:nowrap;">${sc.label}</span>
+          ${role==='manager' ? `<button onclick="event.stopPropagation();deleteCoachingItem('${c.id}')" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;">✕ Delete</button>` : ''}
         </div>
       </div>
     </div>`;
   }).join('');
+}
+
+function deleteCoachingItem(id) {
+  if (!confirm('Delete this coaching item? This cannot be undone.')) return;
+  // Remove from local data
+  _coachingData = _coachingData.filter(c => String(c.id) !== String(id));
+  saveCoaching();
+  // Send delete to Google Sheets
+  fetch(GOOGLE_SHEET_URL, {
+    method:'POST', mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ action:'delete_coaching', id: String(id) })
+  }).catch(e => console.warn('Coaching delete failed:', e));
+  renderCoaching();
 }
 
 function openCoachingModal(id) {
