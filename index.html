@@ -1768,17 +1768,23 @@ a { color:var(--purple-l); text-decoration:none; }
 
     <!-- Priority tabs: CC → CB → NC -->
     <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-      <button onclick="setCoachingTab('cc')" id="ctab-cc" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
-        <span class="si-dot si-dot-red"></span> CC Errors <span id="ctab-cc-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
-      </button>
-      <button onclick="setCoachingTab('cb')" id="ctab-cb" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
-        <span class="si-dot si-dot-orange"></span> CB Errors <span id="ctab-cb-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
-      </button>
-      <button onclick="setCoachingTab('nc')" id="ctab-nc" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
-        <span class="si-dot si-dot-gold"></span> NC Errors <span id="ctab-nc-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
-      </button>
       <button onclick="setCoachingTab('all')" id="ctab-all" class="ctab active-ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--purple);background:var(--purple-dim);color:var(--purple);font-family:var(--font-b);">
         All <span id="ctab-all-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
+      <button onclick="setCoachingTab('pending_qa')" id="ctab-pending_qa" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
+        🔴 QA Action <span id="ctab-pending_qa-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
+      <button onclick="setCoachingTab('pending_tl')" id="ctab-pending_tl" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
+        🟠 Pending TL <span id="ctab-pending_tl-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
+      <button onclick="setCoachingTab('pending_agent')" id="ctab-pending_agent" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
+        🔵 Pending Agent <span id="ctab-pending_agent-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
+      <button onclick="setCoachingTab('disputed')" id="ctab-disputed" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
+        ⚠ Disputed <span id="ctab-disputed-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
+      <button onclick="setCoachingTab('closed')" id="ctab-closed" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
+        ✓ Closed <span id="ctab-closed-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
       </button>
     </div>
 
@@ -5986,6 +5992,16 @@ function syncCoachingItem(item) {
 }
 
 // Merge coaching from Google Sheets — adds items not already in localStorage
+function parseAttrsFromText(raw) {
+  if (!raw || raw === 'NO' || raw === '') return [];
+  if (Array.isArray(raw)) return raw;
+  // Format from Sheets: "Customer Profile → Wrong/Missing QID | Ticket Description → Incomplete"
+  return raw.split(' | ').map(chunk => {
+    const parts = chunk.split(' → ');
+    return { attr: parts[0].trim(), sub: parts[1] ? parts[1].trim() : parts[0].trim() };
+  }).filter(e => e.attr);
+}
+
 function mergeCoachingFromSheets(sheetItems) {
   if (!sheetItems || !sheetItems.length) return;
   const existingIds = new Set(_coachingData.map(c => String(c.id)));
@@ -6007,9 +6023,9 @@ function mergeCoachingFromSheets(sheetItems) {
       hasCB:        row.hasCB === true || row.hasCB === 'YES',
       hasNC:        row.hasNC === true || row.hasNC === 'YES',
       // attrs from sheet come as text strings now, store as-is for display
-      ccAttrs:      typeof row.ccAttrs === 'string' && row.ccAttrs !== 'NO' ? [{attr: row.ccAttrs, sub:''}] : (Array.isArray(row.ccAttrs) ? row.ccAttrs : []),
-      cbAttrs:      typeof row.cbAttrs === 'string' && row.cbAttrs !== 'NO' ? [{attr: row.cbAttrs, sub:''}] : (Array.isArray(row.cbAttrs) ? row.cbAttrs : []),
-      ncAttrs:      typeof row.ncAttrs === 'string' && row.ncAttrs !== 'NO' ? [{attr: row.ncAttrs, sub:''}] : (Array.isArray(row.ncAttrs) ? row.ncAttrs : []),
+      ccAttrs:      parseAttrsFromText(row.ccAttrs),
+      cbAttrs:      parseAttrsFromText(row.cbAttrs),
+      ncAttrs:      parseAttrsFromText(row.ncAttrs),
       qaComment:    row.qaComment || '',
       tlResponse:   row.tlResponse || '',
       tlStatus:     row.tlStatus || '',
@@ -6203,13 +6219,21 @@ function renderOperationHistory() {
 
 function setCoachingTab(tab) {
   _coachingTab = tab;
-  ['cc','cb','nc','all'].forEach(t => {
+  const tabColors = {
+    all:'var(--purple)', pending_qa:'var(--red)', pending_tl:'var(--orange)',
+    pending_agent:'var(--blue-l)', disputed:'var(--red)', closed:'var(--green)'
+  };
+  const tabBgs = {
+    all:'var(--purple-dim)', pending_qa:'var(--red-dim)', pending_tl:'var(--orange-dim)',
+    pending_agent:'var(--blue-dim)', disputed:'var(--red-dim)', closed:'var(--green-dim)'
+  };
+  ['all','pending_qa','pending_tl','pending_agent','disputed','closed'].forEach(t => {
     const btn = document.getElementById('ctab-'+t);
     if (!btn) return;
     if (t === tab) {
-      btn.style.borderColor = t==='cc'?'var(--red)':t==='cb'?'var(--orange)':t==='nc'?'var(--gold)':'var(--purple)';
-      btn.style.background  = t==='cc'?'var(--red-dim)':t==='cb'?'var(--orange-dim)':t==='nc'?'var(--gold-dim)':'var(--purple-dim)';
-      btn.style.color       = t==='cc'?'var(--red)':t==='cb'?'var(--orange)':t==='nc'?'var(--gold)':'var(--purple)';
+      btn.style.borderColor = tabColors[t] || 'var(--purple)';
+      btn.style.background  = tabBgs[t]    || 'var(--purple-dim)';
+      btn.style.color       = tabColors[t] || 'var(--purple)';
     } else {
       btn.style.borderColor = 'var(--border)';
       btn.style.background  = 'var(--card)';
@@ -6233,16 +6257,27 @@ function renderCoaching() {
     return false;
   });
 
-  // Update tab counts
-  document.getElementById('ctab-cc-count').textContent  = items.filter(c => c.hasCC).length;
-  document.getElementById('ctab-cb-count').textContent  = items.filter(c => c.hasCB).length;
-  document.getElementById('ctab-nc-count').textContent  = items.filter(c => c.hasNC).length;
-  document.getElementById('ctab-all-count').textContent = items.length;
+  // Update status tab counts
+  const statusGroups = {
+    pending_qa:    items.filter(c => c.status==='pending_comment' || c.status==='disputed').length,
+    pending_tl:    items.filter(c => c.status==='pending_tl').length,
+    pending_agent: items.filter(c => c.status==='pending_agent').length,
+    disputed:      items.filter(c => c.status==='disputed').length,
+    closed:        items.filter(c => c.status==='closed').length,
+  };
+  document.getElementById('ctab-all-count').textContent           = items.length;
+  const pq = document.getElementById('ctab-pending_qa-count');    if(pq) pq.textContent = statusGroups.pending_qa;
+  const pt = document.getElementById('ctab-pending_tl-count');    if(pt) pt.textContent = statusGroups.pending_tl;
+  const pa = document.getElementById('ctab-pending_agent-count'); if(pa) pa.textContent = statusGroups.pending_agent;
+  const pd = document.getElementById('ctab-disputed-count');      if(pd) pd.textContent = statusGroups.disputed;
+  const pc = document.getElementById('ctab-closed-count');        if(pc) pc.textContent = statusGroups.closed;
 
-  // Filter by selected tab
-  if (_coachingTab === 'cc') items = items.filter(c => c.hasCC);
-  else if (_coachingTab === 'cb') items = items.filter(c => c.hasCB);
-  else if (_coachingTab === 'nc') items = items.filter(c => c.hasNC);
+  // Filter by selected status tab
+  if (_coachingTab === 'pending_qa')    items = items.filter(c => c.status==='pending_comment' || c.status==='disputed');
+  else if (_coachingTab === 'pending_tl')    items = items.filter(c => c.status==='pending_tl');
+  else if (_coachingTab === 'pending_agent') items = items.filter(c => c.status==='pending_agent');
+  else if (_coachingTab === 'disputed')      items = items.filter(c => c.status==='disputed');
+  else if (_coachingTab === 'closed')        items = items.filter(c => c.status==='closed');
 
   // Update subtitle
   const sub = document.getElementById('coaching-subtitle');
