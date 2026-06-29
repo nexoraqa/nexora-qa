@@ -555,22 +555,23 @@ a { color:var(--purple-l); text-decoration:none; }
       <!-- User selector -->
       <div style="margin-bottom:16px;">
         <label style="font-size:10px;color:var(--text-2);text-transform:uppercase;letter-spacing:1.2px;display:block;margin-bottom:7px;font-weight:600;">Select Account</label>
-        <select id="login-user" onchange="onLoginUserChange()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:11px 13px;color:var(--text);font-size:13px;outline:none;font-family:var(--font-b);cursor:pointer;">
-          <option value="">— Choose your name —</option>
-          <optgroup label="Manager">
+        <select id="login-user" onchange="onLoginUserChange()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:11px 13px;color:var(--text);font-size:13px;outline:none;font-family:var(--font-b);cursor:pointer;appearance:auto;">
+          <option value="">— Select your name —</option>
+          <optgroup label="─── Manager ───">
             <option value="younes">Younes Sid</option>
           </optgroup>
-          <optgroup label="QA Assessor">
+          <optgroup label="─── QA Assessor ───">
             <option value="shahd">Shahd Mohamed</option>
           </optgroup>
-          <optgroup label="Team Lead">
-            <option value="walid">Walid</option>
-            <option value="mustafa">Mustafa</option>
-            <option value="lotfi">Lotfi</option>
-            <option value="duaa">Duaa</option>
+          <optgroup label="─── Team Lead ───">
+            <option value="walidb">Walid Bouzidi</option>
+            <option value="walidh">Walid Hassan Eissa</option>
+            <option value="lotfi">Lotfi Hamrouni</option>
+            <option value="duaa">Duaa Ismail Odeh Abumansour</option>
+            <option value="mustafa">Mustafa Yusef Hamid Mohammed Ali</option>
           </optgroup>
-          <optgroup label="Agent">
-            <option value="ramzi">Chaimaa Belhadj</option>
+          <optgroup label="─── Agent ───">
+            <option value="ramzi">Ramzi Haddad</option>
             <option value="abdelrahman">Abdelrahman Mizar</option>
             <option value="hind">Hind Yahya</option>
             <option value="chaimaa">Chaimaa Belhadj</option>
@@ -711,15 +712,15 @@ a { color:var(--purple-l); text-decoration:none; }
       <!-- Alert counts row -->
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">
         <div style="background:#ff4d4d15;border:1px solid #ff4d4d44;border-radius:10px;padding:12px;text-align:center;">
-          <div style="font-family:var(--font-h);font-size:28px;font-weight:900;color:var(--red);" id="home-escalate">0</div>
+          <div style="font-family:var(--font-mono);font-size:26px;font-weight:800;color:var(--red);" id="home-escalate">0</div>
           <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-top:2px;"><span class="si-dot si-dot-red"></span> Escalate</div>
         </div>
         <div style="background:#ff8c0015;border:1px solid #ff8c0044;border-radius:10px;padding:12px;text-align:center;">
-          <div style="font-family:var(--font-h);font-size:28px;font-weight:900;color:var(--orange);" id="home-intervene">0</div>
+          <div style="font-family:var(--font-mono);font-size:26px;font-weight:800;color:var(--orange);" id="home-intervene">0</div>
           <div style="font-size:10px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:2px;"><span class="si-dot si-dot-orange"></span> Intervene</div>
         </div>
         <div style="background:#4a86e815;border:1px solid #4a86e844;border-radius:10px;padding:12px;text-align:center;">
-          <div style="font-family:var(--font-h);font-size:28px;font-weight:900;color:#6da8ff;" id="home-monitor">0</div>
+          <div style="font-family:var(--font-mono);font-size:26px;font-weight:800;color:#6da8ff;" id="home-monitor">0</div>
           <div style="font-size:10px;color:#6da8ff;text-transform:uppercase;letter-spacing:1px;margin-top:2px;"><span class="si-dot si-dot-blue"></span> Monitor</div>
         </div>
       </div>
@@ -858,24 +859,24 @@ a { color:var(--purple-l); text-decoration:none; }
       <div class="card" style="position:relative;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
           <div class="card-title" style="margin-bottom:0;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span> Pattern Intelligence</div>
-          <button onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>switchMonTab('patterns'),100)" style="background:none;border:1px solid var(--purple);color:var(--purple-l);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">View Full →</button>
+          <button onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>switchMonTab('patterns'),100)" style="background:none;border:1px solid var(--purple);color:var(--purple-l);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">View Full →</button>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
-          <div onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('patterns');drillDown('escalate');},150)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid var(--red);cursor:pointer;" onmouseover="this.style.background='#ff4d4d15'" onmouseout="this.style.background='var(--bg)'">
+          <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('patterns');drillDown('escalate');},150)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid var(--red);cursor:pointer;" onmouseover="this.style.background='#ff4d4d15'" onmouseout="this.style.background='var(--bg)'">
             <div><div style="font-size:13px;font-weight:600;"><span class="si-dot si-dot-red"></span> Escalate</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">Chronic — 4+ repeats · Supervisor action</div></div>
-            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;color:var(--red);" id="po-escalate">—</div>
+            <div style="font-family:var(--font-mono);font-size:22px;font-weight:800;color:var(--red);" id="po-escalate">0</div>
           </div>
-          <div onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('patterns');drillDown('intervene');},150)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid var(--orange);cursor:pointer;" onmouseover="this.style.background='#ff8c0015'" onmouseout="this.style.background='var(--bg)'">
+          <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('patterns');drillDown('intervene');},150)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid var(--orange);cursor:pointer;" onmouseover="this.style.background='#ff8c0015'" onmouseout="this.style.background='var(--bg)'">
             <div><div style="font-size:13px;font-weight:600;"><span class="si-dot si-dot-orange"></span> Intervene</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">Confirmed — 3 repeats · Coaching needed</div></div>
-            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;color:var(--orange);" id="po-intervene">—</div>
+            <div style="font-family:var(--font-mono);font-size:22px;font-weight:800;color:var(--orange);" id="po-intervene">0</div>
           </div>
-          <div onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('patterns');drillDown('monitor');},150)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid #6da8ff;cursor:pointer;" onmouseover="this.style.background='#4a86e815'" onmouseout="this.style.background='var(--bg)'">
+          <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('patterns');drillDown('monitor');},150)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid #6da8ff;cursor:pointer;" onmouseover="this.style.background='#4a86e815'" onmouseout="this.style.background='var(--bg)'">
             <div><div style="font-size:13px;font-weight:600;"><span class="si-dot si-dot-blue"></span> Monitor</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">Emerging — 2 repeats · Watch closely</div></div>
-            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;color:#6da8ff;" id="po-monitor">—</div>
+            <div style="font-family:var(--font-mono);font-size:22px;font-weight:800;color:#6da8ff;" id="po-monitor">0</div>
           </div>
         </div>
         <div style="display:flex;gap:8px;">
-          <button onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>switchMonTab('patterns'),100)" style="flex:1;background:var(--purple);border:none;color:#fff;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span> Pattern Intelligence</button>
+          <button onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>switchMonTab('patterns'),100)" style="flex:1;background:var(--purple);border:none;color:#fff;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span> Pattern Intelligence</button>
         </div>
       </div>
 
@@ -883,27 +884,27 @@ a { color:var(--purple-l); text-decoration:none; }
       <div class="card" style="position:relative;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
           <div class="card-title" style="margin-bottom:0;"><span class="si-dot si-dot-gold"></span> At Risk Radar</div>
-          <button onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>switchMonTab('radar'),100)" style="background:none;border:1px solid var(--orange);color:var(--orange);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">View Full →</button>
+          <button onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>switchMonTab('radar'),100)" style="background:none;border:1px solid var(--orange);color:var(--orange);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">View Full →</button>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
-          <div onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;window._radarTypeFilter='multiple';nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('radar');renderMonitorRadar();window._radarTypeFilter=null;},150)" style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;border-top:2px solid var(--red);cursor:pointer;" onmouseover="this.style.background='#ff4d4d15'" onmouseout="this.style.background='var(--bg)'">
+          <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;window._radarTypeFilter='multiple';nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('radar');renderMonitorRadar();window._radarTypeFilter=null;},150)" style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;border-top:2px solid var(--red);cursor:pointer;" onmouseover="this.style.background='#ff4d4d15'" onmouseout="this.style.background='var(--bg)'">
             <div style="font-family:var(--font-h);font-size:26px;font-weight:900;color:var(--red);" id="radar-count-esc">—</div>
             <div style="font-size:10px;color:var(--red);font-weight:700;margin-top:2px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s5 4.5 5 9.5a5 5 0 11-10 0c0-1.5.7-2.7 1.5-3.8.3 1 1 1.8 1.5 1.3-.3-2 .7-4 2-5z"/></svg></span> Multiple Issues</div>
           </div>
-          <div onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;window._radarTypeFilter='cc';nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('radar');renderMonitorRadar();window._radarTypeFilter=null;},150)" style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;border-top:2px solid #4a86e8;cursor:pointer;" onmouseover="this.style.background='#4a86e815'" onmouseout="this.style.background='var(--bg)'">
+          <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;window._radarTypeFilter='cc';nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('radar');renderMonitorRadar();window._radarTypeFilter=null;},150)" style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;border-top:2px solid #4a86e8;cursor:pointer;" onmouseover="this.style.background='#4a86e815'" onmouseout="this.style.background='var(--bg)'">
             <div style="font-family:var(--font-h);font-size:26px;font-weight:900;color:#6da8ff;" id="radar-count-int">—</div>
             <div style="font-size:10px;color:#6da8ff;font-weight:700;margin-top:2px;"><span class="si-dot si-dot-blue"></span> CC Error</div>
           </div>
-          <div onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;window._radarTypeFilter='cb';nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('radar');renderMonitorRadar();window._radarTypeFilter=null;},150)" style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;border-top:2px solid var(--orange);cursor:pointer;" onmouseover="this.style.background='#f0803015'" onmouseout="this.style.background='var(--bg)'">
+          <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;window._radarTypeFilter='cb';nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('radar');renderMonitorRadar();window._radarTypeFilter=null;},150)" style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;border-top:2px solid var(--orange);cursor:pointer;" onmouseover="this.style.background='#f0803015'" onmouseout="this.style.background='var(--bg)'">
             <div style="font-family:var(--font-h);font-size:26px;font-weight:900;color:var(--orange);" id="radar-count-mon">—</div>
             <div style="font-size:10px;color:var(--orange);font-weight:700;margin-top:2px;"><span class="si-dot si-dot-orange"></span> CB Error</div>
           </div>
-          <div onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;window._radarTypeFilter='threshold';nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('radar');renderMonitorRadar();window._radarTypeFilter=null;},150)" style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;border-top:2px solid var(--gold);cursor:pointer;" onmouseover="this.style.background='#f0b42915'" onmouseout="this.style.background='var(--bg)'">
+          <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;window._radarTypeFilter='threshold';nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('radar');renderMonitorRadar();window._radarTypeFilter=null;},150)" style="background:var(--bg);border-radius:10px;padding:12px;text-align:center;border-top:2px solid var(--gold);cursor:pointer;" onmouseover="this.style.background='#f0b42915'" onmouseout="this.style.background='var(--bg)'">
             <div style="font-family:var(--font-h);font-size:26px;font-weight:900;color:var(--gold);" id="radar-count-thr">—</div>
             <div style="font-size:10px;color:var(--gold);font-weight:700;margin-top:2px;"><span class="si-dot si-dot-gold"></span> Below 80%</div>
           </div>
         </div>
-        <button onclick="window._dashScrollPos=document.getElementById('page-dashboard').scrollTop||window.scrollY||document.documentElement.scrollTop;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>switchMonTab('radar'),100)" style="width:100%;background:var(--orange);border:none;color:#fff;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;"><span class="si-dot si-dot-gold"></span> View At Risk Radar</button>
+        <button onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>switchMonTab('radar'),100)" style="width:100%;background:var(--orange);border:none;color:#fff;border-radius:8px;padding:9px;font-size:12px;font-weight:700;cursor:pointer;"><span class="si-dot si-dot-gold"></span> View At Risk Radar</button>
       </div>
 
     </div>
@@ -1230,102 +1231,23 @@ a { color:var(--purple-l); text-decoration:none; }
   <!-- ══════════════════════════════════════
        DELETE CONFIRMATION MODAL
        ══════════════════════════════════════ -->
-  <div id="delete-modal" style="display:none;position:fixed;inset:0;background:#00000080;z-index:999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:420px;margin:16px;box-shadow:0 24px 60px #000000aa;animation:fadeIn .18s ease;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
-        <div style="width:40px;height:40px;background:var(--red-dim);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13"/></svg></span></div>
-        <div>
-          <div style="font-family:var(--font-h);font-size:16px;font-weight:800;" id="del-modal-title">Delete Evaluation</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="del-modal-sub">This action cannot be undone.</div>
-        </div>
-      </div>
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:14px;margin:18px 0;" id="del-modal-info"></div>
-      <div style="display:flex;gap:10px;">
-        <button onclick="closeDeleteModal()" style="flex:1;padding:11px;background:var(--card);border:1px solid var(--border-l);color:var(--text-2);border-radius:var(--radius-s);font-size:13px;font-weight:700;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-2)'">Cancel</button>
-        <button onclick="confirmDelete()" style="flex:1;padding:11px;background:var(--red-dim);border:1px solid #f04f4f55;color:var(--red);border-radius:var(--radius-s);font-size:13px;font-weight:700;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);" onmouseover="this.style.background='#f04f4f30'" onmouseout="this.style.background='var(--red-dim)'" id="del-confirm-btn">Yes, Delete</button>
-      </div>
-    </div>
-  </div>
+  
 
   <!-- Team Heatmap Detail Popup -->
-  <div id="heatmap-modal" style="display:none;position:fixed;inset:0;background:#00000080;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="if(event.target===this) closeHeatmapModal()">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:480px;margin:16px;max-height:80vh;overflow-y:auto;box-shadow:0 24px 60px #000000aa;animation:fadeIn .18s ease;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div>
-          <div style="font-family:var(--font-h);font-size:16px;font-weight:800;" id="hm-modal-title">Details</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="hm-modal-sub"></div>
-        </div>
-        <button onclick="closeHeatmapModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px;line-height:1;">✕</button>
-      </div>
-      <div id="hm-modal-body"></div>
-    </div>
-  </div>
+  
 
   <!-- TL Agent Hover Popup -->
-  <div id="tl-agent-hover" style="display:none;position:fixed;z-index:999;background:var(--card);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:12px 14px;box-shadow:0 8px 24px #000000aa;pointer-events:none;min-width:200px;max-width:260px;"></div>
+  
 
   <!-- Agent Hover Trend Popup -->
-  <div id="hover-trend-popup" style="display:none;position:fixed;z-index:997;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:0 16px 40px #000000aa;pointer-events:none;min-width:220px;"></div>
+  
 
-  <!-- About App Modal -->
-  <div id="about-modal" style="display:none;position:fixed;inset:0;background:#00000088;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="if(event.target===this)closeAboutModal()">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:520px;margin:16px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px #000000aa;animation:fadeIn .18s ease;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
-        <div>
-          <div style="font-family:var(--font-h);font-size:18px;font-weight:800;">How Nexora QA Works</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:3px;">Call Quality Intelligence Platform</div>
-        </div>
-        <button onclick="closeAboutModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
-      </div>
-
-      <div style="display:flex;flex-direction:column;gap:16px;">
-
-        <div style="background:var(--bg);border-radius:var(--radius-s);padding:14px;">
-          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📋 The Workflow</div>
-          <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
-            <b style="color:var(--text);">1. Submit Evaluation</b> — Assessor opens Score Calculator, selects an agent, scores the call across NC/CC/CB attributes and submits.<br><br>
-            <b style="color:var(--text);">2. Auto-Save</b> — Evaluation saves instantly to the app and syncs to Google Sheets in the background. All users see the same data.<br><br>
-            <b style="color:var(--text);">3. Dashboard Updates</b> — All charts, scores, and patterns update automatically with every new evaluation.
-          </div>
-        </div>
-
-        <div style="background:var(--bg);border-radius:var(--radius-s);padding:14px;">
-          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">⚙️ Scoring System</div>
-          <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
-            <b style="color:var(--text);">NC (Non-Critical)</b> — 6 attributes worth 30 points total. Each error deducts points.<br><br>
-            <b style="color:var(--text);">CC (Critical to Customer)</b> — Any error = automatic fail for that category.<br><br>
-            <b style="color:var(--text);">CB (Critical to Business)</b> — Any error = automatic fail for that category.<br><br>
-            <b style="color:var(--text);">Overall Score</b> = NC score + 70 points (if no CC or CB errors).<br>
-            <b style="color:var(--green);">Pass mark = 90%</b>
-          </div>
-        </div>
-
-        <div style="background:var(--bg);border-radius:var(--radius-s);padding:14px;">
-          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🎯 Pattern Intelligence</div>
-          <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
-            Tracks when the <b style="color:var(--text);">same agent</b> makes the <b style="color:var(--text);">same error</b> across multiple evaluations:<br><br>
-            <span class="si-dot si-dot-blue" style="vertical-align:middle;"></span> <b style="color:#6da8ff;">Monitor</b> — 2 repeats · Watch this agent<br>
-            <span class="si-dot si-dot-orange" style="vertical-align:middle;"></span> <b style="color:var(--orange);">Intervene</b> — 3 repeats · Coach now (CC/CB errors: 2 repeats)<br>
-            <span class="si-dot si-dot-red" style="vertical-align:middle;"></span> <b style="color:var(--red);">Escalate</b> — 4+ repeats · Supervisor action required
-          </div>
-        </div>
-
-        <div style="background:var(--bg);border-radius:var(--radius-s);padding:14px;">
-          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🔴 At Risk Radar</div>
-          <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
-            Shows agents who are struggling <b style="color:var(--text);">right now</b> based on their current scores — not historical patterns.<br><br>
-            <b style="color:var(--text);">Below 80%</b> = Critical · <b style="color:var(--text);">80–89%</b> = At Risk · <b style="color:var(--text);">CC/CB error</b> = flagged regardless of overall score
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
+  
 
   <!-- ══════════════════════════════════════
        VALIDATION ERROR TOAST
        ══════════════════════════════════════ -->
-  <div id="validation-toast" style="display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a0a0a;border:1px solid #f04f4f66;color:var(--red);border-radius:var(--radius-s);padding:12px 22px;font-size:13px;font-weight:600;z-index:998;box-shadow:0 8px 32px #00000066;white-space:nowrap;"></div>
+  
 
 
 
@@ -1360,7 +1282,7 @@ a { color:var(--purple-l); text-decoration:none; }
     <!-- Header + Single Filter Bar -->
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
       <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
-        <button onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1]);setTimeout(()=>{const p=document.getElementById('page-dashboard');const pos=window._dashScrollPos||0;if(p){p.scrollTop=pos;}window.scrollTo(0,pos);document.documentElement.scrollTop=pos;},150)" style="display:inline-flex;align-items:center;gap:7px;background:var(--blue-dim);border:1px solid #4a86e850;color:var(--blue-l);border-radius:var(--radius-s);padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);letter-spacing:.3px;flex-shrink:0;" onmouseover="this.style.background='#4a86e825';this.style.borderColor='var(--blue-l)'" onmouseout="this.style.background='var(--blue-dim)';this.style.borderColor='#4a86e850'">← Dashboard</button>
+        <button onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1]);setTimeout(()=>{const pos=window._dashScrollPos||0;const m=document.querySelector('.main');if(m)m.scrollTop=pos;},50)" style="display:inline-flex;align-items:center;gap:7px;background:var(--blue-dim);border:1px solid #4a86e850;color:var(--blue-l);border-radius:var(--radius-s);padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);letter-spacing:.3px;flex-shrink:0;" onmouseover="this.style.background='#4a86e825';this.style.borderColor='var(--blue-l)'" onmouseout="this.style.background='var(--blue-dim)';this.style.borderColor='#4a86e850'">← Dashboard</button>
         <div>
           <div style="font-family:var(--font-h);font-size:20px;font-weight:800;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6.5L4.5 19a2 2 0 001.8 3h11.4a2 2 0 001.8-3L15 8.5V2"/><path d="M8.5 14h7"/></svg></span> QA Monitor</div>
           <div style="font-size:12px;color:var(--muted);margin-top:4px;">Pattern Intelligence + At Risk Radar — one unified view</div>
@@ -1441,7 +1363,7 @@ a { color:var(--purple-l); text-decoration:none; }
     <!-- TAB 1: Pattern Intelligence -->
     <div id="mon-tab-patterns">
       <div style="margin-bottom:16px;">
-        <button onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1]);setTimeout(()=>{const p=document.getElementById('page-dashboard');const pos=window._dashScrollPos||0;if(p){p.scrollTop=pos;}window.scrollTo(0,pos);document.documentElement.scrollTop=pos;},150)" style="display:inline-flex;align-items:center;gap:7px;background:var(--blue-dim);border:1px solid #4a86e850;color:var(--blue-l);border-radius:var(--radius-s);padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);" onmouseover="this.style.background='#4a86e825'" onmouseout="this.style.background='var(--blue-dim)'">← Dashboard</button>
+        <button onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1]);setTimeout(()=>{const pos=window._dashScrollPos||0;const m=document.querySelector('.main');if(m)m.scrollTop=pos;},50)" style="display:inline-flex;align-items:center;gap:7px;background:var(--blue-dim);border:1px solid #4a86e850;color:var(--blue-l);border-radius:var(--radius-s);padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);" onmouseover="this.style.background='#4a86e825'" onmouseout="this.style.background='var(--blue-dim)'">← Dashboard</button>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
         <div onclick="drillDown('escalate')" id="card-escalate" style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--red);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;position:relative;" onmouseover="this.style.background='#1a0a0a'" onmouseout="this.style.background='var(--card)'">
@@ -1601,64 +1523,7 @@ a { color:var(--purple-l); text-decoration:none; }
     </div>
 
     <!-- Agent Profile Modal -->
-    <div id="prof-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;overflow-y:auto;padding:20px;">
-      <div style="max-width:720px;margin:40px auto;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
-        <!-- Modal Header -->
-        <div id="prof-modal-header" style="padding:24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;">
-          <div style="display:flex;align-items:center;gap:16px;">
-            <div id="prof-modal-av" style="width:56px;height:56px;border-radius:14px;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0;"></div>
-            <div>
-              <div id="prof-modal-name" style="font-family:var(--font-h);font-size:18px;font-weight:800;"></div>
-              <div id="prof-modal-meta" style="font-size:12px;color:var(--muted);margin-top:4px;"></div>
-              <div id="prof-modal-pill" style="margin-top:6px;display:inline-block;"></div>
-            </div>
-          </div>
-          <button onclick="closeProfile()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;">✕ Close</button>
-        </div>
-        <!-- Score Overview -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);">
-          <div style="background:var(--card);padding:16px;text-align:center;">
-            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;" id="prof-score">—</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px;">Overall</div>
-          </div>
-          <div style="background:var(--card);padding:16px;text-align:center;">
-            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;color:var(--gold);" id="prof-nc">—</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px;">NC</div>
-          </div>
-          <div style="background:var(--card);padding:16px;text-align:center;">
-            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;" id="prof-cc">—</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px;">CC</div>
-          </div>
-          <div style="background:var(--card);padding:16px;text-align:center;">
-            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;" id="prof-cb">—</div>
-            <div style="font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px;">CB</div>
-          </div>
-        </div>
-        <!-- Modal Body -->
-        <div style="padding:20px;">
-          <!-- Common Errors -->
-          <div style="margin-bottom:20px;">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;"><span class="si-dot si-dot-gold"></span> Common Errors</div>
-            <div id="prof-errors"></div>
-          </div>
-          <!-- Coaching Status -->
-          <div style="margin-bottom:20px;">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><rect x="5" y="6" width="14" height="15" rx="1.5"/><path d="M9 12h6M9 16h6"/></svg></span> Coaching Status</div>
-            <div id="prof-coaching"></div>
-          </div>
-          <!-- Score Trend -->
-          <div style="margin-bottom:20px;">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span> Score Context</div>
-            <div id="prof-trend"></div>
-          </div>
-          <!-- Score Sparkline -->
-          <div>
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span> Score Trend</div>
-            <div id="prof-sparkline"></div>
-          </div>
-        </div>
-      </div>
-    </div>
+    
 
     </div><!-- /hist-tab-qa -->
 
@@ -1861,33 +1726,7 @@ a { color:var(--purple-l); text-decoration:none; }
        SETTINGS PAGE
        ══════════════════════════════════════ -->
   <!-- Coaching Comment Popup — appears after eval submit if errors found -->
-  <div id="coaching-popup" style="display:none;position:fixed;inset:0;background:#00000088;z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="if(event.target===this)skipCoachingPopup()">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:500px;margin:16px;box-shadow:0 24px 60px #000000aa;">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
-        <div>
-          <div style="font-family:var(--font-h);font-size:17px;font-weight:800;">Add Coaching Comment</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:3px;" id="cp-agent-meta"></div>
-        </div>
-        <button onclick="skipCoachingPopup()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;">✕</button>
-      </div>
-
-      <!-- Error types detected -->
-      <div id="cp-errors" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
-
-      <!-- Comment text area -->
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Your Coaching Comment</div>
-      <textarea id="cp-comment" placeholder="Describe what needs to be coached, what the agent should improve, and any specific action..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:12px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:100px;outline:none;box-sizing:border-box;line-height:1.5;"></textarea>
-
-      <!-- Buttons -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
-        <button onclick="skipCoachingPopup()" style="background:var(--bg);border:1px solid var(--border-l);color:var(--muted);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);">Skip for now</button>
-        <button onclick="sendCoachingToTL()" style="background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);display:flex;align-items:center;justify-content:center;gap:6px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          Send to TL
-        </button>
-      </div>
-    </div>
-  </div>
+  
 
   <!-- ═══════════════ COACHING PAGE ═══════════════ -->
   <div class="page" id="page-coaching">
@@ -1923,43 +1762,7 @@ a { color:var(--purple-l); text-decoration:none; }
     <div id="coaching-list" style="display:flex;flex-direction:column;gap:12px;"></div>
 
     <!-- Coaching Detail Modal -->
-    <div id="coaching-modal" style="display:none;position:fixed;inset:0;background:#00000088;z-index:998;overflow-y:auto;backdrop-filter:blur(3px);">
-      <div style="max-width:560px;margin:40px auto;padding:16px;">
-        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
-            <div>
-              <div style="font-family:var(--font-h);font-size:17px;font-weight:800;" id="cm-agent"></div>
-              <div style="font-size:11px;color:var(--muted);margin-top:3px;" id="cm-meta"></div>
-            </div>
-            <button onclick="closeCoachingModal()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
-          </div>
-
-          <!-- Status indicator -->
-          <div id="cm-status-bar" style="margin-bottom:16px;padding:10px 14px;border-radius:var(--radius-s);font-size:12px;font-weight:600;"></div>
-
-          <!-- QA Comment -->
-          <div style="margin-bottom:16px;">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">📋 QA Comment</div>
-            <div id="cm-qa-comment" style="background:var(--bg);border-radius:var(--radius-s);padding:12px;font-size:13px;color:var(--text);line-height:1.6;"></div>
-          </div>
-
-          <!-- TL Response -->
-          <div id="cm-tl-section" style="margin-bottom:16px;display:none;">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">👥 TL Response</div>
-            <div id="cm-tl-comment" style="background:var(--bg);border-radius:var(--radius-s);padding:12px;font-size:13px;color:var(--text);line-height:1.6;"></div>
-          </div>
-
-          <!-- Agent Response -->
-          <div id="cm-agent-section" style="margin-bottom:16px;display:none;">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">🧑 Agent Response</div>
-            <div id="cm-agent-comment" style="background:var(--bg);border-radius:var(--radius-s);padding:12px;font-size:13px;color:var(--text);line-height:1.6;"></div>
-          </div>
-
-          <!-- Action area — changes based on role + status -->
-          <div id="cm-action-area"></div>
-        </div>
-      </div>
-    </div>
+    
   </div>
 
   <!-- ═══════════════ OPERATION FORM PAGE ═══════════════ -->
@@ -2331,6 +2134,233 @@ a { color:var(--purple-l); text-decoration:none; }
         <div class="card" id="agent-coaching-card" style="display:none;">
           <div class="card-title" style="margin-bottom:12px;">My Coaching Plan</div>
           <div id="agent-coaching-list"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+
+<div id="prof-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;overflow-y:auto;padding:20px;">
+      <div style="max-width:720px;margin:40px auto;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;">
+        <!-- Modal Header -->
+        <div id="prof-modal-header" style="padding:24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div id="prof-modal-av" style="width:56px;height:56px;border-radius:14px;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#fff;flex-shrink:0;"></div>
+            <div>
+              <div id="prof-modal-name" style="font-family:var(--font-h);font-size:18px;font-weight:800;"></div>
+              <div id="prof-modal-meta" style="font-size:12px;color:var(--muted);margin-top:4px;"></div>
+              <div id="prof-modal-pill" style="margin-top:6px;display:inline-block;"></div>
+            </div>
+          </div>
+          <button onclick="closeProfile()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;">✕ Close</button>
+        </div>
+        <!-- Score Overview -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);">
+          <div style="background:var(--card);padding:16px;text-align:center;">
+            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;" id="prof-score">—</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px;">Overall</div>
+          </div>
+          <div style="background:var(--card);padding:16px;text-align:center;">
+            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;color:var(--gold);" id="prof-nc">—</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px;">NC</div>
+          </div>
+          <div style="background:var(--card);padding:16px;text-align:center;">
+            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;" id="prof-cc">—</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px;">CC</div>
+          </div>
+          <div style="background:var(--card);padding:16px;text-align:center;">
+            <div style="font-family:var(--font-h);font-size:24px;font-weight:900;" id="prof-cb">—</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:1px;">CB</div>
+          </div>
+        </div>
+        <!-- Modal Body -->
+        <div style="padding:20px;">
+          <!-- Common Errors -->
+          <div style="margin-bottom:20px;">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;"><span class="si-dot si-dot-gold"></span> Common Errors</div>
+            <div id="prof-errors"></div>
+          </div>
+          <!-- Coaching Status -->
+          <div style="margin-bottom:20px;">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><rect x="5" y="6" width="14" height="15" rx="1.5"/><path d="M9 12h6M9 16h6"/></svg></span> Coaching Status</div>
+            <div id="prof-coaching"></div>
+          </div>
+          <!-- Score Trend -->
+          <div style="margin-bottom:20px;">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></span> Score Context</div>
+            <div id="prof-trend"></div>
+          </div>
+          <!-- Score Sparkline -->
+          <div>
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span> Score Trend</div>
+            <div id="prof-sparkline"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  <!-- ══ Global Modals & Popups (outside all pages) ══ -->
+
+  <div id="delete-modal" style="display:none;position:fixed;inset:0;background:#00000080;z-index:999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:420px;margin:16px;box-shadow:0 24px 60px #000000aa;animation:fadeIn .18s ease;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <div style="width:40px;height:40px;background:var(--red-dim);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13"/></svg></span></div>
+        <div>
+          <div style="font-family:var(--font-h);font-size:16px;font-weight:800;" id="del-modal-title">Delete Evaluation</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="del-modal-sub">This action cannot be undone.</div>
+        </div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:14px;margin:18px 0;" id="del-modal-info"></div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeDeleteModal()" style="flex:1;padding:11px;background:var(--card);border:1px solid var(--border-l);color:var(--text-2);border-radius:var(--radius-s);font-size:13px;font-weight:700;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-2)'">Cancel</button>
+        <button onclick="confirmDelete()" style="flex:1;padding:11px;background:var(--red-dim);border:1px solid #f04f4f55;color:var(--red);border-radius:var(--radius-s);font-size:13px;font-weight:700;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);" onmouseover="this.style.background='#f04f4f30'" onmouseout="this.style.background='var(--red-dim)'" id="del-confirm-btn">Yes, Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="heatmap-modal" style="display:none;position:fixed;inset:0;background:#00000080;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="if(event.target===this) closeHeatmapModal()">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:480px;margin:16px;max-height:80vh;overflow-y:auto;box-shadow:0 24px 60px #000000aa;animation:fadeIn .18s ease;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-family:var(--font-h);font-size:16px;font-weight:800;" id="hm-modal-title">Details</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;" id="hm-modal-sub"></div>
+        </div>
+        <button onclick="closeHeatmapModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px;line-height:1;">✕</button>
+      </div>
+      <div id="hm-modal-body"></div>
+    </div>
+  </div>
+
+  <div id="tl-agent-hover" style="display:none;position:fixed;z-index:999;background:var(--card);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:12px 14px;box-shadow:0 8px 24px #000000aa;pointer-events:none;min-width:200px;max-width:260px;"></div>
+
+  <div id="hover-trend-popup" style="display:none;position:fixed;z-index:997;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:0 16px 40px #000000aa;pointer-events:none;min-width:220px;"></div>
+
+  
+
+  <div id="validation-toast" style="display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1a0a0a;border:1px solid #f04f4f66;color:var(--red);border-radius:var(--radius-s);padding:12px 22px;font-size:13px;font-weight:600;z-index:998;box-shadow:0 8px 32px #00000066;white-space:nowrap;"></div>
+
+  <div id="coaching-popup" style="display:none;position:fixed;inset:0;background:#00000088;z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="if(event.target===this)skipCoachingPopup()">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:500px;margin:16px;box-shadow:0 24px 60px #000000aa;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+        <div>
+          <div style="font-family:var(--font-h);font-size:17px;font-weight:800;">Add Coaching Comment</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;" id="cp-agent-meta"></div>
+        </div>
+        <button onclick="skipCoachingPopup()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0;">✕</button>
+      </div>
+
+      <!-- Error types detected -->
+      <div id="cp-errors" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;"></div>
+
+      <!-- Comment text area -->
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Your Coaching Comment</div>
+      <textarea id="cp-comment" placeholder="Describe what needs to be coached, what the agent should improve, and any specific action..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:12px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:100px;outline:none;box-sizing:border-box;line-height:1.5;"></textarea>
+
+      <!-- Buttons -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;">
+        <button onclick="skipCoachingPopup()" style="background:var(--bg);border:1px solid var(--border-l);color:var(--muted);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-b);">Skip for now</button>
+        <button onclick="sendCoachingToTL()" style="background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);display:flex;align-items:center;justify-content:center;gap:6px;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Send to TL
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="coaching-modal" style="display:none;position:fixed;inset:0;background:#00000088;z-index:998;overflow-y:auto;backdrop-filter:blur(3px);">
+      <div style="max-width:560px;margin:40px auto;padding:16px;">
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
+            <div>
+              <div style="font-family:var(--font-h);font-size:17px;font-weight:800;" id="cm-agent"></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px;" id="cm-meta"></div>
+            </div>
+            <button onclick="closeCoachingModal()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
+          </div>
+
+          <!-- Status indicator -->
+          <div id="cm-status-bar" style="margin-bottom:16px;padding:10px 14px;border-radius:var(--radius-s);font-size:12px;font-weight:600;"></div>
+
+          <!-- QA Comment -->
+          <div style="margin-bottom:16px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">📋 QA Comment</div>
+            <div id="cm-qa-comment" style="background:var(--bg);border-radius:var(--radius-s);padding:12px;font-size:13px;color:var(--text);line-height:1.6;"></div>
+          </div>
+
+          <!-- TL Response -->
+          <div id="cm-tl-section" style="margin-bottom:16px;display:none;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">👥 TL Response</div>
+            <div id="cm-tl-comment" style="background:var(--bg);border-radius:var(--radius-s);padding:12px;font-size:13px;color:var(--text);line-height:1.6;"></div>
+          </div>
+
+          <!-- Agent Response -->
+          <div id="cm-agent-section" style="margin-bottom:16px;display:none;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">🧑 Agent Response</div>
+            <div id="cm-agent-comment" style="background:var(--bg);border-radius:var(--radius-s);padding:12px;font-size:13px;color:var(--text);line-height:1.6;"></div>
+          </div>
+
+          <!-- Action area — changes based on role + status -->
+          <div id="cm-action-area"></div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+  <!-- About App Modal -->
+  <div id="about-modal" style="display:none;position:fixed;inset:0;background:#00000088;z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="if(event.target===this)closeAboutModal()">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:520px;margin:16px;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px #000000aa;animation:fadeIn .18s ease;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div>
+          <div style="font-family:var(--font-h);font-size:18px;font-weight:800;">How Nexora QA Works</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px;">Call Quality Intelligence Platform</div>
+        </div>
+        <button onclick="closeAboutModal()" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;">✕</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <div style="background:var(--bg);border-radius:var(--radius-s);padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">📋 The Workflow</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
+            <b style="color:var(--text);">1. Submit Evaluation</b> — Assessor opens Score Calculator, selects an agent, scores the call across NC/CC/CB attributes and submits.<br><br>
+            <b style="color:var(--text);">2. Auto-Save</b> — Evaluation saves instantly to the app and syncs to Google Sheets in the background. All users see the same data.<br><br>
+            <b style="color:var(--text);">3. Dashboard Updates</b> — All charts, scores, and patterns update automatically with every new evaluation.
+          </div>
+        </div>
+
+        <div style="background:var(--bg);border-radius:var(--radius-s);padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">⚙️ Scoring System</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
+            <b style="color:var(--text);">NC (Non-Critical)</b> — 6 attributes worth 30 points total. Each error deducts points.<br><br>
+            <b style="color:var(--text);">CC (Critical to Customer)</b> — Any error = automatic fail for that category.<br><br>
+            <b style="color:var(--text);">CB (Critical to Business)</b> — Any error = automatic fail for that category.<br><br>
+            <b style="color:var(--text);">Overall Score</b> = NC score + 70 points (if no CC or CB errors).<br>
+            <b style="color:var(--green);">Pass mark = 90%</b>
+          </div>
+        </div>
+
+        <div style="background:var(--bg);border-radius:var(--radius-s);padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🎯 Pattern Intelligence</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
+            Tracks when the <b style="color:var(--text);">same agent</b> makes the <b style="color:var(--text);">same error</b> across multiple evaluations:<br><br>
+            <span class="si-dot si-dot-blue" style="vertical-align:middle;"></span> <b style="color:#6da8ff;">Monitor</b> — 2 repeats · Watch this agent<br>
+            <span class="si-dot si-dot-orange" style="vertical-align:middle;"></span> <b style="color:var(--orange);">Intervene</b> — 3 repeats · Coach now (CC/CB errors: 2 repeats)<br>
+            <span class="si-dot si-dot-red" style="vertical-align:middle;"></span> <b style="color:var(--red);">Escalate</b> — 4+ repeats · Supervisor action required
+          </div>
+        </div>
+
+        <div style="background:var(--bg);border-radius:var(--radius-s);padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🔴 At Risk Radar</div>
+          <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
+            Shows agents who are struggling <b style="color:var(--text);">right now</b> based on their current scores — not historical patterns.<br><br>
+            <b style="color:var(--text);">Below 80%</b> = Critical · <b style="color:var(--text);">80–89%</b> = At Risk · <b style="color:var(--text);">CC/CB error</b> = flagged regardless of overall score
+          </div>
         </div>
 
       </div>
@@ -3265,17 +3295,17 @@ function buildSubList(cat,idx,attr) { return ''; }
 
 /* ── Score Calculator ── */
 const AGENT_MAP = {
-  'Walid Bouzidi':                        ['Abdelhaq Riahi','Mohamed Sabrery','Marwa Abdelmoniem','Houida Abdalla','Atika Alliaoui','Mahmoud Bakhit','Bianca Bagabaldo','Mohanad Ali','Hani Elkabashi','Zuhur Ahmed Mohamed Haji','Youcef Seddik Latreche','Shafna Asharaf','Aymen Berkani','Souhaib Boularouk','Ahmed Gamal Ismail Mohamed Metawea','Emile Lauren Pelayo','Paul Angelo Asuncion Ronario','Husna Abdullah Mohammed Al Junaidi'],
+  'Walid Bouzidi':                        ['Abdelhaq Riahi','Mohamed Sabrery','Marwa Abdelmoniem','Houida Abdalla','Atika Alliaoui','Mahmoud Bakhit','Bianca Bagabaldo','Mohanad Ali','Hani Elkabashi','Zuhur Ahmed Mohamed Haji','Youcef Seddik Latreche','Shafna Asharaf','Aymen Berkani','Souhaib Boularouk','Ahmed Gamal Ismail Mohamed Metawea','Emile Lauren Pelayo','Paul Angelo Asuncion Ronario','Husna Abdullah Mohammed Al Junaidi','George Njuguna Ngigi','Huzaifa Abdalla Saeed Hamid','Mohamed Mustafa Mohamed AlTaher','Mujahid Barday Mushtaq Barday','Youssef Kalai'],
   'Walid Hassan Eissa':                   ['Rinshidha Valiya Veettil Basheer','Yohannes Sema Gebrhiwot','Ohoud Mohammed D. A. AlDosari','Mohamed Suleiman Mohammed','Marwa Abdelmoniem Mohamed','Hiba Mostafa Idris Elidrissi','Wafa Haji','Mohamed Ismail Khashmelmous El Mahdi','Islam Diab Abdelbaset Mahmoud','Abdelmahmoud Majzoub Khalifa Rahma','Kholoud Ben Khalifa','Reem Abdulrahman Mohammad','Ayub Adem Saleh','Mohamed Sabrery Mohamed Ali','Riaz Ahmad'],
-  'Mustafa Yusef Hamid Mohammed Ali':     ['Om El Khir Ferhi','Vanessa Lacap Quiliza','Omer Gasim Omar Fadlalseed','Ieman Hussain Dehqan','Noora Bakhit','Leena Yosuf Ali','Ahmed Sedeeg Gdalla Sedeeg','Sami Nasser Hassen','Ibtisam Gamal Mohammed','Hind Yahya','Kamar Kasas','Ali Hassen Ali','Nooreldin Ahmed','Walla Abdulazeem Suliman AlHussain','Diana Santos Salvador','Russell Johang II Lleva Balilia','Roilan Alexis Francisco Concepcion','Harshad Pulayar Vayalil','Amina Nishwa','Mohamed Ifran Mohamed Roshan'],
-  'Lotfi Hamrouni':                       ['Hamza Grati','Jonna Lacap Ordillas','Houssem Dhahri','Amenallah Kheirallah','Abdu Mohammed Abdella','Abdelrahman Mohamed Mizar Ibrahim','Shiren Eid Hamid Ahmad','Shahd Mamoun Kamal Algzoli','Yassine Hadj Bachir','Misaa Adil Mustafa Yassin','Sarah Adil Mohamed Saeed','Zaineb Ammar Mbarek Jebali','Mansoor Gholam Dadi','Majdeldeeen Elsiddieg Mohamed Ajeeb','Mohammad Jandy Sehaban','Adrian Sabino Raymundo'],
+  'Mustafa Yusef Hamid Mohammed Ali':     ['Om El Khir Ferhi','Vanessa Lacap Quiliza','Omer Gasim Omar Fadlalseed','Ieman Hussain Dehqan','Noora Bakhit','Leena Yosuf Ali','Ahmed Sedeeg Gdalla Sedeeg','Sami Nasser Hassen','Ibtisam Gamal Mohammed','Hind Yahya','Kamar Kasas','Ali Hassen Ali','Nooreldin Ahmed','Walla Abdulazeem Suliman AlHussain','Diana Santos Salvador','Russell Johang II Lleva Balilia','Roilan Alexis Francisco Concepcion','Harshad Pulayar Vayalil','Amina Nishwa','Mohamed Ifran Mohamed Roshan','Ahmed Ismail Mahdi','Senae Siraj Yosuf'],
+  'Lotfi Hamrouni':                       ['Hamza Grati','Jonna Lacap Ordillas','Houssem Dhahri','Amenallah Kheirallah','Abdu Mohammed Abdella','Abdelrahman Mohamed Mizar Ibrahim','Shiren Eid Hamid Ahmad','Shahd Mamoun Kamal Algzoli','Yassine Hadj Bachir','Misaa Adil Mustafa Yassin','Sarah Adil Mohamed Saeed','Zaineb Ammar Mbarek Jebali','Mansoor Gholam Dadi','Majdeldeeen Elsiddieg Mohamed Ajeeb','Mohammad Jandy Sehaban','Adrian Sabino Raymundo','Omer Abduselam Mohammed Ibrahim'],
   'Duaa Ismail Odeh Abumansour':          ['Janosa Amor Abysa Rendora','Riham Mohamed Nour','Hamed Marwan Barah','Reem Abdulrahman Mohammad','Marowa Sheikhtawil ElSheikh Mohamed','Duaa Mukhtar Mohammed Farah','Chaimaa Belhadj','Houda Elfakhkhar','Ramzi Haddad','Billal Azzazene','Lahcene Bouziane','Mohamed Amine Salem','Omnia Dafaalla','Oussama Ramdani','Lidia Merzoug','Jan Timothy Florres Perez','Sittie Rahma Lucman Imam','Shamna Mammed Koya'],
-  'Ahmad Alsmadi':                        ['Mohammad Noor Edin NuMan Abu Taleb','Nabaa Bassem Awwad Abuashour','Zaid Bashar Mahmoud Al Jadallah','Dareen Loay Ziyad Abu Halimah','Yousef Faris Darweesh Aldarweesh','Aissara Mamduh Mubarak Elmanaseer','Eman Omar Turki Alkhami','Mahmoud Hisham Sadi Obeid','Aya Rafat Salman Alqadi','Ayham Khaled Attallah Hammouri','Huda Salameh Suleiman Alayhawat','Marwan Mohammad Ismail Alshqirat','Tasnim Sweilem Mutleq Alzawaidah','Salem Mohammad Salem Kreisahn','Aliya Mahdi Mohmad Ali','Abdallah Ahmad Ghazi Albataynen','Aos Hani Khaled Alsaub','Maryam Haitham Ayed Alkhawaldeh','Mohamed Jaser Adel Atya','Njood Abdallah','Yousef Mohammad Maroof Alaaldeen','Rashd Majied Zuheir Alghneimine','Marwan Mohammad Ismail Alshqirat'],
+  'Ahmad Alsmadi':                        ['Mohammad Noor Edin NuMan Abu Taleb','Nabaa Bassem Awwad Abuashour','Zaid Bashar Mahmoud Al Jadallah','Dareen Loay Ziyad Abu Halimah','Yousef Faris Darweesh Aldarweesh','Aissara Mamduh Mubarak Elmanaseer','Eman Omar Turki Alkhami','Mahmoud Hisham Sadi Obeid','Aya Rafat Salman Alqadi','Ayham Khaled Attallah Hammouri','Huda Salameh Suleiman Alayhawat','Marwan Mohammad Ismail Alshqirat','Tasnim Sweilem Mutleq Alzawaidah','Salem Mohammad Salem Kreisahn','Aliya Mahdi Mohmad Ali','Abdallah Ahmad Ghazi Albataynen','Aos Hani Khaled Alsaub','Maryam Haitham Ayed Alkhawaldeh','Mohamed Jaser Adel Atya','Njood Abdallah','Yousef Mohammad Maroof Alaaldeen','Rashd Majied Zuheir Alghneimine','Marwan Mohammad Ismail Alshqirat','Mohammad Khaled Jamal Rinno'],
 
   'Akshay Munde':                         ['Daminii Limbaji Jadhav','Sushmita Shashikant Nikam','Shweta Rupekar','Arya Kumar','Satej Sonawane','Tejal Chavan','Stuti Ohol','Shaikh Tarannum Shakil','Vaishnavi Talla','Sushant Kadam','Arsha K S','Kishor K'],
   'Haneen Akram Eid Alsharari':           ['Dana Khaled Ahmad AlNasah','Esraa Jamal Khamees Abu Awad','Roaa Ali Taleb Altawarah','Rawan Rafat Mohammad Almomani','Seba Ahmed','Ola Ali Soud Alsmadi','Areen Omar Jumaeian Altrabean','Marwa Mohammad Khaleel Aljanadyeh','Darin Haidar Mousa Alhawawreh','Sewar Faris Damin Alkhalafat','Razan Mohammad Ahmad Alhelatat','Salwa Yahia Hasan Abuafash','Seren Issam Hasan Abumueitic','Serena Odeh Mohammad Alnaanah','Zakieh Mohammad Jaser Saleh','Ther Abdelbaset Shafiq Altakhainen','Alaa Saleh Saeed Alnajjar','Esraa Asem Ahmad Aloran','Omnia Zeyad Ahmad Alsawalq','Lama Amer Abdel Fattah Ibrahim','Alzahra Jamal Salem Mousa','Maymona Hassan Ibrahim Alrowwad','Rama Ahmed Muslim Alshoubaki'],
   'Jay-Ar Pautan':                        ['Ezikiel Chester Simbulan Salon'],
-  'Salsabeel Azmi Mahmoud Aldardasawi':   ['Ansam Hamoudeh','Rahmeh Hammad Odeh','Tala Mohammad Eisa AlArjeh','Dyala ZuheIr Musbah AlSalhi','Esraa Belal Mahmoood Zabout','Eman Kamel Yousef Alkudari','Shahinaz Thib Mohammed Aqabawi','Roaa Hamdan','Sajeda Hani Jum Ah Al Marafi','Abeer Abedalmajed Abdelatef Abdelnabi','Manar Abdallah Ali Abuawali','Maria Ali Mohammad Albasouny','Raneem Ibrahim Mahmoud Shehadeh','Rana Omar Khaleel Almsadien','Nabaa Mahd Rashid Yasin','Hadeel Ibrahim Ismail Alnamrouti','Yasmine Nedal Rushdi Barhom','Tuleen Moujeebalkahman Saleh Al Qaryouti','Roa Hamdhan','Arj Mohammed Mohammed Shehadeh','Islam Okath Ismail Alazzeh','Khulud Ahmed Ali Garadah','Leen Adnan Mahmoud Abukheile','Lujain Fayiz Khalaf Alzidanin'],
+  'Salsabeel Azmi Mahmoud Aldardasawi':   ['Ansam Hamoudeh','Rahmeh Hammad Odeh','Tala Mohammad Eisa AlArjeh','Dyala ZuheIr Musbah AlSalhi','Esraa Belal Mahmoood Zabout','Eman Kamel Yousef Alkudari','Shahinaz Thib Mohammed Aqabawi','Roaa Hamdan','Sajeda Hani Jum Ah Al Marafi','Abeer Abedalmajed Abdelatef Abdelnabi','Manar Abdallah Ali Abuawali','Maria Ali Mohammad Albasouny','Raneem Ibrahim Mahmoud Shehadeh','Rana Omar Khaleel Almsadien','Nabaa Mahd Rashid Yasin','Hadeel Ibrahim Ismail Alnamrouti','Yasmine Nedal Rushdi Barhom','Tuleen Moujeebalkahman Saleh Al Qaryouti','Roa Hamdhan','Arj Mohammed Mohammed Shehadeh','Islam Okath Ismail Alazzeh','Khulud Ahmed Ali Garadah','Leen Adnan Mahmoud Abukheile','Lujain Fayiz Khalaf Alzidanin','Heba Abdulla Khalil Elgharably'],
 };
 
 function initModalListeners() {
@@ -3850,14 +3880,8 @@ function buildIntelligence(fp, ft, fc) {
   // Update Home critical agents dynamically from real eval data
   const criticalDiv = document.getElementById('home-critical-agents');
   if (criticalDiv) {
-    const sourceData = _evalHistory.map(e => ({
-      agent: e.agent,
-      error: (e.errors && e.errors[0]) ? e.errors[0].v : 'Error',
-      type:  (e.errors && e.errors[0]) ? e.errors[0].t : 'nc',
-      tl: e.tl, proj: e.proj
-    }));
-    const allP = buildPatterns(evalHistoryToPatternData(_evalHistory));
-    const topCritical = allP.filter(p => p.level.key==='escalate' || p.level.key==='intervene').sort((a,b) => b.count - a.count).slice(0,3);
+    // Use already-filtered patterns (respects fp/ft/fc filter)
+    const topCritical = patterns.filter(p => p.level.key==='escalate' || p.level.key==='intervene').sort((a,b) => b.count - a.count).slice(0,3);
     if (topCritical.length) {
       criticalDiv.innerHTML = topCritical.map(p => {
         const col   = p.level.key==='escalate' ? 'var(--red)' : 'var(--orange)';
@@ -4145,6 +4169,35 @@ function loadFromStorage() {
 //  GOOGLE SHEETS INTEGRATION
 // ══════════════════════════════════════════════════════
 const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzBgm42c30Sbk7gEnPAjiW9h9ci576_psfqVL7SqBJ8XCLjYmWV5bJ0CQocPg2wRkIP/exec';
+
+// ── Date/Time display helpers ──────────────────────────────
+function fmtDate(raw) {
+  if (!raw) return '—';
+  // Already clean format like "27 June 2026"
+  if (/^\d{1,2} [A-Z][a-z]+ \d{4}$/.test(raw)) return raw;
+  try {
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+  } catch(e) { return raw; }
+}
+function fmtTime(raw) {
+  if (!raw) return '—';
+  // Already clean HH:MM format
+  if (/^\d{2}:\d{2}(:\d{2})?$/.test(raw)) return raw.slice(0,5);
+  // Excel base date 1899-12-30 = time only value from Sheets
+  if (raw.includes('1899-12-30') || raw.includes('1900-01-00')) {
+    try {
+      const d = new Date(raw);
+      return d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+    } catch(e) { return raw; }
+  }
+  try {
+    const d = new Date(raw);
+    if (isNaN(d.getTime())) return raw;
+    return d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+  } catch(e) { return raw; }
+}
 
 function getAttrValue(errors, attrName) {
   // Find if this attribute has any error — Yes = no error, No = error, N/A = not applicable
@@ -4536,7 +4589,7 @@ function openDeleteModal(uid) {
     `<div style="font-size:13px;font-weight:700;margin-bottom:4px;">${e.agent}</div>
      <div style="font-size:12px;color:var(--muted);">${e.proj} · ${e.tl} · <span style="color:var(--purple-l);">${e.qa}</span></div>
      <div style="margin-top:8px;font-family:var(--font-h);font-size:22px;font-weight:800;color:${col};">${e.overall.toFixed(1)}%</div>
-     <div style="font-size:11px;color:var(--muted);margin-top:2px;">${e.date} · ${e.time}</div>`;
+     <div style="font-size:11px;color:var(--muted);margin-top:2px;">${fmtDate(e.date)} · ${fmtTime(e.time)}</div>`;
   document.getElementById('delete-modal').style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
@@ -7660,7 +7713,7 @@ function downloadTemplate() {
   const example = {
     'Case Number':   'CASE-001',
     'Agent Name':    'Chaimaa Belhadj',
-    'TL Name':       'Duaa',
+    'TL Name':       'Duaa Ismail Odeh Abumansour',
     'Project':       'PHCC',
     'Language':      'Arabic',
     'Assessor':      'Younes Sid',
@@ -7740,14 +7793,15 @@ function downloadTemplate() {
 const USERS = {
   younes:       { name:'Younes Sid',        role:'manager',   pin:'1111', tl:null,      initials:'YS', color:'var(--purple)' },
   shahd:        { name:'Shahd Mohamed',     role:'qa',        pin:'2222', tl:null,      initials:'SM', color:'var(--blue-l)' },
-  walid:        { name:'Walid Bouzidi',      role:'tl', pin:'3333', tl:'Walid Bouzidi', initials:'WA', color:'var(--gold)' },
-  mustafa:      { name:'Mustafa Yusef Hamid Mohammed Ali', role:'tl', pin:'3333', tl:'Mustafa Yusef Hamid Mohammed Ali', initials:'MU', color:'var(--gold)' },
-  lotfi:        { name:'Lotfi Hamrouni',     role:'tl', pin:'3333', tl:'Lotfi Hamrouni', initials:'LO', color:'var(--gold)' },
-  duaa:         { name:'Duaa Ismail Odeh Abumansour', role:'tl', pin:'3333', tl:'Duaa Ismail Odeh Abumansour', initials:'DU', color:'var(--gold)' },
-  ramzi:        { name:'Chaimaa Belhadj',   role:'agent',     pin:'4444', tl:'Duaa',    initials:'CB', color:'var(--red)'    },
-  abdelrahman:  { name:'Abdelrahman Mizar', role:'agent',     pin:'4444', tl:'Lotfi',   initials:'AM', color:'var(--green)'  },
-  hind:         { name:'Hind Yahya',        role:'agent',     pin:'4444', tl:'Mustafa', initials:'HY', color:'var(--green)'  },
-  chaimaa:      { name:'Chaimaa Belhadj',   role:'agent',     pin:'4444', tl:'Duaa',    initials:'CB', color:'var(--green)'  },
+  walidb:       { name:'Walid Bouzidi',                    role:'tl', pin:'1001', tl:'Walid Bouzidi',                    initials:'WB', color:'var(--gold)' },
+  walidh:       { name:'Walid Hassan Eissa',               role:'tl', pin:'1002', tl:'Walid Hassan Eissa',               initials:'WH', color:'var(--gold)' },
+  lotfi:        { name:'Lotfi Hamrouni',                   role:'tl', pin:'1003', tl:'Lotfi Hamrouni',                   initials:'LO', color:'var(--gold)' },
+  duaa:         { name:'Duaa Ismail Odeh Abumansour',      role:'tl', pin:'1004', tl:'Duaa Ismail Odeh Abumansour',      initials:'DU', color:'var(--gold)' },
+  mustafa:      { name:'Mustafa Yusef Hamid Mohammed Ali', role:'tl', pin:'1005', tl:'Mustafa Yusef Hamid Mohammed Ali', initials:'MU', color:'var(--gold)' },
+  ramzi:        { name:'Ramzi Haddad',       role:'agent',     pin:'4444', tl:'Duaa Ismail Odeh Abumansour', initials:'RH', color:'var(--red)'    },
+  abdelrahman:  { name:'Abdelrahman Mohamed Mizar Ibrahim', role:'agent', pin:'4444', tl:'Lotfi Hamrouni', initials:'AM', color:'var(--green)'  },
+  hind:         { name:'Hind Yahya',        role:'agent',     pin:'4444', tl:'Mustafa Yusef Hamid Mohammed Ali', initials:'HY', color:'var(--green)'  },
+  chaimaa:      { name:'Chaimaa Belhadj',   role:'agent',     pin:'4444', tl:'Duaa Ismail Odeh Abumansour', initials:'CB', color:'var(--green)'  },
 };
 
 const ROLE_CONFIG = {
@@ -7788,14 +7842,13 @@ function onLoginUserChange() {
   const desc    = document.getElementById('login-role-desc');
   if (!key) { preview.style.display = 'none'; return; }
   const user = USERS[key];
+  if (!user) { preview.style.display = 'none'; return; }
   const cfg  = ROLE_CONFIG[user.role];
   label.innerHTML = cfg.label;
   label.style.color = cfg.color;
   desc.textContent  = cfg.desc;
   preview.style.display = 'block';
-  // Clear error
   document.getElementById('login-error').style.display = 'none';
-  // Focus PIN
   document.getElementById('login-pin').value = '';
   document.getElementById('login-pin').focus();
 }
@@ -7805,10 +7858,11 @@ function doLogin() {
   const pin = document.getElementById('login-pin').value;
   const errEl = document.getElementById('login-error');
 
-  if (!key) { errEl.textContent = 'Please select your account'; errEl.style.display = 'block'; return; }
-  if (!pin)  { errEl.textContent = 'Please enter your PIN';     errEl.style.display = 'block'; return; }
+  if (!key) { errEl.textContent = 'Please select your name'; errEl.style.display = 'block'; return; }
+  if (!pin)  { errEl.textContent = 'Please enter your PIN';   errEl.style.display = 'block'; return; }
 
   const user = USERS[key];
+  if (!user) { errEl.textContent = 'Please select your name'; errEl.style.display = 'block'; return; }
   if (pin !== user.pin) {
     errEl.style.display = 'block';
     errEl.textContent   = 'Incorrect PIN — please try again';
@@ -8069,7 +8123,7 @@ function renderTLHome(user) {
       return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
         <div style="flex:1;min-width:0;">
           <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.agent}</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${e.date} · ${e.time} ${badges}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${fmtDate(e.date)} · ${fmtTime(e.time)} ${badges}</div>
         </div>
         <div style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:${col};flex-shrink:0;">${e.overall.toFixed(1)}%</div>
       </div>`;
@@ -8173,7 +8227,7 @@ function renderAgentDashboard(user) {
 
   if (myEvals.length > 0) {
     const latest = myEvals[0];
-    document.getElementById('agent-score-date').textContent = `Last evaluated: ${latest.date} at ${latest.time}`;
+    document.getElementById('agent-score-date').textContent = `Last evaluated: ${fmtDate(latest.date)} at ${fmtTime(latest.time)}`;
     if (latest.cc > 0 || latest.cb > 0 || latest.ncCount >= 2) {
       document.getElementById('agent-coaching-card').style.display = 'block';
       const tasks = latest.errors.map((e,i) =>
@@ -8192,7 +8246,7 @@ function renderAgentDashboard(user) {
         : '<span style="font-size:10px;color:var(--green);">'+iconCheck()+'Clean</span>';
       return `<div style="padding:12px 0;border-bottom:1px solid var(--border);">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <div style="font-size:12px;color:var(--muted);">${e.date} · ${e.time}</div>
+          <div style="font-size:12px;color:var(--muted);">${fmtDate(e.date)} · ${fmtTime(e.time)}</div>
           <span style="font-family:var(--font-h);font-size:18px;font-weight:800;color:${col};">${e.overall.toFixed(1)}%</span>
         </div>
         <div style="display:flex;gap:4px;flex-wrap:wrap;">${errSummary}</div>
@@ -8273,7 +8327,7 @@ function switchUser() {
   _currentUser = null;
   window._sessionIsManager = false;
   document.getElementById('login-screen').style.display = 'flex';
-  document.getElementById('login-user').value = '';
+  document.getElementById('login-user').value = ''; document.getElementById('login-role-preview').style.display = 'none';
   document.getElementById('login-pin').value  = '';
   document.getElementById('login-error').style.display = 'none';
   document.getElementById('login-role-preview').style.display = 'none';
