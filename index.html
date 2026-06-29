@@ -663,6 +663,10 @@ a { color:var(--purple-l); text-decoration:none; }
   </div>
   <div class="topbar-right">
     <div class="top-date" id="top-date"></div>
+    <button id="sync-btn" onclick="manualSync()" title="Sync data from Google Sheets" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);padding:5px 8px;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;transition:all .2s;">
+      <svg id="sync-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0115-6.7L21 8M21 3v5h-5"/><path d="M21 12a9 9 0 01-15 6.7L3 16M3 21v-5h5"/></svg>
+      Sync
+    </button>
     <div class="welcome-pill">Welcome back 👋</div>
   </div>
 </header>
@@ -8403,6 +8407,36 @@ function loadFromGoogleSheets() {
 }
 // Load from Google Sheets 1 second after startup
 setTimeout(loadFromGoogleSheets, 1000);
+
+// Auto-refresh every 5 minutes
+setInterval(loadFromGoogleSheets, 5 * 60 * 1000);
+
+// Manual sync function — triggered by Sync button in topbar
+function manualSync() {
+  const btn  = document.getElementById('sync-btn');
+  const icon = document.getElementById('sync-icon');
+  if (!btn || !icon) { loadFromGoogleSheets(); return; }
+  // Spin the icon
+  btn.disabled = true;
+  btn.style.color = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  icon.style.animation = 'spin 1s linear infinite';
+  // Add spin keyframe if not already there
+  if (!document.getElementById('spin-style')) {
+    const s = document.createElement('style');
+    s.id = 'spin-style';
+    s.textContent = '@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }';
+    document.head.appendChild(s);
+  }
+  loadFromGoogleSheets();
+  // Reset button after 2.5 seconds
+  setTimeout(() => {
+    btn.disabled = false;
+    btn.style.color = '';
+    btn.style.borderColor = '';
+    icon.style.animation = '';
+  }, 2500);
+}
 
 // Sync EVAL_HISTORY + AGENT_META from saved evals on startup
 if (_evalHistory.length > 0) {
