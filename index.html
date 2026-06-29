@@ -6236,7 +6236,7 @@ function renderCoaching() {
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:700;">${dots}</div>
           <div style="font-size:14px;font-weight:700;margin-bottom:3px;">${c.agent}</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${c.project} · ${c.tl} · ${c.date} · by ${c.qaAuthor}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${c.project} · ${c.tl} · ${fmtDate(c.date)} · by ${c.qaAuthor}</div>
           ${attrPreview}
           ${c.qaComment ? `<div style="font-size:12px;color:var(--text-2);margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;border-left:2px solid var(--purple);">"${c.qaComment.slice(0,80)}${c.qaComment.length>80?'...':''}"</div>` : ''}
         </div>
@@ -6256,7 +6256,7 @@ function openCoachingModal(id) {
   const name = _currentUser?.name || '';
 
   document.getElementById('cm-agent').textContent = c.agent;
-  document.getElementById('cm-meta').textContent  = `${c.label} · ${c.project} · ${c.date} · by ${c.qaAuthor}`;
+  document.getElementById('cm-meta').textContent  = `${c.label} · ${c.project} · ${fmtDate(c.date)} · by ${c.qaAuthor}`;
 
   const statusConfig = {
     pending_comment: { label:'Awaiting QA Comment',            color:'var(--muted)',   bg:'var(--bg)' },
@@ -8101,7 +8101,7 @@ function renderTLHome(user) {
       return `<div onclick="openCoachingModal('${c.id}');nav('coaching',document.getElementById('nav-coaching'))" style="padding:10px;border-radius:var(--radius-s);background:var(--bg);margin-bottom:6px;cursor:pointer;border-left:3px solid ${typeColor};">
         <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px;">${dots} <span style="font-size:11px;font-weight:700;color:${typeColor};">${c.label}</span></div>
         <div style="font-size:13px;font-weight:600;">${c.agent}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${c.date} · by ${c.qaAuthor}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${fmtDate(c.date)} · by ${c.qaAuthor}</div>
       </div>`;
     }).join('');
   } else {
@@ -8187,7 +8187,7 @@ function renderAgentDashboard(user) {
       const h     = Math.max(4, (pct/100) * maxH);
       const col   = pct>=90?'var(--green)':pct>=80?'var(--gold)':'var(--red)';
       const isLast = i === myEvalsSorted.length - 1;
-      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;" title="${e.date}: ${pct.toFixed(1)}%">
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;" title="${fmtDate(e.date)}: ${pct.toFixed(1)}%">
         <div style="font-size:9px;color:${isLast?col:'var(--muted)'};">${isLast?pct.toFixed(0)+'%':''}</div>
         <div style="width:100%;height:${h}px;background:${col};border-radius:3px 3px 0 0;opacity:${isLast?1:0.5};transition:all .3s;"></div>
       </div>`;
@@ -8195,8 +8195,8 @@ function renderAgentDashboard(user) {
     trendEl.style.display = 'flex';
     const leftDate  = myEvalsSorted[0]?.date || '';
     const rightDate = myEvalsSorted[myEvalsSorted.length-1]?.date || '';
-    document.getElementById('agent-trend-label-left').textContent  = leftDate;
-    document.getElementById('agent-trend-label-right').textContent = rightDate;
+    document.getElementById('agent-trend-label-left').textContent  = fmtDate(leftDate);
+    document.getElementById('agent-trend-label-right').textContent = fmtDate(rightDate);
   } else if (trendEl) {
     trendEl.innerHTML = '<div style="color:var(--muted);font-size:12px;padding:20px 0;text-align:center;width:100%;">Need at least 2 evaluations to show trend</div>';
   }
@@ -8356,7 +8356,7 @@ function renderAgentDashboard(user) {
         return `<div onclick="nav('coaching', document.getElementById('nav-coaching'))" style="padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;">
           <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px;">${dots} <span style="font-size:11px;font-weight:700;color:${typeColor};">${c.label}</span></div>
           <div style="font-size:12px;color:var(--text-2);">${c.qaComment||'(QA comment pending)'}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:3px;">${c.date} · by ${c.qaAuthor}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:3px;">${fmtDate(c.date)} · by ${c.qaAuthor}</div>
         </div>`;
       }).join('');
     } else {
