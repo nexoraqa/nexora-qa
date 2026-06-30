@@ -3,587 +3,399 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nexora QA — Sales Presentation</title>
+<title>Nexora QA — Call Quality Intelligence</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#060d09;--gold:#e8a23d;--green:#16a766;--red:#f04f4f;
-  --orange:#f07830;--blue:#4a86e8;--purple:#8b5cf6;
-  --text:#e8f0ec;--muted:#4a6358;--card:#0d1a14;--border:#1a2e22;
+  --bg:#050a07;
+  --surface:#0d1410;
+  --line:#1a241d;
+  --gold:#e8a23d;
+  --signal:#16a766;
+  --muted:#7a9b8c;
+  --dim:#3d5347;
+  --text:#eef5f0;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;}
-#bgCanvas{position:fixed;inset:0;z-index:0;}
 
-/* SLIDES */
-.deck{position:relative;width:100vw;height:100vh;z-index:1;}
+/* ═══ AMBIENT MESH BACKGROUND ═══ */
+.mesh{position:fixed;inset:0;z-index:0;overflow:hidden;}
+.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.35;}
+.blob1{width:50vw;height:50vw;background:radial-gradient(circle,var(--signal),transparent 70%);top:-10%;right:-10%;animation:driftA 26s ease-in-out infinite;}
+.blob2{width:42vw;height:42vw;background:radial-gradient(circle,var(--gold),transparent 70%);bottom:-15%;left:-8%;animation:driftB 32s ease-in-out infinite;}
+.blob3{width:30vw;height:30vw;background:radial-gradient(circle,var(--signal),transparent 70%);top:40%;left:35%;opacity:.15;animation:driftC 38s ease-in-out infinite;}
+@keyframes driftA{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-6%,8%) scale(1.12);}}
+@keyframes driftB{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(8%,-6%) scale(1.08);}}
+@keyframes driftC{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-10%,-10%) scale(1.2);}}
+
+.grain{position:fixed;inset:0;z-index:1;opacity:.025;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.gridlines{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.4;
+  background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:64px 64px;
+}
+
+/* ═══ SIGNATURE: LIVE WAVEFORM ═══ */
+.waveform{position:fixed;bottom:0;left:0;right:0;height:46px;z-index:40;display:flex;align-items:flex-end;gap:2px;padding:0 0 0 0;pointer-events:none;opacity:.5;}
+
+/* Full-screen hero waveform — used as background on Welcome / Closing slides */
+.hero-waveform{position:absolute;inset:0;z-index:0;display:flex;align-items:center;justify-content:center;gap:3px;pointer-events:none;opacity:.22;}
+.hero-waveform .hw-bar{width:5px;border-radius:3px;background:linear-gradient(to top,var(--signal),var(--gold));transition:height 1.4s cubic-bezier(.4,0,.2,1);}
+.slide .l-center{position:relative;z-index:1;}
+.slide .l-split{position:relative;z-index:1;}
+.slide-bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.5;pointer-events:none;}
+.wf-bar{flex:1;background:linear-gradient(to top,var(--signal),transparent);border-radius:1px 1px 0 0;transition:height .6s cubic-bezier(.4,0,.2,1),background .6s ease;}
+
+/* ═══ DECK / SLIDES ═══ */
+.deck{position:relative;width:100vw;height:100vh;z-index:5;perspective:2000px;}
 .slide{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  padding:70px 90px;opacity:0;pointer-events:none;
-  transition:opacity .5s ease,transform .5s cubic-bezier(.16,1,.3,1);
-  transform:translateY(28px);
+  padding:64px 80px 70px;opacity:0;pointer-events:none;
+  transform-style:preserve-3d;backface-visibility:hidden;will-change:transform,opacity,filter;
 }
-.slide.active{opacity:1;transform:none;pointer-events:all;}
+.slide.active{opacity:1;pointer-events:all;}
 
-/* LAYOUTS */
-.l-center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;max-width:960px;}
-.l-split{display:grid;grid-template-columns:1fr 1fr;gap:64px;width:100%;max-width:1080px;align-items:center;}
-.l-split-wide{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;width:100%;max-width:1080px;align-items:center;}
+.l-center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;width:100%;max-width:980px;}
+.l-split{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;width:100%;max-width:1100px;align-items:center;}
 
-/* TYPE */
-.eyebrow{
-  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:4px;
-  text-transform:uppercase;color:var(--gold);margin-bottom:18px;
-  display:flex;align-items:center;gap:10px;
-  opacity:0;transform:translateX(-14px);
-  transition:opacity .5s .1s ease,transform .5s .1s ease;
+/* ═══ TYPE SYSTEM ═══ */
+.signal-tag{
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:22px;display:inline-flex;align-items:center;gap:9px;
+  opacity:0;transform:translateY(10px);transition:opacity .5s .1s ease,transform .5s .1s ease;
 }
-.eyebrow::before{content:'';width:22px;height:1px;background:var(--gold);opacity:.5;}
-.slide.active .eyebrow{opacity:1;transform:none;}
+.signal-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);}
+.slide.active .signal-tag{opacity:1;transform:none;}
 
-.h-hero{
-  font-family:'Syne',sans-serif;font-weight:900;
-  font-size:clamp(52px,8vw,104px);line-height:.92;letter-spacing:-3px;
-  margin-bottom:28px;
-  opacity:0;transform:translateY(28px);
-  transition:opacity .8s .15s ease,transform .8s .15s cubic-bezier(.16,1,.3,1);
+.display{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;
+  font-size:clamp(30px,3.6vw,52px);line-height:1.08;letter-spacing:-1px;
+  margin-bottom:20px;
+  opacity:0;transform:translateY(20px);transition:opacity .65s .18s cubic-bezier(.16,1,.3,1),transform .65s .18s cubic-bezier(.16,1,.3,1);
 }
-.slide.active .h-hero{opacity:1;transform:none;}
+.slide.active .display{opacity:1;transform:none;}
 
-.h1{
-  font-family:'Syne',sans-serif;font-weight:900;
-  font-size:clamp(34px,4.5vw,60px);line-height:.95;letter-spacing:-1.5px;
-  margin-bottom:18px;
-  opacity:0;transform:translateY(22px);
-  transition:opacity .7s .2s ease,transform .7s .2s cubic-bezier(.16,1,.3,1);
+.display-hero{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;
+  font-size:clamp(34px,4.4vw,68px);line-height:1.12;letter-spacing:-1.5px;
+  max-width:880px;
+  opacity:0;transform:translateY(24px);transition:opacity .8s .15s cubic-bezier(.16,1,.3,1),transform .8s .15s cubic-bezier(.16,1,.3,1);
 }
-.slide.active .h1{opacity:1;transform:none;}
+.slide.active .display-hero{opacity:1;transform:none;}
 
-.sub{
-  font-size:15px;color:var(--muted);line-height:1.8;
-  opacity:0;transform:translateY(14px);
-  transition:opacity .6s .3s ease,transform .6s .3s ease;
+.body-text{
+  font-size:15px;color:var(--muted);line-height:1.8;font-weight:400;
+  opacity:0;transform:translateY(14px);transition:opacity .6s .3s ease,transform .6s .3s ease;
 }
-.slide.active .sub{opacity:1;transform:none;}
+.slide.active .body-text{opacity:1;transform:none;}
 
-.body-items{
-  margin-top:24px;display:flex;flex-direction:column;gap:0;
-  opacity:0;transform:translateY(14px);
-  transition:opacity .6s .35s ease,transform .6s .35s ease;
+.mono-stat{font-family:'JetBrains Mono',monospace;font-weight:600;}
+
+/* ═══ COMPONENT: SIGNAL CARD ═══ */
+.card-list{
+  margin-top:26px;display:flex;flex-direction:column;gap:0;
+  opacity:0;transform:translateY(16px);transition:opacity .6s .38s ease,transform .6s .38s ease;
 }
-.slide.active .body-items{opacity:1;transform:none;}
+.slide.active .card-list{opacity:1;transform:none;}
+.signal-row{display:flex;align-items:flex-start;gap:16px;padding:15px 0;border-bottom:1px solid var(--line);}
+.signal-row:last-child{border-bottom:none;}
+.signal-mark{width:3px;align-self:stretch;border-radius:2px;flex-shrink:0;margin-top:2px;}
+.row-title{font-size:14px;font-weight:600;margin-bottom:3px;color:var(--text);}
+.row-desc{font-size:12.5px;color:var(--muted);line-height:1.6;}
 
-.item{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
-.item:last-child{border-bottom:none;}
-.item-icon{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px;}
-.item-title{font-size:14px;font-weight:600;margin-bottom:2px;}
-.item-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+/* ═══ COMPONENT: DATA CARD GRID ═══ */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;width:100%;max-width:780px;margin-top:28px;opacity:0;transform:translateY(16px);transition:opacity .6s .38s ease,transform .6s .38s ease;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;width:100%;max-width:860px;margin-top:28px;opacity:0;transform:translateY(16px);transition:opacity .6s .38s ease,transform .6s .38s ease;}
+.slide.active .grid-2,.slide.active .grid-3{opacity:1;transform:none;}
+.data-cell{background:var(--surface);padding:22px 24px;}
+.data-cell.span2{grid-column:span 2;}
+.cell-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:9px;}
+.cell-title{font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:600;margin-bottom:6px;}
+.cell-desc{font-size:12px;color:var(--muted);line-height:1.6;}
 
-/* TAGS */
-.tags{
-  display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;
-  opacity:0;transform:translateY(12px);
-  transition:opacity .6s .4s ease,transform .6s .4s ease;
-}
-.slide.active .tags{opacity:1;transform:none;}
-.tag{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;letter-spacing:.5px;border:1px solid;}
-
-/* MOCKUP */
-.mockup{
-  opacity:0;transform:translateX(28px) scale(.97);
-  transition:opacity .7s .28s ease,transform .7s .28s cubic-bezier(.16,1,.3,1);
-}
-.slide.active .mockup{opacity:1;transform:none;}
-
-/* PHONE */
-.phone{width:248px;height:500px;background:#060d09;border-radius:34px;border:5px solid #1a2e22;box-shadow:0 0 0 1px #060d09,0 36px 72px rgba(0,0,0,.65),0 0 50px rgba(22,167,102,.07);overflow:hidden;position:relative;margin:0 auto;}
-.phone-screen{position:absolute;inset:0;padding:18px 11px 11px;overflow:hidden;}
-
-/* LAPTOP */
-.laptop{width:100%;max-width:500px;border-radius:9px 9px 0 0;background:#111;border:1px solid #2a3a30;box-shadow:0 28px 56px rgba(0,0,0,.55),0 0 36px rgba(22,167,102,.04);overflow:hidden;}
-.laptop-bar{background:#182418;height:26px;display:flex;align-items:center;padding:0 11px;gap:5px;border-bottom:1px solid var(--border);}
+/* ═══ COMPONENT: PHONE MOCKUP ═══ */
+.mockup{opacity:0;transform:scale(.95);transition:opacity .7s .3s ease,transform .7s .3s cubic-bezier(.16,1,.3,1);}
+.slide.active .mockup{opacity:1;transform:scale(1);}
+.phone{width:240px;height:480px;background:#040907;border-radius:32px;border:1px solid rgba(255,255,255,.06);box-shadow:0 40px 90px rgba(0,0,0,.7),0 0 60px rgba(22,167,102,.06),inset 0 0 0 1px rgba(255,255,255,.02);overflow:hidden;position:relative;margin:0 auto;}
+.phone-screen{position:absolute;inset:0;padding:18px 12px 12px;overflow:hidden;}
+.laptop{width:100%;max-width:520px;border-radius:10px 10px 0 0;background:#0a0f0c;border:1px solid var(--line);box-shadow:0 32px 70px rgba(0,0,0,.65),0 0 50px rgba(22,167,102,.04);overflow:hidden;}
+.laptop-bar{background:#111813;height:26px;display:flex;align-items:center;padding:0 11px;gap:6px;border-bottom:1px solid var(--line);}
 .lbtn{width:8px;height:8px;border-radius:50%;}
-.laptop-screen{background:#060d09;padding:13px;min-height:240px;}
-.laptop-base{height:14px;background:linear-gradient(#182418,#0d0d0d);border-radius:0 0 7px 7px;border:1px solid #2a3a30;border-top:none;}
+.laptop-screen{background:var(--bg);padding:14px;min-height:260px;}
+.laptop-base{height:14px;background:linear-gradient(#111813,#070a08);border-radius:0 0 8px 8px;border:1px solid var(--line);border-top:none;}
 
-/* APP UI */
-.topbar{background:#0d1a14;border-bottom:1px solid var(--border);padding:6px 9px;display:flex;align-items:center;justify-content:space-between;font-size:8px;margin:-13px -13px 9px;}
-.app-logo{font-family:'Syne',sans-serif;font-weight:800;color:var(--gold);font-size:9px;letter-spacing:.5px;}
-.badge{padding:2px 7px;border-radius:7px;font-size:7px;font-weight:700;font-family:'JetBrains Mono',monospace;}
-.krow{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:8px;}
-.kcard{background:#0d1a14;border:1px solid var(--border);border-radius:5px;padding:6px;text-align:center;}
-.knum{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;line-height:1;}
-.klbl{font-size:6px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px;}
-.sec{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-family:'JetBrains Mono',monospace;}
-.rcard{background:#0d1a14;border-radius:5px;padding:7px;border:1px solid;text-align:center;}
-.rnum{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;line-height:1;}
-.rlbl{font-size:6px;color:var(--muted);margin-top:2px;}
-.cattr{background:#0d1a14;border:1px solid var(--border);border-radius:5px;padding:6px 8px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;}
-.caname{font-size:7px;font-weight:600;}
-.cabtns{display:flex;gap:2px;}
-.cabtn{padding:2px 5px;border-radius:3px;font-size:6px;font-weight:700;font-family:'JetBrains Mono',monospace;border:1px solid rgba(255,255,255,.08);color:var(--muted);}
-.fstep{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid var(--border);}
-.fstep:last-child{border-bottom:none;}
-.fcircle{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;flex-shrink:0;border:1px solid;}
-.ft{font-size:7px;font-weight:700;margin-bottom:1px;}
-.fd{font-size:6px;color:var(--muted);line-height:1.4;}
-.arow{display:flex;align-items:center;justify-content:space-between;padding:5px 7px;border-radius:4px;margin-bottom:3px;}
-.aav{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:800;flex-shrink:0;}
-.aname{font-size:7px;font-weight:600;}
-.atl{font-size:6px;color:var(--muted);}
-.ascore{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;}
-.pcard{background:#0d1a14;border-radius:5px;padding:7px;border:1px solid;text-align:center;margin-bottom:5px;}
-.pnum{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;line-height:1;}
-.plevel{font-size:7px;font-weight:800;letter-spacing:1px;margin:3px 0 2px;}
-.pdesc{font-size:6px;color:var(--muted);line-height:1.4;}
-.citem{background:#0d1a14;border:1px solid var(--border);border-radius:5px;padding:7px;margin-bottom:4px;position:relative;overflow:hidden;}
-.ctop{position:absolute;top:0;left:0;right:0;height:2px;}
-.cagent{font-size:8px;font-weight:700;margin-bottom:2px;}
-.cmeta{font-size:6px;color:var(--muted);margin-bottom:4px;}
-.cstatus{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:6px;font-size:6px;font-weight:700;font-family:'JetBrains Mono',monospace;}
-.cacts{display:flex;gap:4px;margin-top:5px;}
-.cact{flex:1;padding:3px;border-radius:3px;font-size:7px;font-weight:700;text-align:center;border:1px solid;font-family:'JetBrains Mono',monospace;}
+.topbar{background:#0a0f0c;border-bottom:1px solid var(--line);padding:7px 10px;display:flex;align-items:center;justify-content:space-between;font-size:8px;margin:-14px -12px 10px;}
+.app-name{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--gold);font-size:9px;letter-spacing:.3px;}
+.role-pill{padding:2px 7px;border-radius:7px;font-size:7px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.k4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:9px;}
+.k-cell{background:var(--surface);border:1px solid var(--line);border-radius:5px;padding:7px;text-align:center;}
+.k-num{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;line-height:1;}
+.k-lbl{font-size:6px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
+.section-lbl{font-size:7px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;font-family:'JetBrains Mono',monospace;}
 
-/* HERO ELEMENTS */
-.pdot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pa 2s ease-in-out infinite;}
-@keyframes pa{0%,100%{box-shadow:0 0 0 0 rgba(22,167,102,.5);}50%{box-shadow:0 0 0 8px rgba(22,167,102,0);}}
-.live-pill{display:inline-flex;align-items:center;gap:8px;padding:7px 18px;border-radius:20px;border:1px solid rgba(22,167,102,.25);background:rgba(22,167,102,.07);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--green);margin-bottom:32px;opacity:0;transition:opacity .5s .15s ease;}
-.slide.active .live-pill{opacity:1;}
-.stats-row{display:flex;gap:0;opacity:0;transform:translateY(14px);transition:opacity .6s .5s ease,transform .6s .5s ease;}
-.slide.active .stats-row{opacity:1;transform:none;}
-.stat{padding:0 32px;text-align:center;border-right:1px solid var(--border);}
+/* ═══ NAV CHROME ═══ */
+#progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--signal),var(--gold));z-index:100;transition:width .6s cubic-bezier(.4,0,.2,1);box-shadow:0 0 12px rgba(22,167,102,.5);}
+.nav-dots{position:fixed;right:24px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px;z-index:100;}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.1);cursor:pointer;transition:all .35s cubic-bezier(.4,0,.2,1);}
+.dot.active{background:var(--gold);height:20px;border-radius:3px;box-shadow:0 0 8px var(--gold);}
+.counter{position:fixed;bottom:54px;right:40px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:2px;z-index:100;}
+.arr{position:fixed;bottom:50px;z-index:100;background:none;border:1px solid var(--line);color:var(--dim);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:13px;transition:all .25s ease;display:flex;align-items:center;justify-content:center;}
+.arr:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 14px rgba(232,162,61,.18);}
+.arr-p{left:40px;}.arr-n{left:84px;}
+.logobar{position:fixed;top:22px;left:36px;display:flex;align-items:center;gap:9px;z-index:100;}
+.logomark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--gold),var(--signal));display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:12px;color:#050a07;box-shadow:0 0 16px rgba(232,162,61,.25);}
+.logotxt{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:12px;color:var(--dim);letter-spacing:1px;}
+.hint{position:fixed;bottom:54px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--dim);font-family:'JetBrains Mono',monospace;letter-spacing:2px;z-index:100;}
+
+/* ═══ HERO STATS ═══ */
+.stat-strip{display:flex;gap:0;margin-top:36px;opacity:0;transform:translateY(14px);transition:opacity .6s .5s ease,transform .6s .5s ease;}
+.slide.active .stat-strip{opacity:1;transform:none;}
+.stat{padding:0 30px;text-align:center;border-right:1px solid var(--line);}
 .stat:last-child{border-right:none;}
-.stat-n{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:600;color:var(--gold);display:block;line-height:1;}
-.stat-l{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;}
+.stat-n{font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;color:var(--gold);display:block;line-height:1;}
+.stat-l{font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-top:5px;}
 
-/* PAIN CARDS */
-.pain-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:800px;margin-top:28px;
-  opacity:0;transform:translateY(16px);transition:opacity .6s .35s ease,transform .6s .35s ease;
+.live-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border-radius:20px;border:1px solid rgba(22,167,102,.25);background:rgba(22,167,102,.06);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;color:var(--signal);margin-bottom:30px;opacity:0;transition:opacity .5s .15s ease;}
+.slide.active .live-badge{opacity:1;}
+.pdot{width:6px;height:6px;border-radius:50%;background:var(--signal);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(22,167,102,.5);}50%{box-shadow:0 0 0 7px rgba(22,167,102,0);}}
+
+/* ═══ TAG PILLS ═══ */
+.pill-row{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px;justify-content:center;opacity:0;transform:translateY(12px);transition:opacity .6s .55s ease,transform .6s .55s ease;}
+.slide.active .pill-row{opacity:1;transform:none;}
+.pill{padding:6px 15px;border-radius:18px;font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;letter-spacing:.4px;border:1px solid;}
+
+/* ═══ MOBILE ═══ */
+@media (max-width:768px){
+  .slide{padding:54px 20px 90px;align-items:flex-start;overflow-y:auto;}
+  .l-center{text-align:left;align-items:flex-start;}
+  .l-split{grid-template-columns:1fr;gap:26px;}
+  .display-hero{font-size:clamp(26px,8vw,42px);}
+  .display{font-size:clamp(20px,6vw,30px);}
+  .phone{width:190px;height:380px;}
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+  .data-cell.span2{grid-column:span 1;}
+  .stat-strip{flex-wrap:wrap;}
+  .stat{padding:8px 14px;border-right:none;border-bottom:1px solid var(--line);}
+  .nav-dots,.arr,.hint{display:none;}
+  .counter{bottom:60px;right:16px;}
+  .logobar{top:14px;left:16px;}
+  .deck{pointer-events:none;}
+  .slide{pointer-events:all;}
+  .mobile-nav{display:flex!important;}
 }
-.slide.active .pain-grid{opacity:1;transform:none;}
-.pain{background:#0d1a14;border:1px solid rgba(240,79,79,.15);border-radius:10px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start;}
-.pain-ico{width:30px;height:30px;border-radius:7px;background:rgba(240,79,79,.12);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
-.pain-t{font-size:12px;font-weight:700;margin-bottom:3px;}
-.pain-d{font-size:11px;color:var(--muted);line-height:1.5;}
-
-/* COST CARDS */
-.cost-grid{
-  display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;width:100%;max-width:860px;margin-top:28px;
-  opacity:0;transform:translateY(16px);transition:opacity .6s .35s ease,transform .6s .35s ease;
-}
-.slide.active .cost-grid{opacity:1;transform:none;}
-.cost{background:#0d1a14;border:1px solid rgba(240,79,79,.12);border-radius:10px;padding:20px;text-align:center;}
-.cost-n{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:700;color:var(--red);line-height:1;margin-bottom:6px;text-shadow:0 0 20px rgba(240,79,79,.25);}
-.cost-t{font-size:12px;font-weight:700;margin-bottom:4px;}
-.cost-d{font-size:11px;color:var(--muted);line-height:1.5;}
-
-/* SOLUTION GRID */
-.sol-grid{
-  display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:760px;margin-top:28px;
-  opacity:0;transform:translateY(16px);transition:opacity .6s .35s ease,transform .6s .35s ease;
-}
-.slide.active .sol-grid{opacity:1;transform:none;}
-.sol{background:#0d1a14;border:1px solid var(--border);border-radius:12px;padding:20px;display:flex;gap:14px;align-items:flex-start;}
-.sol-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
-.sol-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;margin-bottom:4px;}
-.sol-desc{font-size:11px;color:var(--muted);line-height:1.6;}
-
-/* STEPS FLOW */
-.steps-col{
-  display:flex;flex-direction:column;gap:0;margin-top:22px;
-  opacity:0;transform:translateY(14px);transition:opacity .6s .35s ease,transform .6s .35s ease;
-}
-.slide.active .steps-col{opacity:1;transform:none;}
-.steprow{display:flex;align-items:flex-start;gap:14px;padding:13px 0;border-bottom:1px solid var(--border);}
-.steprow:last-child{border-bottom:none;}
-.stepnum{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;flex-shrink:0;border:1px solid;}
-.stept{font-size:14px;font-weight:600;margin-bottom:3px;}
-.stepd{font-size:12px;color:var(--muted);line-height:1.5;}
-
-/* UI CHROME */
-#progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .6s ease;z-index:100;box-shadow:0 0 10px rgba(232,162,61,.5);}
-.nav-dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:7px;z-index:100;}
-.dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.1);cursor:pointer;transition:all .3s;}
-.dot.active{background:var(--gold);height:18px;border-radius:3px;box-shadow:0 0 8px var(--gold);}
-.counter{position:fixed;bottom:22px;right:34px;font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(255,255,255,.16);letter-spacing:2px;z-index:100;}
-.arr{position:fixed;bottom:18px;z-index:100;background:none;border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.22);width:35px;height:35px;border-radius:50%;cursor:pointer;font-size:13px;transition:all .2s;display:flex;align-items:center;justify-content:center;}
-.arr:hover{border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(232,162,61,.15);}
-.arr-p{left:34px;}.arr-n{left:76px;}
-.logobar{position:fixed;top:20px;left:34px;display:flex;align-items:center;gap:8px;z-index:100;}
-.logomark{width:27px;height:27px;border-radius:7px;background:linear-gradient(135deg,var(--gold),var(--green));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:900;font-size:12px;color:#060d09;box-shadow:0 0 16px rgba(232,162,61,.25);}
-.logotxt{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;color:rgba(255,255,255,.22);letter-spacing:1.5px;text-transform:uppercase;}
-.hint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);font-size:9px;color:rgba(255,255,255,.1);font-family:'JetBrains Mono',monospace;letter-spacing:2px;z-index:100;}
-
-  /* ── MOBILE RESPONSIVE ── */
-  @media (max-width: 768px) {
-    .slide{padding:56px 18px 90px;align-items:flex-start;overflow-y:auto;overflow-x:hidden;}
-    .l-center{text-align:left;align-items:flex-start;}
-    .l-split,.l-split-wide{grid-template-columns:1fr;gap:24px;}
-    .mockup{transform:none!important;opacity:1!important;}
-    .h-hero{font-size:clamp(36px,10vw,56px);letter-spacing:-2px;}
-    .h1{font-size:clamp(24px,7vw,40px);}
-    .sub{font-size:13px;}
-    .phone{width:190px;height:380px;border-radius:26px;}
-    .laptop{max-width:100%;}
-    .pain-grid{grid-template-columns:1fr;}
-    .cost-grid{grid-template-columns:1fr;}
-    .sol-grid{grid-template-columns:1fr;}
-    .stats-row{flex-wrap:wrap;}
-    .stat{padding:10px 14px;border-right:none;border-bottom:1px solid var(--border);}
-    .stat:last-child{border-bottom:none;}
-    .stat-n{font-size:24px;}
-    .nav-dots{display:none;}
-    .arr{display:none;}
-    .hint{display:none;}
-    .counter{font-size:9px;bottom:60px;right:16px;}
-    .logobar{top:14px;left:16px;}
-    .live-pill{font-size:9px;padding:5px 12px;margin-bottom:18px;}
-    .deck{pointer-events:none;}
-    .slide{pointer-events:all;}
-  }
-  .mobile-next{display:none;}
-  .mobile-prev{display:none;}
-  @media (max-width: 768px) {
-    .mobile-next{
-      display:flex!important;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
-      background:rgba(232,162,61,.15);border:1px solid rgba(232,162,61,.3);
-      color:var(--gold);border-radius:20px;padding:9px 28px;
-      font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
-      letter-spacing:1px;z-index:100;cursor:pointer;align-items:center;gap:8px;
-    }
-    .mobile-prev{
-      display:flex!important;position:fixed;bottom:16px;left:16px;
-      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-      color:rgba(255,255,255,.3);border-radius:20px;padding:9px 16px;
-      font-family:'JetBrains Mono',monospace;font-size:11px;
-      z-index:100;cursor:pointer;align-items:center;
-    }
-  }
+.mobile-nav{display:none;position:fixed;bottom:14px;left:0;right:0;z-index:100;justify-content:space-between;padding:0 16px;}
+.mnav-btn{background:rgba(232,162,61,.1);border:1px solid rgba(232,162,61,.25);color:var(--gold);border-radius:18px;padding:8px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:1px;}
+.mnav-btn.prev{background:rgba(255,255,255,.04);border-color:var(--line);color:var(--dim);}
 </style>
 </head>
 <body>
-<canvas id="bgCanvas"></canvas>
-<div class="logobar"><div class="logomark">N</div><div class="logotxt">Nexora QA</div></div>
-<div id="progress"></div>
+
+<div class="mesh"><div class="blob blob1"></div><div class="blob blob2"></div><div class="blob blob3"></div></div>
+<div class="grain"></div>
+<div class="gridlines"></div>
+<div class="waveform" id="waveform"></div>
+
+<div class="logobar"><div class="logomark">N</div><div class="logotxt">NEXORA QA</div></div>
+<button class="arr" id="fsBtn" onclick="toggleFullscreen()" style="top:22px;right:36px;left:auto;position:fixed;">⛶</button>
+<div id="progress" style="width:6.25%"></div>
 <div class="nav-dots" id="navDots"></div>
-<div class="counter" id="counter">01 / 15</div>
+<div class="counter" id="counter">01 / 16</div>
 <button class="arr arr-p" onclick="go(-1)">←</button>
 <button class="arr arr-n" onclick="go(1)">→</button>
-<div class="hint">ARROWS · SPACE · CLICK · SWIPE</div>
+<div class="hint">ARROWS · SPACE · CLICK · F = FULLSCREEN</div>
+<div class="mobile-nav"><button class="mnav-btn prev" onclick="go(-1)">← Back</button><button class="mnav-btn" onclick="go(1)">Next →</button></div>
 
 <div class="deck" id="deck">
 
-<!-- S01 HOOK -->
-<div class="slide active" id="s1">
+<!-- S00 — WELCOME -->
+<div class="slide active" id="s0">
+<canvas class="slide-bg" id="bg-s0"></canvas>
+<div class="hero-waveform" id="heroWaveform0"></div>
 <div class="l-center">
-  <div class="live-pill"><span class="pdot"></span>Nexora QA · Doha, Qatar · 2026</div>
-  <div class="h-hero" style="max-width:820px;">"What if you knew <span style="color:var(--gold)">exactly</span> which agent will fail<br>before they do?"</div>
-  <div class="sub" style="max-width:520px;font-size:17px;">That's not a question anymore.<br>That's what Nexora QA does — every single day.</div>
+  <div class="logomark" style="width:64px;height:64px;border-radius:18px;font-size:30px;margin-bottom:28px;opacity:0;transform:scale(.8);animation:welcomeMark .8s .1s cubic-bezier(.16,1,.3,1) forwards;">N</div>
+  <div class="display-hero" style="font-size:clamp(38px,5.5vw,76px);">Nexora <span style="color:var(--gold)">QA</span></div>
+  <div class="body-text" style="margin-top:18px;max-width:460px;font-size:16px;">Call Quality Intelligence Platform</div>
+  <div class="body-text" style="margin-top:30px;font-size:13px;color:var(--dim);font-family:'JetBrains Mono',monospace;letter-spacing:1px;">PRESENTED BY YOUNES SID — QA MANAGER · DOHA, QATAR</div>
 </div>
 </div>
 
-<!-- S02 INDUSTRY PROBLEM -->
+<style>@keyframes welcomeMark{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}</style>
+
+<!-- S01 — HOOK -->
+<div class="slide" id="s1">
+<canvas class="slide-bg" id="bg-s1"></canvas>
+<div class="l-center">
+  <div class="live-badge"><span class="pdot"></span>Doha, Qatar · Call Quality Intelligence</div>
+  <div class="display-hero">What if you knew <span style="color:var(--gold)">exactly</span> which agent will fail — <span style="color:var(--signal)">before they do?</span></div>
+  <div class="body-text" style="margin-top:24px;max-width:480px;font-size:16px;">That's not a question anymore. That's what Nexora QA does, every day.</div>
+</div>
+</div>
+
+<!-- S02 — PROBLEM -->
 <div class="slide" id="s2">
-<div class="l-split-wide">
-  <div>
-    <div class="eyebrow">The Industry Problem</div>
-    <div class="h1">Call Centers Are<br><span style="color:var(--red)">Flying Blind</span></div>
-    <div class="sub">Across the Middle East and globally, call centers invest heavily in hiring and training — then lose it all because they can't see what's happening on the call floor.</div>
-    <div class="body-items">
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,79,79,.12);color:var(--red);">📞</div>
-        <div><div class="item-title">Millions of calls. Zero structured QA.</div><div class="item-desc">Most call centers evaluate less than 2% of all calls — and those evaluations are inconsistent, subjective, and untracked.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,79,79,.12);color:var(--red);">📊</div>
-        <div><div class="item-title">Managers make decisions on gut feel.</div><div class="item-desc">Without real data, Team Leads can't identify patterns. Problems repeat for weeks before anyone notices.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,79,79,.12);color:var(--red);">🔄</div>
-        <div><div class="item-title">Coaching is a one-way conversation.</div><div class="item-desc">QA tells an agent what went wrong. The agent nods. Nothing is recorded. The same mistake happens next week.</div></div>
-      </div>
-    </div>
-  </div>
-  <div class="mockup">
-    <div style="background:#0d1a14;border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:20px;">INDUSTRY REALITY</div>
-      <div style="display:flex;flex-direction:column;gap:14px;">
-        <div style="background:rgba(240,79,79,.06);border:1px solid rgba(240,79,79,.15);border-radius:8px;padding:16px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--red);text-shadow:0 0 20px rgba(240,79,79,.3);">2%</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;">of calls actually get evaluated</div>
-        </div>
-        <div style="background:rgba(240,120,48,.06);border:1px solid rgba(240,120,48,.15);border-radius:8px;padding:16px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--orange);text-shadow:0 0 20px rgba(240,120,48,.3);">67%</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;">of coaching is delivered verbally with no record</div>
-        </div>
-        <div style="background:rgba(232,162,61,.06);border:1px solid rgba(232,162,61,.15);border-radius:8px;padding:16px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--gold);text-shadow:0 0 20px rgba(232,162,61,.3);">6 wks</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;">average time before a pattern is identified manually</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- S03 THE 5 PAINS -->
-<div class="slide" id="s3">
-<div class="l-center">
-  <div class="eyebrow">The 5 Pains</div>
-  <div class="h1">Every QA Manager<br><span style="color:var(--red)">Knows These</span></div>
-  <div class="pain-grid" style="max-width:900px;">
-    <div class="pain">
-      <div class="pain-ico">📋</div>
-      <div><div class="pain-t">Paper & Excel Evaluations</div><div class="pain-d">No consistency. No searchability. No way to compare agents or spot trends over time.</div></div>
-    </div>
-    <div class="pain">
-      <div class="pain-ico">👁</div>
-      <div><div class="pain-t">Zero Real-Time Visibility</div><div class="pain-d">Management has no dashboard. No live view. No alert when an agent is declining.</div></div>
-    </div>
-    <div class="pain">
-      <div class="pain-ico">🔗</div>
-      <div><div class="pain-t">No Accountability Loop</div><div class="pain-d">QA evaluates. TL is told verbally. Agent never confirms. Nothing is tracked end to end.</div></div>
-    </div>
-    <div class="pain">
-      <div class="pain-ico">💬</div>
-      <div><div class="pain-t">Verbal Coaching — No Proof</div><div class="pain-d">Coaching happens in hallways. No written record. Agent can say "I was never told" — and they'd be right.</div></div>
-    </div>
-    <div class="pain" style="grid-column:span 2;">
-      <div class="pain-ico">🧠</div>
-      <div><div class="pain-t">Patterns Go Undetected for Weeks</div><div class="pain-d">The same agent makes the same mistake 6 times. No one connects the dots. Customer complaints pile up. By the time management notices, the damage is done.</div></div>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- S04 COST -->
-<div class="slide" id="s4">
-<div class="l-center">
-  <div class="eyebrow">The Real Cost</div>
-  <div class="h1">Bad QA Isn't Just<br><span style="color:var(--red)">a Training Problem</span></div>
-  <div class="sub" style="max-width:560px;">It's a business risk. Every undetected pattern, every unacknowledged coaching session, every blind spot has a price.</div>
-  <div class="cost-grid">
-    <div class="cost">
-      <div class="cost-n">73%</div>
-      <div class="cost-t">Customer Churn</div>
-      <div class="cost-d">of customers who have a poor call center experience never call back — they switch to a competitor</div>
-    </div>
-    <div class="cost">
-      <div class="cost-n">4×</div>
-      <div class="cost-t">Cost to Recover</div>
-      <div class="cost-d">it costs 4 times more to recover a dissatisfied customer than to serve them correctly the first time</div>
-    </div>
-    <div class="cost">
-      <div class="cost-n">0</div>
-      <div class="cost-t">Accountability</div>
-      <div class="cost-d">without a written coaching trail, there is zero legal or operational record that performance management happened</div>
-    </div>
-  </div>
-  <div style="margin-top:24px;padding:16px 28px;background:rgba(22,167,102,.06);border:1px solid rgba(22,167,102,.2);border-radius:10px;font-size:15px;color:var(--green);font-weight:600;opacity:0;transform:translateY(12px);transition:opacity .6s .6s ease,transform .6s .6s ease;" class="solution-teaser">
-    There is a better way →
-  </div>
-</div>
-</div>
-
-<!-- S05 INTRODUCING -->
-<div class="slide" id="s5">
+<canvas class="slide-bg" id="bg-s2"></canvas>
 <div class="l-split">
   <div>
-    <div class="eyebrow">The Solution</div>
-    <div class="h1">Introducing<br><span style="color:var(--gold)">Nexora QA</span></div>
-    <div class="sub">One intelligent platform that closes the loop between QA, Team Leads, and Agents — with real-time pattern detection, full coaching accountability, and live dashboards for every role.</div>
-    <div class="tags" style="margin-top:24px;flex-direction:column;align-items:flex-start;gap:10px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="color:var(--green);font-size:16px;">✓</span>
-        <span style="font-size:14px;font-weight:500;">Every evaluation structured, scored and saved permanently</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="color:var(--green);font-size:16px;">✓</span>
-        <span style="font-size:14px;font-weight:500;">Patterns detected automatically — no manual analysis</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="color:var(--green);font-size:16px;">✓</span>
-        <span style="font-size:14px;font-weight:500;">Full coaching audit trail — QA → TL → Agent → Closed</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="color:var(--green);font-size:16px;">✓</span>
-        <span style="font-size:14px;font-weight:500;">Live dashboards for Manager, QA, Team Lead and Agent</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px;">
-        <span style="color:var(--green);font-size:16px;">✓</span>
-        <span style="font-size:14px;font-weight:500;">Works on any device, anywhere, from day one</span>
-      </div>
+    <div class="signal-tag">The Industry Problem</div>
+    <div class="display">Call centers are<br>flying blind</div>
+    <div class="body-text">Teams invest heavily in hiring and training, then lose visibility the moment a call connects. Without structured signal, every evaluation is a guess.</div>
+    <div class="card-list">
+      <div class="signal-row"><div class="signal-mark" style="background:var(--gold);"></div><div><div class="row-title">Manual evaluation, zero structure</div><div class="row-desc">Paper sheets and spreadsheets — no consistency, no searchable record.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--gold);"></div><div><div class="row-title">No real-time signal</div><div class="row-desc">Management has no live view. Patterns surface weeks after they start.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--gold);"></div><div><div class="row-title">Coaching with no record</div><div class="row-desc">A hallway conversation, then nothing. No proof it ever happened.</div></div></div>
     </div>
   </div>
   <div class="mockup">
-    <div style="background:#0d1a14;border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;">
-      <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:28px;color:var(--gold);letter-spacing:-1px;margin-bottom:4px;">NEXORA QA</div>
-      <div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:24px;font-family:'JetBrains Mono',monospace;">CALL QUALITY INTELLIGENCE</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-        <div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);border-radius:8px;padding:14px;text-align:center;">
-          <div style="font-size:20px;margin-bottom:5px;">👑</div>
-          <div style="font-size:11px;font-weight:700;color:var(--purple);">Manager</div>
-          <div style="font-size:9px;color:var(--muted);">Full Intelligence</div>
+    <div style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:2px;margin-bottom:16px;">TYPICAL EVALUATION SHEET</div>
+      <div style="background:#0a0f0c;border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:9px;">
+        <div style="display:grid;grid-template-columns:80px 55px 45px 1fr;gap:1px;margin-bottom:3px;">
+          <div style="background:#11181a;padding:5px 6px;color:var(--gold);font-weight:700;">Agent</div>
+          <div style="background:#11181a;padding:5px 6px;color:var(--gold);font-weight:700;">Date</div>
+          <div style="background:#11181a;padding:5px 6px;color:var(--gold);font-weight:700;">Score</div>
+          <div style="background:#11181a;padding:5px 6px;color:var(--gold);font-weight:700;">Notes</div>
         </div>
-        <div style="background:rgba(74,134,232,.08);border:1px solid rgba(74,134,232,.2);border-radius:8px;padding:14px;text-align:center;">
-          <div style="font-size:20px;margin-bottom:5px;">📋</div>
-          <div style="font-size:11px;font-weight:700;color:var(--blue);">QA Assessor</div>
-          <div style="font-size:9px;color:var(--muted);">Evaluate & Coach</div>
+        <div style="display:grid;grid-template-columns:80px 55px 45px 1fr;gap:1px;margin-bottom:2px;">
+          <div style="background:var(--bg);padding:5px 6px;color:var(--muted);">Agent A</div>
+          <div style="background:var(--bg);padding:5px 6px;color:var(--muted);">12 Jun</div>
+          <div style="background:var(--bg);padding:5px 6px;color:#e85d5d;">42%</div>
+          <div style="background:var(--bg);padding:5px 6px;color:var(--muted);">told verbally</div>
         </div>
-        <div style="background:rgba(232,162,61,.08);border:1px solid rgba(232,162,61,.2);border-radius:8px;padding:14px;text-align:center;">
-          <div style="font-size:20px;margin-bottom:5px;">🎯</div>
-          <div style="font-size:11px;font-weight:700;color:var(--gold);">Team Lead</div>
-          <div style="font-size:9px;color:var(--muted);">My Team Control</div>
+        <div style="display:grid;grid-template-columns:80px 55px 45px 1fr;gap:1px;margin-bottom:2px;">
+          <div style="background:var(--bg);padding:5px 6px;color:var(--muted);">Agent B</div>
+          <div style="background:var(--bg);padding:5px 6px;color:var(--muted);">18 Jun</div>
+          <div style="background:var(--bg);padding:5px 6px;color:var(--gold);">71%</div>
+          <div style="background:var(--bg);padding:5px 6px;color:var(--muted);">—</div>
         </div>
-        <div style="background:rgba(22,167,102,.08);border:1px solid rgba(22,167,102,.2);border-radius:8px;padding:14px;text-align:center;">
-          <div style="font-size:20px;margin-bottom:5px;">📈</div>
-          <div style="font-size:11px;font-weight:700;color:var(--green);">Agent</div>
-          <div style="font-size:9px;color:var(--muted);">Personal Dashboard</div>
+        <div style="display:grid;grid-template-columns:80px 55px 45px 1fr;gap:1px;">
+          <div style="background:var(--bg);padding:5px 6px;color:var(--muted);">Agent A</div>
+          <div style="background:var(--bg);padding:5px 6px;color:var(--muted);">28 Jun</div>
+          <div style="background:var(--bg);padding:5px 6px;color:#e85d5d;">38%</div>
+          <div style="background:var(--bg);padding:5px 6px;color:var(--muted);">—</div>
         </div>
       </div>
-      <div style="background:rgba(22,167,102,.06);border:1px solid rgba(22,167,102,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--green);font-weight:600;">
-        174 Agents · 10 TLs · 3 Projects · 4 Countries
+      <div style="margin-top:14px;padding:11px;background:rgba(232,93,93,.06);border:1px solid rgba(232,93,93,.18);border-radius:8px;font-size:11px;color:#e85d5d;line-height:1.7;">
+        Same agent, same low score, 16 days apart.<br>No one connected the two. No coaching record exists.
       </div>
     </div>
   </div>
 </div>
 </div>
 
-<!-- S06 HOW IT WORKS -->
+<!-- S03 — COST -->
+<div class="slide" id="s3">
+<canvas class="slide-bg" id="bg-s3"></canvas>
+<div class="l-center">
+  <div class="signal-tag">The Real Cost</div>
+  <div class="display">Bad QA isn't a training problem — <span style="color:var(--gold)">it's a signal problem</span></div>
+  <div class="body-text" style="max-width:560px;">Every undetected pattern, every unacknowledged coaching session, every blind spot compounds quietly until it's a customer complaint.</div>
+  <div class="grid-3">
+    <div class="data-cell"><div style="font-size:26px;margin-bottom:8px;">😤</div><div class="cell-title">Customer Frustration</div><div class="cell-desc">Repeated unresolved issues erode trust in the call center's ability to fix anything.</div></div>
+    <div class="data-cell"><div style="font-size:26px;margin-bottom:8px;">🔁</div><div class="cell-title">Repeat Mistakes</div><div class="cell-desc">Without tracking, the same error can recur for weeks before anyone notices.</div></div>
+    <div class="data-cell"><div style="font-size:26px;margin-bottom:8px;">📄</div><div class="cell-title">No Paper Trail</div><div class="cell-desc">No written coaching record means no proof performance management happened.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- S04 — SOLUTION -->
+<div class="slide" id="s4">
+<canvas class="slide-bg" id="bg-s4"></canvas>
+<div class="l-split">
+  <div>
+    <div class="signal-tag">The Solution</div>
+    <div class="display">Introducing<br><span style="color:var(--gold)">Nexora QA</span></div>
+    <div class="body-text">One platform that turns every call evaluation into structured signal — connecting QA, Team Lead, and Agent in a single accountability loop.</div>
+    <div class="card-list">
+      <div class="signal-row"><div class="signal-mark" style="background:var(--signal);"></div><div><div class="row-title">Every evaluation, structured and saved</div><div class="row-desc">Permanent record. Searchable. Comparable across time.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--signal);"></div><div><div class="row-title">Patterns detected automatically</div><div class="row-desc">No manual analysis — the system flags recurring issues for you.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--signal);"></div><div><div class="row-title">Full coaching audit trail</div><div class="row-desc">QA → Team Lead → Agent. Every step recorded, every time.</div></div></div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;text-align:center;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:26px;color:var(--gold);letter-spacing:-.5px;">NEXORA QA</div>
+      <div style="font-size:9px;color:var(--dim);letter-spacing:2px;margin:4px 0 22px;font-family:'JetBrains Mono',monospace;">CALL QUALITY INTELLIGENCE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+        <div style="background:#0a0f0c;border:1px solid var(--line);border-radius:8px;padding:13px;"><div style="font-size:18px;margin-bottom:4px;">👑</div><div style="font-size:10px;font-weight:700;">Manager</div></div>
+        <div style="background:#0a0f0c;border:1px solid var(--line);border-radius:8px;padding:13px;"><div style="font-size:18px;margin-bottom:4px;">📋</div><div style="font-size:10px;font-weight:700;">QA Assessor</div></div>
+        <div style="background:#0a0f0c;border:1px solid var(--line);border-radius:8px;padding:13px;"><div style="font-size:18px;margin-bottom:4px;">🎯</div><div style="font-size:10px;font-weight:700;">Team Lead</div></div>
+        <div style="background:#0a0f0c;border:1px solid var(--line);border-radius:8px;padding:13px;"><div style="font-size:18px;margin-bottom:4px;">📈</div><div style="font-size:10px;font-weight:700;">Agent</div></div>
+      </div>
+      <div style="margin-top:14px;padding:10px;background:rgba(22,167,102,.06);border:1px solid rgba(22,167,102,.18);border-radius:7px;font-size:11px;color:var(--signal);">174 Agents · 10 TLs · 3 Projects</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- S05 — HOW IT WORKS -->
+<div class="slide" id="s5">
+<canvas class="slide-bg" id="bg-s5"></canvas>
+<div class="l-split">
+  <div>
+    <div class="signal-tag">The Workflow</div>
+    <div class="display">Four steps.<br><span style="color:var(--gold)">Fully automated.</span></div>
+    <div class="body-text">From evaluation to acknowledgement, the loop runs itself. No manual follow-up, nothing falls through.</div>
+    <div class="card-list">
+      <div class="signal-row"><div class="signal-mark" style="background:#4a86e8;"></div><div><div class="row-title">01 · QA evaluates the call</div><div class="row-desc">NC / CC / CB scoring with full sub-attribute breakdown.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--gold);"></div><div><div class="row-title">02 · Coaching auto-created</div><div class="row-desc">On any error, a coaching item is generated and sent to the TL.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#e8853d;"></div><div><div class="row-title">03 · Team Lead reviews</div><div class="row-desc">Accept and forward, or dispute with comment back to QA.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--signal);"></div><div><div class="row-title">04 · Agent acknowledges</div><div class="row-desc">Loop closes. Full record saved permanently.</div></div></div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="phone"><div class="phone-screen">
+      <div class="topbar"><span class="app-name">Coaching</span><span class="role-pill" style="background:rgba(139,110,230,.18);color:#a78bfa;">Manager</span></div>
+      <div class="section-lbl">Live Status</div>
+      <div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);"><div style="width:18px;height:18px;border-radius:50%;background:rgba(232,93,93,.15);display:flex;align-items:center;justify-content:center;font-size:8px;">🔴</div><div><div style="font-size:8px;font-weight:700;color:#e85d5d;">OPEN</div><div style="font-size:7px;color:var(--dim);">CC Error · just now</div></div></div>
+      <div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);"><div style="width:18px;height:18px;border-radius:50%;background:rgba(232,133,61,.15);display:flex;align-items:center;justify-content:center;font-size:8px;">🟠</div><div><div style="font-size:8px;font-weight:700;color:#e8853d;">PENDING TL</div><div style="font-size:7px;color:var(--dim);">3 items waiting</div></div></div>
+      <div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);"><div style="width:18px;height:18px;border-radius:50%;background:rgba(74,134,232,.15);display:flex;align-items:center;justify-content:center;font-size:8px;">🔵</div><div><div style="font-size:8px;font-weight:700;color:#4a86e8;">PENDING AGENT</div><div style="font-size:7px;color:var(--dim);">1 item waiting</div></div></div>
+      <div style="display:flex;gap:8px;padding:7px 0;"><div style="width:18px;height:18px;border-radius:50%;background:rgba(22,167,102,.15);display:flex;align-items:center;justify-content:center;font-size:8px;">✓</div><div><div style="font-size:8px;font-weight:700;color:var(--signal);">CLOSED</div><div style="font-size:7px;color:var(--dim);">Acknowledged · 29 Jun</div></div></div>
+    </div></div>
+  </div>
+</div>
+</div>
+
+<!-- S06 — MANAGER VIEW -->
 <div class="slide" id="s6">
-<div class="l-split-wide">
+<canvas class="slide-bg" id="bg-s6"></canvas>
+<div class="l-split">
   <div>
-    <div class="eyebrow">The Workflow</div>
-    <div class="h1">4 Steps.<br><span style="color:var(--gold)">The Entire Loop<br>Automated.</span></div>
-    <div class="sub">From the moment a QA submits an evaluation to the moment an agent acknowledges their coaching — everything runs automatically. No manual follow-up. No dropped balls.</div>
-    <div class="steps-col">
-      <div class="steprow">
-        <div class="stepnum" style="background:rgba(74,134,232,.12);color:var(--blue);border-color:rgba(74,134,232,.3);">1</div>
-        <div><div class="stept">QA Assessor evaluates the call</div><div class="stepd">NC / CC / CB scoring with full sub-attribute breakdown. Live score preview. Review step before submitting.</div></div>
-      </div>
-      <div class="steprow">
-        <div class="stepnum" style="background:rgba(232,162,61,.12);color:var(--gold);border-color:rgba(232,162,61,.3);">2</div>
-        <div><div class="stept">Coaching auto-created and sent to TL</div><div class="stepd">If errors found, a coaching item is created instantly. QA adds comment. Team Lead is notified immediately.</div></div>
-      </div>
-      <div class="steprow">
-        <div class="stepnum" style="background:rgba(240,120,48,.12);color:var(--orange);border-color:rgba(240,120,48,.3);">3</div>
-        <div><div class="stept">Team Lead accepts or disputes</div><div class="stepd">TL reviews the coaching. Accept → moves to agent. Dispute → returns to QA with comment. Full trail kept.</div></div>
-      </div>
-      <div class="steprow">
-        <div class="stepnum" style="background:rgba(22,167,102,.12);color:var(--green);border-color:rgba(22,167,102,.3);">4</div>
-        <div><div class="stept">Agent acknowledges — loop closes</div><div class="stepd">Agent reads the full coaching note. One tap to acknowledge. Status → Closed. Audit trail saved forever.</div></div>
-      </div>
-    </div>
-  </div>
-  <div class="mockup">
-    <div class="phone">
-      <div class="phone-screen" style="background:#060d09;">
-        <div class="topbar"><span class="app-logo">Coaching Workflow</span><span class="badge" style="background:rgba(139,92,246,.2);color:var(--purple);">Manager</span></div>
-        <div class="sec">Live Status</div>
-        <div class="fstep">
-          <div class="fcircle" style="background:rgba(240,79,79,.15);color:var(--red);border-color:rgba(240,79,79,.3);">🔴</div>
-          <div><div class="ft" style="color:var(--red);">OPEN</div><div class="fd">CC Error detected · Chaimaa B. · Just now</div></div>
-        </div>
-        <div class="fstep">
-          <div class="fcircle" style="background:rgba(240,120,48,.15);color:var(--orange);border-color:rgba(240,120,48,.3);">🟠</div>
-          <div><div class="ft" style="color:var(--orange);">PENDING TL</div><div class="fd">Duaa reviewing · 3 items waiting</div></div>
-        </div>
-        <div class="fstep">
-          <div class="fcircle" style="background:rgba(74,134,232,.15);color:var(--blue);border-color:rgba(74,134,232,.3);">🔵</div>
-          <div><div class="ft" style="color:var(--blue);">PENDING AGENT</div><div class="fd">Mohamed must acknowledge · 1 item</div></div>
-        </div>
-        <div class="fstep">
-          <div class="fcircle" style="background:rgba(22,167,102,.15);color:var(--green);border-color:rgba(22,167,102,.3);">✓</div>
-          <div><div class="ft" style="color:var(--green);">CLOSED</div><div class="fd">Hamed acknowledged · 29 Jun 2026</div></div>
-        </div>
-        <div style="margin-top:10px;background:rgba(22,167,102,.07);border:1px solid rgba(22,167,102,.2);border-radius:5px;padding:7px;text-align:center;font-size:8px;color:var(--green);font-family:'JetBrains Mono',monospace;">
-          Full audit trail · Saved to Google Sheets
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- S07 MANAGER VIEW -->
-<div class="slide" id="s7">
-<div class="l-split-wide">
-  <div>
-    <div class="eyebrow">Manager View</div>
-    <div class="h1">See Everything.<br><span style="color:var(--gold)">Act Immediately.</span></div>
-    <div class="sub">The Manager dashboard gives complete visibility across all teams, all projects and all countries — with automatic pattern detection and risk alerts.</div>
-    <div class="body-items">
-      <div class="item">
-        <div class="item-icon" style="background:rgba(232,162,61,.12);color:var(--gold);">🧠</div>
-        <div><div class="item-title">Pattern Intelligence — Auto-Detected</div><div class="item-desc">Escalate / Intervene / Monitor levels assigned automatically. CC priority first, CB second, NC third.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,120,48,.12);color:var(--orange);">📡</div>
-        <div><div class="item-title">At Risk Radar — Live</div><div class="item-desc">Multiple Issues · CC Error · CB Error · Below 80% — all visible in one panel. Click to drill down.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(74,134,232,.12);color:var(--blue);">🔥</div>
-        <div><div class="item-title">Team Heatmap — NC / CC / CB by TL</div><div class="item-desc">See which TL teams have the most errors and what type. Click any cell for agent names and specific errors.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(22,167,102,.12);color:var(--green);">⚡</div>
-        <div><div class="item-title">Smart Filters — Instant Results</div><div class="item-desc">Filter by Project · TL · Country · Date. Every chart, every number updates instantly. Qatar, Jordan, India, Philippines.</div></div>
-      </div>
+    <div class="signal-tag">Manager View</div>
+    <div class="display">See everything.<br><span style="color:var(--gold)">Act immediately.</span></div>
+    <div class="body-text">Complete visibility across every team, project and country — with automatic pattern detection.</div>
+    <div class="card-list">
+      <div class="signal-row"><div class="signal-mark" style="background:var(--gold);"></div><div><div class="row-title">Pattern intelligence, auto-detected</div><div class="row-desc">Escalate / Intervene / Monitor levels assigned automatically.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#e85d5d;"></div><div><div class="row-title">At Risk Radar, live</div><div class="row-desc">Multiple issues, CC error, CB error, below threshold — one panel.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#4a86e8;"></div><div><div class="row-title">Team heatmap by TL</div><div class="row-desc">See which teams have the most errors and what type.</div></div></div>
     </div>
   </div>
   <div class="mockup">
     <div class="laptop">
-      <div class="laptop-bar">
-        <div class="lbtn" style="background:#f04f4f;"></div><div class="lbtn" style="background:#f0b429;"></div><div class="lbtn" style="background:#16a766;"></div>
-        <div style="flex:1;text-align:center;font-size:8px;color:var(--muted);font-family:'JetBrains Mono',monospace;">nexora-qa.vercel.app · Dashboard</div>
-      </div>
+      <div class="laptop-bar"><div class="lbtn" style="background:#e85d5d;"></div><div class="lbtn" style="background:#e8a23d;"></div><div class="lbtn" style="background:var(--signal);"></div><div style="flex:1;text-align:center;font-size:8px;color:var(--dim);font-family:'JetBrains Mono',monospace;">nexora-qa.vercel.app</div></div>
       <div class="laptop-screen">
-        <div class="topbar"><span class="app-logo">Analytics Dashboard</span><span class="badge" style="background:rgba(139,92,246,.2);color:var(--purple);">Manager</span></div>
-        <div class="krow">
-          <div class="kcard"><div class="knum" style="color:var(--gold);">65</div><div class="klbl">Evals</div></div>
-          <div class="kcard"><div class="knum" style="color:var(--green);">30</div><div class="klbl">Agents</div></div>
-          <div class="kcard"><div class="knum" style="color:var(--blue);">64%</div><div class="klbl">Avg</div></div>
-          <div class="kcard"><div class="knum" style="color:var(--red);">17</div><div class="klbl">At Risk</div></div>
+        <div class="topbar"><span class="app-name">Dashboard</span><span class="role-pill" style="background:rgba(139,110,230,.18);color:#a78bfa;">Manager</span></div>
+        <div class="k4">
+          <div class="k-cell"><div class="k-num" style="color:var(--gold);">65</div><div class="k-lbl">Evals</div></div>
+          <div class="k-cell"><div class="k-num" style="color:var(--signal);">30</div><div class="k-lbl">Agents</div></div>
+          <div class="k-cell"><div class="k-num" style="color:#4a86e8;">64%</div><div class="k-lbl">Avg</div></div>
+          <div class="k-cell"><div class="k-num" style="color:#e85d5d;">17</div><div class="k-lbl">At Risk</div></div>
         </div>
-        <div class="sec">At Risk Radar</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px;margin-bottom:8px;">
-          <div class="rcard" style="border-color:rgba(240,79,79,.3);background:rgba(240,79,79,.05);"><div class="rnum" style="color:var(--red);">2</div><div class="rlbl" style="color:var(--red);">Multiple</div></div>
-          <div class="rcard" style="border-color:rgba(74,134,232,.3);background:rgba(74,134,232,.05);"><div class="rnum" style="color:var(--blue);">2</div><div class="rlbl" style="color:var(--blue);">CC Error</div></div>
-          <div class="rcard" style="border-color:rgba(240,120,48,.3);background:rgba(240,120,48,.05);"><div class="rnum" style="color:var(--orange);">13</div><div class="rlbl" style="color:var(--orange);">CB Error</div></div>
-          <div class="rcard" style="border-color:rgba(232,162,61,.3);background:rgba(232,162,61,.05);"><div class="rnum" style="color:var(--gold);">17</div><div class="rlbl" style="color:var(--gold);">Below 80%</div></div>
+        <div class="section-lbl">At Risk Radar</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:9px;">
+          <div style="background:var(--surface);border:1px solid rgba(232,93,93,.25);border-radius:6px;padding:7px;text-align:center;"><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#e85d5d;">2</div><div style="font-size:6px;color:var(--dim);">Multiple</div></div>
+          <div style="background:var(--surface);border:1px solid rgba(74,134,232,.25);border-radius:6px;padding:7px;text-align:center;"><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#4a86e8;">2</div><div style="font-size:6px;color:var(--dim);">CC Error</div></div>
+          <div style="background:var(--surface);border:1px solid rgba(232,133,61,.25);border-radius:6px;padding:7px;text-align:center;"><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#e8853d;">13</div><div style="font-size:6px;color:var(--dim);">CB Error</div></div>
+          <div style="background:var(--surface);border:1px solid rgba(232,162,61,.25);border-radius:6px;padding:7px;text-align:center;"><div style="font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--gold);">17</div><div style="font-size:6px;color:var(--dim);">&lt;80%</div></div>
         </div>
-        <div class="sec">Team Heatmap — Qatar</div>
-        <div style="background:#0d1a14;border:1px solid var(--border);border-radius:5px;padding:6px;">
-          <div style="display:flex;gap:4px;align-items:center;margin-bottom:3px;">
-            <div style="width:16px;font-size:6px;color:var(--muted);font-family:'JetBrains Mono',monospace;"></div>
-            <div style="flex:1;font-size:6px;color:var(--muted);text-align:center;font-family:'JetBrains Mono',monospace;">Walid B</div>
-            <div style="flex:1;font-size:6px;color:var(--muted);text-align:center;font-family:'JetBrains Mono',monospace;">Duaa</div>
-            <div style="flex:1;font-size:6px;color:var(--muted);text-align:center;font-family:'JetBrains Mono',monospace;">Lotfi</div>
-            <div style="flex:1;font-size:6px;color:var(--muted);text-align:center;font-family:'JetBrains Mono',monospace;">Mustafa</div>
-          </div>
-          <div style="display:flex;gap:4px;align-items:center;margin-bottom:2px;">
-            <div style="width:16px;font-size:6px;color:var(--muted);font-family:'JetBrains Mono',monospace;">NC</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(240,120,48,.2);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--orange);">2</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(240,79,79,.3);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--red);">8</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(22,167,102,.15);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--green);">—</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(232,162,61,.2);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--gold);">1</div>
-          </div>
-          <div style="display:flex;gap:4px;align-items:center;margin-bottom:2px;">
-            <div style="width:16px;font-size:6px;color:var(--muted);font-family:'JetBrains Mono',monospace;">CC</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(22,167,102,.15);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--green);">—</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(240,79,79,.25);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--red);">3</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(22,167,102,.15);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--green);">—</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(240,120,48,.2);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--orange);">1</div>
-          </div>
-          <div style="display:flex;gap:4px;align-items:center;">
-            <div style="width:16px;font-size:6px;color:var(--muted);font-family:'JetBrains Mono',monospace;">CB</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(240,79,79,.3);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--red);">4</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(240,79,79,.35);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--red);">5</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(232,162,61,.2);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--gold);">1</div>
-            <div style="flex:1;height:14px;border-radius:3px;background:rgba(22,167,102,.15);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:700;color:var(--green);">—</div>
-          </div>
+        <div class="section-lbl">Team Heatmap</div>
+        <div style="background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px;">
+          <div style="display:flex;gap:4px;margin-bottom:3px;"><div style="width:16px;"></div><div style="flex:1;font-size:6px;color:var(--dim);text-align:center;font-family:'JetBrains Mono',monospace;">Walid</div><div style="flex:1;font-size:6px;color:var(--dim);text-align:center;font-family:'JetBrains Mono',monospace;">Duaa</div><div style="flex:1;font-size:6px;color:var(--dim);text-align:center;font-family:'JetBrains Mono',monospace;">Lotfi</div></div>
+          <div style="display:flex;gap:4px;"><div style="width:16px;font-size:6px;color:var(--dim);font-family:'JetBrains Mono',monospace;">CC</div><div style="flex:1;height:14px;border-radius:3px;background:rgba(22,167,102,.12);display:flex;align-items:center;justify-content:center;font-size:6px;color:var(--signal);">—</div><div style="flex:1;height:14px;border-radius:3px;background:rgba(232,93,93,.22);display:flex;align-items:center;justify-content:center;font-size:6px;color:#e85d5d;">3</div><div style="flex:1;height:14px;border-radius:3px;background:rgba(22,167,102,.12);display:flex;align-items:center;justify-content:center;font-size:6px;color:var(--signal);">—</div></div>
         </div>
       </div>
       <div class="laptop-base"></div>
@@ -592,483 +404,627 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(
 </div>
 </div>
 
-<!-- S08 QA VIEW -->
+<!-- S07 — QA VIEW -->
+<div class="slide" id="s7">
+<canvas class="slide-bg" id="bg-s7"></canvas>
+<div class="l-split">
+  <div>
+    <div class="signal-tag">QA Assessor View</div>
+    <div class="display">Professional<br><span style="color:var(--gold)">score calculator</span></div>
+    <div class="body-text">The most complete evaluation form — NC sub-attributes, CC/CB critical scoring, live preview, auto-coaching.</div>
+    <div class="card-list">
+      <div class="signal-row"><div class="signal-mark" style="background:var(--gold);"></div><div><div class="row-title">NC — Non-Critical, 30 points</div><div class="row-desc">6 attributes with full sub-attributes. Hold N/A scoring.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#e85d5d;"></div><div><div class="row-title">CC — Critical to Customer</div><div class="row-desc">Any error caps the total score. 7 attributes tracked.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--signal);"></div><div><div class="row-title">Pass mark: 90%</div><div class="row-desc">Live score preview. Coaching auto-created on fail.</div></div></div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="phone"><div class="phone-screen">
+      <div class="topbar"><span class="app-name">Score Calculator</span><span class="role-pill" style="background:rgba(74,134,232,.18);color:#4a86e8;">QA</span></div>
+      <div style="background:var(--surface);border:1px solid rgba(232,93,93,.3);border-radius:7px;padding:10px;text-align:center;margin-bottom:8px;">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:30px;font-weight:700;color:#e85d5d;line-height:1;">21.7%</div>
+        <div style="font-size:7px;color:#e85d5d;margin-top:3px;letter-spacing:1px;">✕ CRITICAL — COACHING REQUIRED</div>
+      </div>
+      <div class="section-lbl" style="color:#e85d5d;">● CC — Critical</div>
+      <div style="background:var(--surface);border:1px solid rgba(232,93,93,.25);border-radius:6px;padding:7px 9px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:8px;font-weight:600;">Customer Profile</div><div style="font-size:7px;font-weight:700;color:#e85d5d;background:rgba(232,93,93,.15);padding:2px 6px;border-radius:4px;">Fail</div></div>
+      <div style="padding:6px 9px;margin:-2px 0 7px;font-size:7px;color:#e85d5d;background:rgba(232,93,93,.05);border-radius:5px;">↳ Wrong/Missing QID</div>
+      <div class="section-lbl">● NC Attributes</div>
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px 9px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;"><div style="font-size:8px;font-weight:600;">Tone of Voice</div><div style="font-size:7px;font-weight:700;color:#e85d5d;background:rgba(232,93,93,.15);padding:2px 6px;border-radius:4px;">Fail</div></div>
+      <div style="margin-top:8px;padding:8px;background:rgba(139,110,230,.08);border:1px solid rgba(139,110,230,.2);border-radius:6px;font-size:7px;color:#a78bfa;text-align:center;">⚡ Coaching auto-created and sent to TL</div>
+    </div></div>
+  </div>
+</div>
+</div>
+
+<!-- S08 — TL VIEW -->
 <div class="slide" id="s8">
-<div class="l-split-wide">
+<canvas class="slide-bg" id="bg-s8"></canvas>
+<div class="l-split">
   <div>
-    <div class="eyebrow">QA Assessor View</div>
-    <div class="h1">Professional<br><span style="color:var(--blue)">Score Calculator</span></div>
-    <div class="sub">The most complete QA evaluation form. NC sub-attributes, CC and CB critical scoring, live score preview, review step before submission, and auto-generated coaching.</div>
-    <div class="body-items">
-      <div class="item">
-        <div class="item-icon" style="background:rgba(232,162,61,.12);color:var(--gold);">NC</div>
-        <div><div class="item-title">Non-Critical — 30 Points</div><div class="item-desc">6 attributes with full sub-attributes. Hold N/A scoring (6 pts). Pass = max 2 attributes failed.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,79,79,.12);color:var(--red);">CC</div>
-        <div><div class="item-title">Critical to Customer — Pass/Fail</div><div class="item-desc">Any CC error = total score becomes NC score only. 7 attributes with sub-attributes.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,120,48,.12);color:var(--orange);">CB</div>
-        <div><div class="item-title">Critical to Business — Pass/Fail</div><div class="item-desc">Any CB error = total score becomes NC score only. 3 attributes with sub-attributes.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(22,167,102,.12);color:var(--green);">✓</div>
-        <div><div class="item-title">Pass Mark: 90% — Auto Coaching on Fail</div><div class="item-desc">Live score preview. Review step before submit. Coaching auto-created immediately after submission.</div></div>
-      </div>
+    <div class="signal-tag">Team Lead View</div>
+    <div class="display">My team —<br><span style="color:var(--gold)">full visibility</span></div>
+    <div class="body-text">Every TL sees their team only. Worst performers first. One tap to accept or dispute coaching.</div>
+    <div class="card-list">
+      <div class="signal-row"><div class="signal-mark" style="background:var(--gold);"></div><div><div class="row-title">Team KPI dashboard</div><div class="row-desc">Avg, Passing, At Risk, Critical — ranked worst first.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#e8853d;"></div><div><div class="row-title">Coaching reviews</div><div class="row-desc">Accept and forward, or dispute with written comment.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#4a86e8;"></div><div><div class="row-title">Operation Form — self-evaluation</div><div class="row-desc">Same professional form, visible to Manager in reports.</div></div></div>
     </div>
   </div>
   <div class="mockup">
-    <div class="phone">
-      <div class="phone-screen" style="background:#060d09;">
-        <div class="topbar"><span class="app-logo">Score Calculator</span><span class="badge" style="background:rgba(74,134,232,.2);color:var(--blue);">QA</span></div>
-        <div style="background:#0d1a14;border:1px solid var(--border);border-radius:7px;padding:10px;text-align:center;margin-bottom:8px;">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--green);text-shadow:0 0 20px rgba(22,167,102,.3);line-height:1;">94.2%</div>
-          <div style="font-size:7px;color:var(--muted);margin-top:3px;letter-spacing:1px;">LIVE SCORE · PASS ✓</div>
-          <div style="display:flex;gap:4px;justify-content:center;margin-top:6px;">
-            <span style="font-size:6px;padding:2px 5px;background:rgba(232,162,61,.15);color:var(--gold);border-radius:3px;font-family:'JetBrains Mono',monospace;">NC 24/30</span>
-            <span style="font-size:6px;padding:2px 5px;background:rgba(22,167,102,.15);color:var(--green);border-radius:3px;font-family:'JetBrains Mono',monospace;">CC ✓</span>
-            <span style="font-size:6px;padding:2px 5px;background:rgba(22,167,102,.15);color:var(--green);border-radius:3px;font-family:'JetBrains Mono',monospace;">CB ✓</span>
-          </div>
-        </div>
-        <div style="font-size:7px;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-family:'JetBrains Mono',monospace;">● NC Attributes</div>
-        <div class="cattr"><div class="caname">Call Opening / Closure</div><div class="cabtns"><div class="cabtn" style="background:rgba(240,79,79,.2);color:var(--red);border-color:rgba(240,79,79,.3);">Fail</div><div class="cabtn" style="background:rgba(22,167,102,.2);color:var(--green);border-color:rgba(22,167,102,.3);">Pass</div></div></div>
-        <div class="cattr"><div class="caname">Tone of Voice</div><div class="cabtns"><div class="cabtn">Fail</div><div class="cabtn" style="background:rgba(22,167,102,.2);color:var(--green);border-color:rgba(22,167,102,.3);">Pass</div></div></div>
-        <div class="cattr"><div class="caname">Active Listening</div><div class="cabtns"><div class="cabtn">Fail</div><div class="cabtn" style="background:rgba(22,167,102,.2);color:var(--green);border-color:rgba(22,167,102,.3);">Pass</div></div></div>
-        <div class="cattr"><div class="caname">Showing Empathy</div><div class="cabtns"><div class="cabtn">Fail</div><div class="cabtn" style="background:rgba(22,167,102,.2);color:var(--green);border-color:rgba(22,167,102,.3);">Pass</div></div></div>
-        <div class="cattr"><div class="caname">HOLD</div><div class="cabtns"><div class="cabtn">Fail</div><div class="cabtn">Pass</div><div class="cabtn" style="background:rgba(232,162,61,.2);color:var(--gold);border-color:rgba(232,162,61,.3);">N/A</div></div></div>
+    <div class="phone"><div class="phone-screen">
+      <div class="topbar"><span class="app-name">My Team · Duaa</span><span class="role-pill" style="background:rgba(232,162,61,.18);color:var(--gold);">Team Lead</span></div>
+      <div class="k4">
+        <div class="k-cell"><div class="k-num" style="color:var(--gold);font-size:11px;">62%</div><div class="k-lbl">Avg</div></div>
+        <div class="k-cell"><div class="k-num" style="color:var(--signal);font-size:11px;">3</div><div class="k-lbl">Pass</div></div>
+        <div class="k-cell"><div class="k-num" style="color:var(--gold);font-size:11px;">2</div><div class="k-lbl">Risk</div></div>
+        <div class="k-cell"><div class="k-num" style="color:#e85d5d;font-size:11px;">5</div><div class="k-lbl">Critical</div></div>
       </div>
-    </div>
+      <div class="section-lbl">Agents — Worst First</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 8px;background:rgba(232,93,93,.06);border:1px solid rgba(232,93,93,.15);border-radius:5px;margin-bottom:4px;"><div style="display:flex;align-items:center;gap:6px;"><div style="width:20px;height:20px;border-radius:5px;background:rgba(232,93,93,.2);display:flex;align-items:center;justify-content:center;font-size:6px;font-weight:800;color:#e85d5d;">CB</div><div style="font-size:8px;font-weight:600;">Chaimaa Belhadj</div></div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#e85d5d;">30%</div></div>
+      <div class="section-lbl" style="margin-top:8px;">Pending Coaching</div>
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:#e85d5d;"></div>
+        <div style="font-size:8px;font-weight:700;">Chaimaa Belhadj</div>
+        <div style="font-size:6px;color:var(--dim);margin:2px 0 6px;">29 Jun · by Younes Sid</div>
+        <div style="display:flex;gap:4px;"><div style="flex:1;padding:4px;border-radius:4px;text-align:center;font-size:7px;font-weight:700;color:var(--signal);background:rgba(22,167,102,.1);border:1px solid rgba(22,167,102,.3);">✓ Accept</div><div style="flex:1;padding:4px;border-radius:4px;text-align:center;font-size:7px;font-weight:700;color:#e85d5d;background:rgba(232,93,93,.1);border:1px solid rgba(232,93,93,.3);">✕ Dispute</div></div>
+      </div>
+    </div></div>
   </div>
 </div>
 </div>
 
-<!-- S09 TL VIEW -->
+<!-- S09 — AGENT VIEW -->
 <div class="slide" id="s9">
-<div class="l-split-wide">
+<canvas class="slide-bg" id="bg-s9"></canvas>
+<div class="l-split">
   <div>
-    <div class="eyebrow">Team Lead View</div>
-    <div class="h1">My Team —<br><span style="color:var(--gold)">Full Visibility</span></div>
-    <div class="sub">Every Team Lead logs in and sees their team only. Worst performers first. Pending coaching to review. Real-time KPIs. One tap to accept or dispute.</div>
-    <div class="body-items">
-      <div class="item">
-        <div class="item-icon" style="background:rgba(232,162,61,.12);color:var(--gold);">📊</div>
-        <div><div class="item-title">Team KPI Dashboard</div><div class="item-desc">Team Avg · Passing · At Risk · Critical. All agents ranked by score, worst first. Hover for instant preview.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,120,48,.12);color:var(--orange);">📝</div>
-        <div><div class="item-title">Coaching Reviews — Accept or Dispute</div><div class="item-desc">One tap to accept and forward to agent. Or dispute with written comment — returns to QA immediately.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(74,134,232,.12);color:var(--blue);">📋</div>
-        <div><div class="item-title">Operation Form — TL Self-Evaluation</div><div class="item-desc">Same professional form as QA. Saved separately. Visible to Manager in reports and eval history.</div></div>
-      </div>
+    <div class="signal-tag">Agent View</div>
+    <div class="display">Personal<br><span style="color:var(--gold)">accountability</span></div>
+    <div class="body-text">Agents see their own score, trend, errors, and coaching. Transparent, private, no surprises.</div>
+    <div class="card-list">
+      <div class="signal-row"><div class="signal-mark" style="background:#4a86e8;"></div><div><div class="row-title">Latest score + NC/CC/CB breakdown</div><div class="row-desc">Know exactly where points were lost and why.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--gold);"></div><div><div class="row-title">Score trend — last 10 evaluations</div><div class="row-desc">Visual trend. Improving or declining, visible instantly.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#a78bfa;"></div><div><div class="row-title">Coaching — read and acknowledge</div><div class="row-desc">One tap closes the loop. Always tracked.</div></div></div>
     </div>
   </div>
   <div class="mockup">
-    <div class="phone">
-      <div class="phone-screen" style="background:#060d09;">
-        <div class="topbar"><span class="app-logo">My Team · Duaa</span><span class="badge" style="background:rgba(232,162,61,.2);color:var(--gold);">Team Lead</span></div>
-        <div class="krow">
-          <div class="kcard"><div class="knum" style="color:var(--gold);font-size:11px;">62%</div><div class="klbl">Avg</div></div>
-          <div class="kcard"><div class="knum" style="color:var(--green);font-size:11px;">3</div><div class="klbl">Pass</div></div>
-          <div class="kcard"><div class="knum" style="color:var(--gold);font-size:11px;">2</div><div class="klbl">Risk</div></div>
-          <div class="kcard"><div class="knum" style="color:var(--red);font-size:11px;">5</div><div class="klbl">Critical</div></div>
-        </div>
-        <div class="sec">Agents — Worst First</div>
-        <div class="arow" style="background:rgba(240,79,79,.08);border:1px solid rgba(240,79,79,.15);border-radius:5px;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <div class="aav" style="background:rgba(240,79,79,.2);color:var(--red);">CB</div>
-            <div><div class="aname">Chaimaa Belhadj</div><div class="atl">MOPH_MCI · 4 evals</div></div>
-          </div>
-          <div class="ascore" style="color:var(--red);">30%</div>
-        </div>
-        <div class="arow" style="background:rgba(240,79,79,.05);border:1px solid rgba(240,79,79,.1);border-radius:5px;margin-top:3px;">
-          <div style="display:flex;align-items:center;gap:6px;">
-            <div class="aav" style="background:rgba(240,79,79,.15);color:var(--red);">RH</div>
-            <div><div class="aname">Ramzi Haddad</div><div class="atl">PHCC · 2 evals</div></div>
-          </div>
-          <div class="ascore" style="color:var(--red);">65%</div>
-        </div>
-        <div style="margin-top:7px;" class="sec">Pending Coaching Reviews</div>
-        <div class="citem">
-          <div class="ctop" style="background:var(--red);"></div>
-          <div style="display:flex;gap:3px;margin-bottom:3px;"><span style="font-size:6px;padding:1px 4px;background:rgba(240,79,79,.15);color:var(--red);border-radius:2px;font-family:'JetBrains Mono',monospace;">CC</span></div>
-          <div class="cagent">Chaimaa Belhadj</div>
-          <div class="cmeta">29 Jun 2026 · by Younes Sid</div>
-          <div class="cstatus" style="background:rgba(240,120,48,.15);color:var(--orange);">⏳ Awaiting Your Review</div>
-          <div class="cacts">
-            <div class="cact" style="background:rgba(22,167,102,.1);color:var(--green);border-color:rgba(22,167,102,.3);">✓ Accept</div>
-            <div class="cact" style="background:rgba(240,79,79,.1);color:var(--red);border-color:rgba(240,79,79,.3);">✕ Dispute</div>
-          </div>
+    <div class="phone"><div class="phone-screen">
+      <div class="topbar"><span class="app-name">Hi, Chaimaa 👋</span><span class="role-pill" style="background:rgba(22,167,102,.18);color:var(--signal);">Agent</span></div>
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:7px;padding:10px;text-align:center;margin-bottom:8px;">
+        <div style="font-size:6px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;font-family:'JetBrains Mono',monospace;">Latest Score</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:700;color:#e85d5d;line-height:1;">31.7%</div>
+        <div style="font-size:7px;color:#e85d5d;margin-top:3px;">✕ Critical — Coaching Required</div>
+      </div>
+      <div class="section-lbl">Score Trend</div>
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:7px;margin-bottom:8px;">
+        <div style="display:flex;align-items:flex-end;gap:3px;height:42px;">
+          <div style="flex:1;background:#e85d5d;height:20%;border-radius:2px 2px 0 0;"></div>
+          <div style="flex:1;background:#e85d5d;height:28%;border-radius:2px 2px 0 0;"></div>
+          <div style="flex:1;background:var(--gold);height:55%;border-radius:2px 2px 0 0;"></div>
+          <div style="flex:1;background:var(--gold);height:60%;border-radius:2px 2px 0 0;"></div>
+          <div style="flex:1;background:#e85d5d;height:24%;border-radius:2px 2px 0 0;"></div>
+          <div style="flex:1;background:var(--signal);height:90%;border-radius:2px 2px 0 0;"></div>
+          <div style="flex:1;background:#e85d5d;height:28%;border-radius:2px 2px 0 0;"></div>
+          <div style="flex:1;background:#e85d5d;height:22%;border-radius:2px 2px 0 0;"></div>
+          <div style="flex:1;background:#e85d5d;height:26%;border-radius:2px 2px 0 0;"></div>
+          <div style="flex:1;background:#e85d5d;height:30%;border-radius:2px 2px 0 0;"></div>
         </div>
       </div>
-    </div>
+      <div style="background:rgba(139,110,230,.07);border:1px solid rgba(139,110,230,.2);border-radius:6px;padding:7px;"><div style="font-size:7px;font-weight:700;color:#a78bfa;margin-bottom:3px;">● Pending Coaching</div><div style="font-size:7px;color:var(--dim);line-height:1.5;">CC Error · Customer Profile<br><span style="color:var(--gold);">Tap to acknowledge →</span></div></div>
+    </div></div>
   </div>
 </div>
 </div>
 
-<!-- S10 AGENT VIEW -->
+<!-- S10 — COACHING -->
 <div class="slide" id="s10">
-<div class="l-split-wide">
+<canvas class="slide-bg" id="bg-s10"></canvas>
+<div class="l-split">
   <div>
-    <div class="eyebrow">Agent View</div>
-    <div class="h1">Personal<br><span style="color:var(--green)">Accountability</span></div>
-    <div class="sub">Every agent sees their own score, their own trend, their own errors — and their own coaching. Transparent. Personal. Private. No more surprises.</div>
-    <div class="body-items">
-      <div class="item">
-        <div class="item-icon" style="background:rgba(74,134,232,.12);color:var(--blue);">📈</div>
-        <div><div class="item-title">Latest Score + NC/CC/CB Breakdown</div><div class="item-desc">They know exactly where they lost points and why. No ambiguity. Full transparency.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(232,162,61,.12);color:var(--gold);">📉</div>
-        <div><div class="item-title">Score Trend — Last 10 Evaluations</div><div class="item-desc">Visual bar chart. Green = Pass, Gold = At Risk, Red = Critical. Improving or declining — visible instantly.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,79,79,.12);color:var(--red);">⚠</div>
-        <div><div class="item-title">Top Errors — Pattern Engine</div><div class="item-desc">The system identifies which errors repeat most. Escalate / Intervene / Monitor level shown per error.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(139,92,246,.12);color:var(--purple);">✉</div>
-        <div><div class="item-title">Coaching — Read and Acknowledge</div><div class="item-desc">Agent reads QA comment and TL decision. One tap to acknowledge. Loop closes automatically.</div></div>
-      </div>
+    <div class="signal-tag">The Coaching System</div>
+    <div class="display">No more<br><span style="color:#a78bfa">"I was never told"</span></div>
+    <div class="body-text">Every coaching item is written, tracked and confirmed. QA states it, TL reviews it, Agent confirms it.</div>
+    <div class="card-list">
+      <div class="signal-row"><div class="signal-mark" style="background:#e85d5d;"></div><div><div class="row-title">OPEN — QA submits</div><div class="row-desc">Coaching auto-created. Notification sent to TL.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#e8853d;"></div><div><div class="row-title">PENDING TL — accept or dispute</div><div class="row-desc">Both options tracked with full written trail.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#4a86e8;"></div><div><div class="row-title">PENDING AGENT — read and confirm</div><div class="row-desc">Reads QA comment and TL decision, acknowledges.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--signal);"></div><div><div class="row-title">CLOSED — saved forever</div><div class="row-desc">Who said what, when. Manager sees everything live.</div></div></div>
     </div>
   </div>
   <div class="mockup">
-    <div class="phone">
-      <div class="phone-screen" style="background:#060d09;">
-        <div class="topbar"><span class="app-logo">Hi, Chaimaa 👋</span><span class="badge" style="background:rgba(22,167,102,.2);color:var(--green);">Agent</span></div>
-        <div style="background:#0d1a14;border:1px solid var(--border);border-radius:7px;padding:10px;text-align:center;margin-bottom:8px;">
-          <div style="font-size:6px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;font-family:'JetBrains Mono',monospace;">My Latest Score</div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--red);line-height:1;text-shadow:0 0 18px rgba(240,79,79,.3);">31.7%</div>
-          <div style="font-size:7px;color:var(--red);margin-top:3px;">✕ Critical — Coaching Required</div>
-          <div style="display:flex;gap:3px;justify-content:center;margin-top:6px;">
-            <span style="font-size:6px;padding:2px 5px;background:rgba(240,79,79,.15);color:var(--red);border-radius:3px;font-family:'JetBrains Mono',monospace;">NC 1.7/30</span>
-            <span style="font-size:6px;padding:2px 5px;background:rgba(240,79,79,.15);color:var(--red);border-radius:3px;font-family:'JetBrains Mono',monospace;">CC ✕</span>
-            <span style="font-size:6px;padding:2px 5px;background:rgba(240,79,79,.15);color:var(--red);border-radius:3px;font-family:'JetBrains Mono',monospace;">CB ✕</span>
-          </div>
-        </div>
-        <div class="sec">Score Trend</div>
-        <div style="background:#0d1a14;border:1px solid var(--border);border-radius:5px;padding:7px;margin-bottom:8px;">
-          <div style="display:flex;align-items:flex-end;gap:3px;height:44px;">
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--red);height:20%;"></div>
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--red);height:28%;"></div>
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--gold);height:55%;"></div>
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--gold);height:60%;"></div>
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--red);height:24%;"></div>
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--green);height:90%;"></div>
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--red);height:28%;"></div>
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--red);height:22%;"></div>
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--red);height:26%;"></div>
-            <div style="flex:1;border-radius:2px 2px 0 0;background:var(--red);height:30%;"></div>
-          </div>
-        </div>
-        <div style="background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.2);border-radius:5px;padding:7px;">
-          <div style="font-size:7px;font-weight:700;color:var(--purple);margin-bottom:3px;">● Pending Coaching — Action Required</div>
-          <div style="font-size:7px;color:var(--muted);line-height:1.5;">CC Error · Customer Profile · Verified by TL<br><span style="color:var(--gold);">Tap to read and acknowledge →</span></div>
-        </div>
-      </div>
-    </div>
+    <div class="phone"><div class="phone-screen">
+      <div class="topbar"><span class="app-name">Coaching</span><span class="role-pill" style="background:rgba(232,133,61,.18);color:#e8853d;">3 Pending</span></div>
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px;margin-bottom:5px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:#e85d5d;"></div><div style="font-size:8px;font-weight:700;">Chaimaa Belhadj</div><div style="font-size:6px;color:var(--dim);margin:2px 0 5px;">29 Jun · by Younes Sid</div><div style="display:inline-flex;padding:2px 7px;border-radius:8px;font-size:6px;font-weight:700;background:rgba(232,133,61,.15);color:#e8853d;">⏳ Pending TL</div></div>
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px;margin-bottom:5px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:#4a86e8;"></div><div style="font-size:8px;font-weight:700;">Mohamed Sabrery</div><div style="font-size:6px;color:var(--dim);margin:2px 0 5px;">28 Jun</div><div style="display:inline-flex;padding:2px 7px;border-radius:8px;font-size:6px;font-weight:700;background:rgba(74,134,232,.15);color:#4a86e8;">🔵 Pending Agent</div></div>
+      <div style="background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px;position:relative;overflow:hidden;"><div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--signal);"></div><div style="font-size:8px;font-weight:700;">Hamed Marwan</div><div style="font-size:6px;color:var(--dim);margin:2px 0 5px;">27 Jun · Acknowledged</div><div style="display:inline-flex;padding:2px 7px;border-radius:8px;font-size:6px;font-weight:700;background:rgba(22,167,102,.15);color:var(--signal);">✓ Closed</div></div>
+    </div></div>
   </div>
 </div>
 </div>
 
-<!-- S11 COACHING WORKFLOW -->
+<!-- S11 — INTELLIGENCE ENGINE -->
 <div class="slide" id="s11">
-<div class="l-split">
-  <div>
-    <div class="eyebrow">The Coaching System</div>
-    <div class="h1">No More<br><span style="color:var(--purple)">"I Was Never Told"</span></div>
-    <div class="sub">Every coaching item is written, tracked, and confirmed. QA says what happened. TL reviews and agrees or challenges. Agent reads and confirms. All saved permanently.</div>
-    <div class="steps-col">
-      <div class="steprow">
-        <div style="width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);flex-shrink:0;margin-top:6px;"></div>
-        <div><div class="stept" style="color:var(--red);">OPEN — QA Submits</div><div class="stepd">Coaching auto-created on error. QA writes detailed comment. Notification sent to TL.</div></div>
-      </div>
-      <div class="steprow">
-        <div style="width:10px;height:10px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange);flex-shrink:0;margin-top:6px;"></div>
-        <div><div class="stept" style="color:var(--orange);">PENDING TL — Accept or Dispute</div><div class="stepd">Accept → moves to agent. Dispute → returns to QA with written comment. Both options tracked.</div></div>
-      </div>
-      <div class="steprow">
-        <div style="width:10px;height:10px;border-radius:50%;background:var(--blue);box-shadow:0 0 8px var(--blue);flex-shrink:0;margin-top:6px;"></div>
-        <div><div class="stept" style="color:var(--blue);">PENDING AGENT — Read and Acknowledge</div><div class="stepd">Agent reads QA comment and TL decision. Taps acknowledge. Can add their own comment.</div></div>
-      </div>
-      <div class="steprow">
-        <div style="width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);flex-shrink:0;margin-top:6px;"></div>
-        <div><div class="stept" style="color:var(--green);">CLOSED ✓ — Full Audit Trail</div><div class="stepd">Who said what, when, and what the response was. Saved to Google Sheets forever. Manager sees everything.</div></div>
-      </div>
-    </div>
+<canvas class="slide-bg" id="bg-s11"></canvas>
+<div class="l-center">
+  <div class="signal-tag">Intelligence Engine</div>
+  <div class="display">Stop reacting.<br><span style="color:var(--gold)">Start predicting.</span></div>
+  <div class="body-text" style="max-width:540px;">The engine scans every evaluation automatically — flagging patterns before they become complaints.</div>
+  <div class="grid-3">
+    <div class="data-cell" style="text-align:center;"><div class="mono-stat" style="font-size:38px;color:#e85d5d;">4+</div><div class="cell-label" style="margin-top:6px;">repeats</div><div class="cell-title" style="color:#e85d5d;">ESCALATE</div><div class="cell-desc">Chronic pattern. Supervisor action required now.</div></div>
+    <div class="data-cell" style="text-align:center;"><div class="mono-stat" style="font-size:38px;color:#e8853d;">3+</div><div class="cell-label" style="margin-top:6px;">NC or 2+ CC/CB</div><div class="cell-title" style="color:#e8853d;">INTERVENE</div><div class="cell-desc">Confirmed pattern. Coaching required immediately.</div></div>
+    <div class="data-cell" style="text-align:center;"><div class="mono-stat" style="font-size:38px;color:#4a86e8;">1+</div><div class="cell-label" style="margin-top:6px;">CC/CB detected</div><div class="cell-title" style="color:#4a86e8;">MONITOR</div><div class="cell-desc">Emerging pattern. Flag and watch closely.</div></div>
   </div>
-  <div class="mockup">
-    <div class="phone">
-      <div class="phone-screen" style="background:#060d09;">
-        <div class="topbar"><span class="app-logo">Coaching</span><span class="badge" style="background:rgba(240,120,48,.2);color:var(--orange);">3 Pending</span></div>
-        <div class="citem">
-          <div class="ctop" style="background:var(--red);"></div>
-          <div style="display:flex;gap:3px;margin-bottom:3px;"><span style="font-size:6px;padding:1px 4px;background:rgba(240,79,79,.15);color:var(--red);border-radius:2px;font-family:'JetBrains Mono',monospace;">CC</span><span style="font-size:6px;padding:1px 4px;background:rgba(240,120,48,.15);color:var(--orange);border-radius:2px;font-family:'JetBrains Mono',monospace;">CB</span></div>
-          <div class="cagent">Chaimaa Belhadj</div>
-          <div class="cmeta">MOPH_MCI · 29 Jun 2026 · by Younes Sid</div>
-          <div class="cstatus" style="background:rgba(240,120,48,.15);color:var(--orange);">⏳ Pending TL Review</div>
-          <div class="cacts"><div class="cact" style="background:rgba(22,167,102,.1);color:var(--green);border-color:rgba(22,167,102,.3);">✓ Accept</div><div class="cact" style="background:rgba(240,79,79,.1);color:var(--red);border-color:rgba(240,79,79,.3);">✕ Dispute</div></div>
-        </div>
-        <div class="citem">
-          <div class="ctop" style="background:var(--blue);"></div>
-          <div style="display:flex;gap:3px;margin-bottom:3px;"><span style="font-size:6px;padding:1px 4px;background:rgba(232,162,61,.15);color:var(--gold);border-radius:2px;font-family:'JetBrains Mono',monospace;">NC</span></div>
-          <div class="cagent">Mohamed Sabrery</div>
-          <div class="cmeta">MOPH_MCI · 28 Jun 2026</div>
-          <div class="cstatus" style="background:rgba(74,134,232,.15);color:var(--blue);">🔵 Pending Agent Acknowledgement</div>
-        </div>
-        <div class="citem">
-          <div class="ctop" style="background:var(--green);"></div>
-          <div class="cagent">Hamed Marwan Barah</div>
-          <div class="cmeta">PHCC · 27 Jun 2026 · Acknowledged ✓</div>
-          <div class="cstatus" style="background:rgba(22,167,102,.15);color:var(--green);">✓ Closed — Full Record Saved</div>
-        </div>
-      </div>
-    </div>
+  <div class="pill-row">
+    <span class="pill" style="color:#e85d5d;border-color:rgba(232,93,93,.3);background:rgba(232,93,93,.07);">CC Priority First</span>
+    <span class="pill" style="color:#e8853d;border-color:rgba(232,133,61,.3);background:rgba(232,133,61,.07);">CB Second</span>
+    <span class="pill" style="color:var(--gold);border-color:rgba(232,162,61,.3);background:rgba(232,162,61,.07);">NC Third</span>
   </div>
 </div>
 </div>
 
-<!-- S12 INTELLIGENCE ENGINE -->
+<!-- S12 — DATA -->
 <div class="slide" id="s12">
-<div class="l-split-wide">
-  <div>
-    <div class="eyebrow">Intelligence Engine</div>
-    <div class="h1">Stop Reacting.<br><span style="color:var(--gold)">Start Predicting.</span></div>
-    <div class="sub">The pattern engine scans every evaluation automatically. Before a problem becomes a complaint, before a trend becomes a crisis — Nexora QA flags it first.</div>
-    <div class="body-items">
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,79,79,.12);color:var(--red);font-weight:800;font-family:'JetBrains Mono',monospace;font-size:10px;">4+</div>
-        <div><div class="item-title" style="color:var(--red);">ESCALATE — Chronic Pattern</div><div class="item-desc">4+ repeats of the same error. Supervisor action required immediately. Highest priority alert.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(240,120,48,.12);color:var(--orange);font-weight:800;font-family:'JetBrains Mono',monospace;font-size:10px;">3+</div>
-        <div><div class="item-title" style="color:var(--orange);">INTERVENE — Confirmed Pattern</div><div class="item-desc">3+ NC repeats or 2+ CC/CB repeats. Immediate 1-on-1 coaching session required.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(74,134,232,.12);color:var(--blue);font-weight:800;font-family:'JetBrains Mono',monospace;font-size:10px;">1+</div>
-        <div><div class="item-title" style="color:var(--blue);">MONITOR — Emerging Pattern</div><div class="item-desc">First CC or CB error detected. Flag and watch closely. Early warning before it becomes a real problem.</div></div>
-      </div>
-    </div>
-    <div class="tags" style="margin-top:16px;">
-      <span class="tag" style="color:var(--red);border-color:rgba(240,79,79,.25);background:rgba(240,79,79,.07);">CC Priority First</span>
-      <span class="tag" style="color:var(--orange);border-color:rgba(240,120,48,.25);background:rgba(240,120,48,.07);">CB Second</span>
-      <span class="tag" style="color:var(--gold);border-color:rgba(232,162,61,.25);background:rgba(232,162,61,.07);">NC Third</span>
-    </div>
-  </div>
-  <div class="mockup">
-    <div class="phone">
-      <div class="phone-screen" style="background:#060d09;">
-        <div class="topbar"><span class="app-logo">QA Monitor</span><span class="badge" style="background:rgba(139,92,246,.2);color:var(--purple);">Manager</span></div>
-        <div class="krow">
-          <div class="kcard"><div class="knum" style="color:var(--red);">2</div><div class="klbl">Escalate</div></div>
-          <div class="kcard"><div class="knum" style="color:var(--orange);">5</div><div class="klbl">Intervene</div></div>
-          <div class="kcard"><div class="knum" style="color:var(--blue);">15</div><div class="klbl">Monitor</div></div>
-          <div class="kcard"><div class="knum" style="color:var(--gold);">22</div><div class="klbl">Total</div></div>
-        </div>
-        <div class="pcard" style="border-color:rgba(240,79,79,.3);background:rgba(240,79,79,.05);">
-          <div class="pnum" style="color:var(--red);text-shadow:0 0 18px rgba(240,79,79,.4);">2</div>
-          <div class="plevel" style="color:var(--red);">ESCALATE</div>
-          <div class="pdesc">Chaimaa B. — CC Error × 5 evals<br>Hamed M. — CB Error × 4 evals</div>
-        </div>
-        <div class="pcard" style="border-color:rgba(240,120,48,.3);background:rgba(240,120,48,.05);">
-          <div class="pnum" style="color:var(--orange);text-shadow:0 0 18px rgba(240,120,48,.4);">5</div>
-          <div class="plevel" style="color:var(--orange);">INTERVENE</div>
-          <div class="pdesc">5 agents · immediate coaching required</div>
-        </div>
-        <div class="pcard" style="border-color:rgba(74,134,232,.3);background:rgba(74,134,232,.05);">
-          <div class="pnum" style="color:var(--blue);text-shadow:0 0 18px rgba(74,134,232,.4);">15</div>
-          <div class="plevel" style="color:var(--blue);">MONITOR</div>
-          <div class="pdesc">Emerging patterns — watch closely</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<!-- S13 DATA & SECURITY -->
-<div class="slide" id="s13">
+<canvas class="slide-bg" id="bg-s12"></canvas>
 <div class="l-split">
   <div>
-    <div class="eyebrow">Built for Scale</div>
-    <div class="h1">Enterprise Ready.<br><span style="color:var(--green)">From Day One.</span></div>
-    <div class="sub">Nexora QA is built on permanent cloud storage, role-based access, and real-time sync — ready to grow from one country to a global operation.</div>
-    <div class="body-items">
-      <div class="item">
-        <div class="item-icon" style="background:rgba(22,167,102,.12);color:var(--green);">📊</div>
-        <div><div class="item-title">Google Sheets — Permanent Storage</div><div class="item-desc">3 tabs: Evaluations · Coaching · TL Operations. Every record saved forever. Never lost. Full history always available.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(232,162,61,.12);color:var(--gold);">🔄</div>
-        <div><div class="item-title">Real-Time Sync — All Devices</div><div class="item-desc">Auto-refresh every 5 minutes. Manual Sync button. Submit on phone in Doha, visible on laptop in 30 seconds.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(74,134,232,.12);color:var(--blue);">🔐</div>
-        <div><div class="item-title">Role-Based Access — Zero Overlap</div><div class="item-desc">Manager sees all. TL sees only their team. Agent sees only themselves. Unique username and PIN per user.</div></div>
-      </div>
-      <div class="item">
-        <div class="item-icon" style="background:rgba(139,92,246,.12);color:var(--purple);">🌍</div>
-        <div><div class="item-title">Any Device. Any Country.</div><div class="item-desc">Phone, tablet or laptop. Qatar, Jordan, India, Philippines. No app install. Open in browser and start.</div></div>
-      </div>
+    <div class="signal-tag">Built for Scale</div>
+    <div class="display">Enterprise ready.<br><span style="color:var(--signal)">From day one.</span></div>
+    <div class="body-text">Permanent storage, role-based access, real-time sync — ready to grow from one country to a global operation.</div>
+    <div class="card-list">
+      <div class="signal-row"><div class="signal-mark" style="background:var(--signal);"></div><div><div class="row-title">Google Sheets — permanent storage</div><div class="row-desc">Every record saved forever. Full history always available.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:var(--gold);"></div><div><div class="row-title">Real-time sync, all devices</div><div class="row-desc">Auto-refresh every 5 minutes plus manual sync.</div></div></div>
+      <div class="signal-row"><div class="signal-mark" style="background:#4a86e8;"></div><div><div class="row-title">Role-based access, zero overlap</div><div class="row-desc">Manager sees all. TL sees their team. Agent sees themselves.</div></div></div>
     </div>
   </div>
   <div class="mockup">
-    <div style="background:#0d1a14;border:1px solid var(--border);border-radius:14px;padding:22px;">
-      <div style="font-size:9px;color:var(--muted);letter-spacing:2px;font-family:'JetBrains Mono',monospace;margin-bottom:16px;">PLATFORM COVERAGE</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-        <div style="background:rgba(232,162,61,.07);border:1px solid rgba(232,162,61,.2);border-radius:8px;padding:14px;">
-          <div style="font-size:18px;margin-bottom:4px;">🇶🇦</div>
-          <div style="font-size:12px;font-weight:700;color:var(--gold);">Qatar</div>
-          <div style="font-size:10px;color:var(--muted);">95 agents · 5 TLs</div>
-          <div style="font-size:9px;color:var(--green);margin-top:4px;font-family:'JetBrains Mono',monospace;">● LIVE NOW</div>
-        </div>
-        <div style="background:#0a1410;border:1px solid var(--border);border-radius:8px;padding:14px;opacity:.6;">
-          <div style="font-size:18px;margin-bottom:4px;">🇯🇴</div>
-          <div style="font-size:12px;font-weight:700;">Jordan</div>
-          <div style="font-size:10px;color:var(--muted);">71 agents · 3 TLs</div>
-          <div style="font-size:9px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;">○ Phase 2</div>
-        </div>
-        <div style="background:#0a1410;border:1px solid var(--border);border-radius:8px;padding:14px;opacity:.6;">
-          <div style="font-size:18px;margin-bottom:4px;">🇮🇳</div>
-          <div style="font-size:12px;font-weight:700;">India</div>
-          <div style="font-size:10px;color:var(--muted);">12 agents · 1 TL</div>
-          <div style="font-size:9px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;">○ Phase 2</div>
-        </div>
-        <div style="background:#0a1410;border:1px solid var(--border);border-radius:8px;padding:14px;opacity:.6;">
-          <div style="font-size:18px;margin-bottom:4px;">🇵🇭</div>
-          <div style="font-size:12px;font-weight:700;">Philippines</div>
-          <div style="font-size:10px;color:var(--muted);">1 agent · 1 TL</div>
-          <div style="font-size:9px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;">○ Phase 2</div>
-        </div>
-      </div>
-      <div style="background:rgba(22,167,102,.06);border:1px solid rgba(22,167,102,.2);border-radius:8px;padding:12px;font-size:11px;color:var(--green);line-height:1.6;">
-        174 agents · 10 TLs · 3 projects<br>All mapped and ready to go
+    <div style="background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:2px;margin-bottom:16px;text-align:center;">PLATFORM COVERAGE</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">
+        <div style="background:rgba(232,162,61,.06);border:1px solid rgba(232,162,61,.2);border-radius:8px;padding:13px;"><div style="font-size:16px;margin-bottom:4px;">🇶🇦</div><div style="font-size:11px;font-weight:700;color:var(--gold);">Qatar</div><div style="font-size:9px;color:var(--dim);">95 agents</div><div style="font-size:8px;color:var(--signal);margin-top:3px;font-family:'JetBrains Mono',monospace;">● LIVE</div></div>
+        <div style="background:#0a0f0c;border:1px solid var(--line);border-radius:8px;padding:13px;opacity:.6;"><div style="font-size:16px;margin-bottom:4px;">🇯🇴</div><div style="font-size:11px;font-weight:700;">Jordan</div><div style="font-size:9px;color:var(--dim);">71 agents</div><div style="font-size:8px;color:var(--dim);margin-top:3px;font-family:'JetBrains Mono',monospace;">○ Phase 2</div></div>
+        <div style="background:#0a0f0c;border:1px solid var(--line);border-radius:8px;padding:13px;opacity:.6;"><div style="font-size:16px;margin-bottom:4px;">🇮🇳</div><div style="font-size:11px;font-weight:700;">India</div><div style="font-size:9px;color:var(--dim);">12 agents</div><div style="font-size:8px;color:var(--dim);margin-top:3px;font-family:'JetBrains Mono',monospace;">○ Phase 2</div></div>
+        <div style="background:#0a0f0c;border:1px solid var(--line);border-radius:8px;padding:13px;opacity:.6;"><div style="font-size:16px;margin-bottom:4px;">🇵🇭</div><div style="font-size:11px;font-weight:700;">Philippines</div><div style="font-size:9px;color:var(--dim);">1 agent</div><div style="font-size:8px;color:var(--dim);margin-top:3px;font-family:'JetBrains Mono',monospace;">○ Phase 2</div></div>
       </div>
     </div>
   </div>
 </div>
 </div>
 
-<!-- S14 WHY NEXORA -->
+<!-- S13 — WHY -->
+<div class="slide" id="s13">
+<canvas class="slide-bg" id="bg-s13"></canvas>
+<div class="l-center">
+  <div class="signal-tag">Why Nexora QA</div>
+  <div class="display">Not just a tool.<br><span style="color:var(--gold)">A system of record.</span></div>
+  <div class="body-text" style="max-width:560px;">Only Nexora QA connects the full accountability loop — from the first error to the final acknowledgement — with intelligence at every step.</div>
+  <div class="grid-3">
+    <div class="data-cell" style="text-align:center;"><div class="mono-stat" style="font-size:30px;color:var(--signal);">100%</div><div class="cell-title" style="margin-top:8px;">Evaluation Coverage</div><div class="cell-desc">Every eval structured, scored, saved. Nothing verbal.</div></div>
+    <div class="data-cell" style="text-align:center;"><div class="mono-stat" style="font-size:30px;color:var(--gold);">Auto</div><div class="cell-title" style="margin-top:8px;">Pattern Detection</div><div class="cell-desc">Escalate / Intervene / Monitor assigned automatically.</div></div>
+    <div class="data-cell" style="text-align:center;"><div class="mono-stat" style="font-size:30px;color:#a78bfa;">3-Step</div><div class="cell-title" style="margin-top:8px;">Coaching Loop</div><div class="cell-desc">QA → TL → Agent. Auto-closes on acknowledgement.</div></div>
+  </div>
+</div>
+</div>
+
+<!-- S14 — GO LIVE -->
 <div class="slide" id="s14">
+<canvas class="slide-bg" id="bg-s14"></canvas>
 <div class="l-center">
-  <div class="eyebrow">Why Nexora QA</div>
-  <div class="h1">Not Just a Tool.<br><span style="color:var(--gold)">A System of Record.</span></div>
-  <div class="sub" style="max-width:580px;">Every call center has evaluations. But only Nexora QA connects the full accountability loop — from the first error to the final acknowledgement — with automatic intelligence at every step.</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;width:100%;max-width:860px;margin-top:32px;opacity:0;transform:translateY(16px);transition:opacity .6s .4s ease,transform .6s .4s ease;" class="why-grid">
-    <div style="background:#0d1a14;border:1px solid rgba(22,167,102,.15);border-radius:12px;padding:22px;text-align:center;">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--green);margin-bottom:8px;text-shadow:0 0 16px rgba(22,167,102,.3);">100%</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Evaluation Coverage</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.5;">Every eval structured, scored and saved. Nothing verbal. Nothing lost.</div>
-    </div>
-    <div style="background:#0d1a14;border:1px solid rgba(232,162,61,.15);border-radius:12px;padding:22px;text-align:center;">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--gold);margin-bottom:8px;text-shadow:0 0 16px rgba(232,162,61,.3);">Auto</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Pattern Detection</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.5;">No manual analysis. Escalate / Intervene / Monitor assigned automatically.</div>
-    </div>
-    <div style="background:#0d1a14;border:1px solid rgba(139,92,246,.15);border-radius:12px;padding:22px;text-align:center;">
-      <div style="font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:700;color:var(--purple);margin-bottom:8px;text-shadow:0 0 16px rgba(139,92,246,.3);">3-Step</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Coaching Loop</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.5;">QA → TL → Agent. Full written trail. Auto-closes when agent acknowledges.</div>
-    </div>
+  <div class="live-badge"><span class="pdot"></span>Qatar Team — Ready to Go Live Today</div>
+  <div class="display-hero">The answer to "what if" — <span style="color:var(--signal)">is already built.</span></div>
+  <div class="body-text" style="max-width:480px;margin:22px 0 8px;font-size:16px;">Live, tested, ready. Every TL has a login. Every agent is mapped. Let's start today.</div>
+  <div class="stat-strip">
+    <div class="stat"><span class="stat-n">5</span><span class="stat-l">TLs Ready</span></div>
+    <div class="stat"><span class="stat-n">2</span><span class="stat-l">QA Assessors</span></div>
+    <div class="stat"><span class="stat-n">174</span><span class="stat-l">Agents Mapped</span></div>
+    <div class="stat"><span class="stat-n">4</span><span class="stat-l">Countries Ready</span></div>
+  </div>
+  <div class="pill-row">
+    <span class="pill" style="color:var(--dim);border-color:var(--line);background:rgba(255,255,255,.02);">Phase 2 → Jordan · India · Philippines</span>
+    <span class="pill" style="color:var(--gold);border-color:rgba(232,162,61,.3);background:rgba(232,162,61,.06);">Vision → VERIDIQ Global</span>
   </div>
 </div>
 </div>
 
-<!-- S15 GO LIVE -->
+<!-- S15 — CLOSING -->
 <div class="slide" id="s15">
+<canvas class="slide-bg" id="bg-s15"></canvas>
+<div class="hero-waveform" id="heroWaveform15"></div>
 <div class="l-center">
-  <div class="live-pill"><span class="pdot"></span>Qatar Team — Ready to Go Live Today</div>
-  <div class="h-hero" style="font-size:clamp(48px,7vw,88px);">The Answer to<br>"What if?"<br><span style="color:var(--green)">Is Already Built.</span></div>
-  <div class="sub" style="font-size:16px;max-width:500px;margin-bottom:36px;">Nexora QA is live, tested and ready. Every TL has a login. Every agent is mapped. The coaching loop is working. Let's start today.</div>
-  <div class="stats-row">
-    <div class="stat"><span class="stat-n" style="color:var(--gold);">5</span><span class="stat-l">TLs Ready</span></div>
-    <div class="stat"><span class="stat-n" style="color:var(--blue);">2</span><span class="stat-l">QA Assessors</span></div>
-    <div class="stat"><span class="stat-n" style="color:var(--green);">174</span><span class="stat-l">Agents Mapped</span></div>
-    <div class="stat"><span class="stat-n" style="color:var(--purple);">4</span><span class="stat-l">Countries Ready</span></div>
+  <div class="logomark" style="width:50px;height:50px;border-radius:14px;font-size:22px;margin-bottom:26px;">N</div>
+  <div class="display-hero" style="font-size:clamp(32px,4.6vw,58px);">Thank you</div>
+  <div class="body-text" style="margin-top:18px;max-width:460px;font-size:16px;">Questions, feedback, or ready to start — let's talk.</div>
+  <div class="card-list" style="margin-top:36px;max-width:380px;width:100%;">
+    <div class="signal-row" style="border-bottom:none;justify-content:center;text-align:center;display:flex;flex-direction:column;align-items:center;">
+      <div class="row-title" style="font-size:16px;">Younes Sid</div>
+      <div class="row-desc" style="font-size:12px;margin-top:2px;">QA Manager · Nexora QA · Doha, Qatar</div>
+    </div>
   </div>
-  <div style="margin-top:32px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;opacity:0;transform:translateY(14px);transition:opacity .6s .7s ease,transform .6s .7s ease;" class="end-tags">
-    <span class="tag" style="color:var(--muted);border-color:rgba(255,255,255,.07);background:rgba(255,255,255,.02);">Phase 2 → Jordan · India · Philippines</span>
-    <span class="tag" style="color:var(--gold);border-color:rgba(232,162,61,.3);background:rgba(232,162,61,.06);">Long-Term Vision → VERIDIQ Global</span>
+  <div class="pill-row" style="margin-top:8px;">
+    <span class="pill" style="color:var(--signal);border-color:rgba(22,167,102,.3);background:rgba(22,167,102,.06);">nexora-qa.vercel.app</span>
   </div>
 </div>
 </div>
 
 </div>
-
-<!-- Mobile Navigation Buttons -->
-<button class="mobile-prev" onclick="go(-1)">← Back</button>
-<button class="mobile-next" onclick="go(1)">Next <span style="font-size:14px;">→</span></button>
 
 <script>
-// BG CANVAS
-const canvas=document.getElementById('bgCanvas'),ctx=canvas.getContext('2d');
-let W,H,pts=[];
-function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight;}
-function initPts(){pts=[];const n=Math.floor(W*H/9500);for(let i=0;i<n;i++)pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.1,vy:(Math.random()-.5)*.1,r:Math.random()*.7+.2,c:Math.random()>.6?'#e8a23d':'#16a766'});}
-function draw(){
-  ctx.clearRect(0,0,W,H);
-  ctx.strokeStyle='rgba(255,255,255,.02)';ctx.lineWidth=.5;
-  for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-  let g=ctx.createRadialGradient(W*.8,H*.1,0,W*.8,H*.1,W*.4);g.addColorStop(0,'rgba(22,167,102,.05)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  g=ctx.createRadialGradient(W*.15,H*.85,0,W*.15,H*.85,W*.3);g.addColorStop(0,'rgba(232,162,61,.04)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c+'33';ctx.fill();});
-  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<85){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(255,255,255,${.025*(1-d/85)})`;ctx.lineWidth=.4;ctx.stroke();}}
-  requestAnimationFrame(draw);
+// ═══ WAVEFORM ═══
+const wf = document.getElementById('waveform');
+const WF_BARS = 80;
+const wfBars = [];
+for(let i=0;i<WF_BARS;i++){
+  const b = document.createElement('div');
+  b.className = 'wf-bar';
+  b.style.height = '4px';
+  wf.appendChild(b);
+  wfBars.push(b);
 }
-addEventListener('resize',()=>{resize();initPts();});resize();initPts();draw();
+// Different "mood" per slide section — calmer on intro, spikier on problem, steady on solution
+const WF_MOODS = ['calm','calm','spike','spike','calm','calm','calm','calm','calm','calm','calm','calm','calm','calm','wave','calm'];
+function animateWaveform(idx){
+  const mood = WF_MOODS[idx] || 'calm';
+  wfBars.forEach((b,i)=>{
+    let h;
+    if(mood==='calm')  h = 4 + Math.sin(i*0.3)*3 + Math.random()*3;
+    if(mood==='spike') h = 4 + Math.abs(Math.sin(i*0.5))*22 + Math.random()*10;
+    if(mood==='wave')  h = 4 + Math.sin(i*0.25 + idx)*16 + 12;
+    b.style.height = Math.max(3,h) + 'px';
+    b.style.background = mood==='spike' ? 'linear-gradient(to top,#e85d5d,transparent)' : 'linear-gradient(to top,var(--signal),transparent)';
+  });
+}
+setInterval(()=>{ animateWaveform(cur); }, 1800);
 
-// SLIDES
+// ═══ PER-SLIDE CANVAS BACKGROUNDS ═══
+// Each slide gets its own signature visual, drawn on its own canvas.
+// Theme arc: chaos (problem) -> structure (solution) -> signal (features) -> launch (go live)
+const slideCanvases = {};
+['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11','s12','s13','s14'].forEach(id=>{
+  const c = document.getElementById('bg-'+id);
+  if (c) slideCanvases[id] = { canvas:c, ctx:c.getContext('2d'), t:0 };
+});
+
+function resizeSlideCanvases(){
+  Object.values(slideCanvases).forEach(s=>{
+    const r = s.canvas.parentElement.getBoundingClientRect();
+    s.canvas.width = r.width; s.canvas.height = r.height;
+  });
+}
+window.addEventListener('resize', resizeSlideCanvases);
+resizeSlideCanvases();
+
+const GOLD='#e8a23d', SIGNAL='#16a766', RED='#e85d5d', BLUE='#4a86e8', MUTED='rgba(122,155,140,.5)';
+
+// S2 — Industry Problem: scattered chaotic dots, no connections (disorder)
+function drawChaos(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const n=60;
+  for(let i=0;i<n;i++){
+    const seed=i*137.5;
+    const x = (w/2) + Math.sin(seed+t*0.3)*w*0.42 + Math.cos(seed*1.7)*w*0.15;
+    const y = (h/2) + Math.cos(seed+t*0.2)*h*0.42 + Math.sin(seed*1.3)*h*0.15;
+    const r = 2+Math.sin(seed)*1.5;
+    ctx.beginPath();ctx.arc(x,y,Math.abs(r),0,Math.PI*2);
+    ctx.fillStyle = i%9===0?RED:MUTED;ctx.fill();
+  }
+}
+
+// S3 — Cost: dots fading and disappearing (loss/decay)
+function drawDecay(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const n=40;
+  for(let i=0;i<n;i++){
+    const seed=i*97.3;
+    const cycle = (t*0.4+seed)%10;
+    const opacity = Math.max(0, 1-cycle/10);
+    const x = (w*0.15) + (i%8)*(w*0.7/8) + Math.sin(seed)*20;
+    const y = (h*0.2) + Math.floor(i/8)*(h*0.6/5) + Math.cos(seed)*15;
+    ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);
+    ctx.fillStyle = `rgba(232,93,93,${opacity*0.5})`;ctx.fill();
+  }
+}
+
+// S4 — Solution: chaotic dots SNAPPING into an organized grid (order emerging)
+function drawSnapGrid(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const cols=10, rows=7, n=cols*rows;
+  const progress = Math.min(1, (Math.sin(t*0.15)+1)/2 + 0.3);
+  for(let i=0;i<n;i++){
+    const col=i%cols, row=Math.floor(i/cols);
+    const gx = w*0.12 + col*(w*0.76/(cols-1));
+    const gy = h*0.18 + row*(h*0.64/(rows-1));
+    const seed=i*53.7;
+    const chaosX = (w/2) + Math.sin(seed)*w*0.4;
+    const chaosY = (h/2) + Math.cos(seed)*h*0.4;
+    const x = chaosX + (gx-chaosX)*progress;
+    const y = chaosY + (gy-chaosY)*progress;
+    ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);
+    ctx.fillStyle = progress>0.7?SIGNAL:MUTED;ctx.fill();
+  }
+}
+
+// S5 — How It Works: 4 connected nodes pulsing left to right
+function drawSequence(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const nodes=4;
+  const positions=[];
+  for(let i=0;i<nodes;i++) positions.push({x:w*0.2+i*(w*0.6/(nodes-1)), y:h*0.5});
+  ctx.strokeStyle='rgba(232,162,61,.2)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(positions[0].x,positions[0].y);
+  positions.forEach(p=>ctx.lineTo(p.x,p.y));ctx.stroke();
+  const active = Math.floor(t*0.6)%nodes;
+  positions.forEach((p,i)=>{
+    const isActive = i===active;
+    ctx.beginPath();ctx.arc(p.x,p.y,isActive?12:7,0,Math.PI*2);
+    ctx.fillStyle = isActive?GOLD:'rgba(122,155,140,.3)';ctx.fill();
+    if(isActive){ctx.beginPath();ctx.arc(p.x,p.y,18,0,Math.PI*2);ctx.strokeStyle=GOLD+'55';ctx.lineWidth=2;ctx.stroke();}
+  });
+}
+
+// S6 — Manager: dense grid of small data points (dashboard texture)
+function drawDataGrid(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const cols=16, rows=10;
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const x=w*0.05+c*(w*0.9/cols), y=h*0.08+r*(h*0.84/rows);
+    const pulse = Math.sin(t*0.5+c*0.4+r*0.3);
+    const active = pulse>0.7;
+    ctx.beginPath();ctx.arc(x,y,active?2.5:1.3,0,Math.PI*2);
+    ctx.fillStyle = active?SIGNAL:'rgba(122,155,140,.25)';ctx.fill();
+  }
+}
+
+// S7 — QA: simple waveform (audio analysis)
+function drawWaveformBg(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const bars=44;
+  for(let i=0;i<bars;i++){
+    const x = w*0.1 + i*(w*0.8/bars);
+    const hgt = (Math.sin(i*0.3+t*0.8)*0.5+0.5)*h*0.3+h*0.05;
+    ctx.fillStyle='rgba(74,134,232,.35)';
+    ctx.fillRect(x,h/2-hgt/2,3,hgt);
+  }
+}
+
+// S8 — Team Lead: hub and spoke (one center, many connected)
+function drawHubSpoke(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const cx=w/2, cy=h/2, spokes=8, radius=Math.min(w,h)*0.32;
+  for(let i=0;i<spokes;i++){
+    const angle=(i/spokes)*Math.PI*2+t*0.1;
+    const x=cx+Math.cos(angle)*radius, y=cy+Math.sin(angle)*radius;
+    ctx.strokeStyle='rgba(232,162,61,.18)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='rgba(232,162,61,.4)';ctx.fill();
+  }
+  ctx.beginPath();ctx.arc(cx,cy,9,0,Math.PI*2);ctx.fillStyle=GOLD;ctx.fill();
+}
+
+// S9 — Agent: single heartbeat pulse line (personal/individual)
+function drawHeartbeat(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='rgba(22,167,102,.4)';ctx.lineWidth=2;ctx.beginPath();
+  const cy=h/2, span=w*0.8, startX=w*0.1;
+  for(let x=0;x<span;x+=2){
+    const px=startX+x;
+    const phase=((x+t*60)%span)/span;
+    let y=cy;
+    if(phase>0.45&&phase<0.55) y=cy-Math.sin((phase-0.45)*10*Math.PI)*h*0.18;
+    if(x===0)ctx.moveTo(px,y);else ctx.lineTo(px,y);
+  }
+  ctx.stroke();
+}
+
+// S10 — Coaching: flowing connected line, left to right journey
+function drawFlowLine(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const points=5;
+  ctx.strokeStyle='rgba(167,139,250,.25)';ctx.lineWidth=2;ctx.beginPath();
+  for(let i=0;i<points;i++){
+    const x=w*0.15+i*(w*0.7/(points-1));
+    const y=h*0.5+Math.sin(i*1.3+t*0.3)*h*0.1;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  const active=(t*0.3)%1;
+  const idx=Math.floor(active*(points-1));
+  const frac=active*(points-1)-idx;
+  const x1=w*0.15+idx*(w*0.7/(points-1)), y1=h*0.5+Math.sin(idx*1.3+t*0.3)*h*0.1;
+  const x2=w*0.15+(idx+1)*(w*0.7/(points-1)), y2=h*0.5+Math.sin((idx+1)*1.3+t*0.3)*h*0.1;
+  const px=x1+(x2-x1)*frac, py=y1+(y2-y1)*frac;
+  ctx.beginPath();ctx.arc(px,py,5,0,Math.PI*2);ctx.fillStyle='#a78bfa';ctx.fill();
+}
+
+// S11 — Intelligence Engine: radar sweep finding hits
+function drawRadarSweep(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const cx=w/2, cy=h/2, maxR=Math.min(w,h)*0.4;
+  for(let i=1;i<=3;i++){ctx.beginPath();ctx.arc(cx,cy,maxR*i/3,0,Math.PI*2);ctx.strokeStyle='rgba(122,155,140,.15)';ctx.lineWidth=1;ctx.stroke();}
+  const angle=t*0.8;
+  const grad=ctx.createConicGradient ? ctx.createConicGradient(angle,cx,cy) : null;
+  ctx.save();ctx.beginPath();ctx.moveTo(cx,cy);
+  ctx.arc(cx,cy,maxR,angle,angle+0.5);ctx.closePath();
+  ctx.fillStyle='rgba(232,93,93,.12)';ctx.fill();ctx.restore();
+  // hits
+  for(let i=0;i<5;i++){
+    const hseed=i*71.3;
+    const hAngle=hseed%(Math.PI*2);
+    const hDist=maxR*(0.3+((hseed*0.618)%0.6));
+    const hx=cx+Math.cos(hAngle)*hDist, hy=cy+Math.sin(hAngle)*hDist;
+    const diff=Math.abs(((angle-hAngle+Math.PI*3)%(Math.PI*2))-Math.PI);
+    const lit = diff>2.8;
+    ctx.beginPath();ctx.arc(hx,hy,lit?4:2,0,Math.PI*2);ctx.fillStyle=lit?RED:'rgba(232,93,93,.25)';ctx.fill();
+  }
+}
+
+// S12 — Data: mesh/lock grid pattern
+function drawMeshLock(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const cols=8,rows=6;
+  for(let r=0;r<=rows;r++){ctx.beginPath();ctx.moveTo(w*0.1,h*0.1+r*(h*0.8/rows));ctx.lineTo(w*0.9,h*0.1+r*(h*0.8/rows));ctx.strokeStyle='rgba(22,167,102,.08)';ctx.lineWidth=1;ctx.stroke();}
+  for(let c=0;c<=cols;c++){ctx.beginPath();ctx.moveTo(w*0.1+c*(w*0.8/cols),h*0.1);ctx.lineTo(w*0.1+c*(w*0.8/cols),h*0.9);ctx.strokeStyle='rgba(22,167,102,.08)';ctx.lineWidth=1;ctx.stroke();}
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    if((r+c+Math.floor(t*0.3))%7===0){
+      const x=w*0.1+c*(w*0.8/cols), y=h*0.1+r*(h*0.8/rows);
+      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fillStyle=SIGNAL+'77';ctx.fill();
+    }
+  }
+}
+
+// S13 — Why Nexora: fully organized clean grid (payoff/order)
+function drawCleanGrid(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const cols=10, rows=7;
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const x=w*0.12+c*(w*0.76/(cols-1)), y=h*0.18+r*(h*0.64/(rows-1));
+    const pulse = Math.sin(t*0.4+c*0.2+r*0.2)*0.3+0.7;
+    ctx.beginPath();ctx.arc(x,y,2.5,0,Math.PI*2);
+    ctx.fillStyle = `rgba(22,167,102,${pulse*0.5})`;ctx.fill();
+  }
+}
+
+// S14 — Go Live: rising ascending bars
+function drawAscend(ctx,w,h,t){
+  ctx.clearRect(0,0,w,h);
+  const bars=20;
+  for(let i=0;i<bars;i++){
+    const x=w*0.1+i*(w*0.8/bars);
+    const targetH = (i/bars)*h*0.55 + h*0.05;
+    const animH = targetH * Math.min(1,(t*0.3));
+    ctx.fillStyle='rgba(22,167,102,.3)';
+    ctx.fillRect(x,h-h*0.12-animH,(w*0.8/bars)*0.6,animH);
+  }
+}
+
+const SLIDE_DRAW_FNS = {
+  s1: drawChaos,     // hook — chaos hint
+  s2: drawChaos,     // problem
+  s3: drawDecay,     // cost
+  s4: drawSnapGrid,  // solution
+  s5: drawSequence,  // how it works
+  s6: drawDataGrid,  // manager
+  s7: drawWaveformBg,// qa
+  s8: drawHubSpoke,  // tl
+  s9: drawHeartbeat, // agent
+  s10: drawFlowLine, // coaching
+  s11: drawRadarSweep,// engine
+  s12: drawMeshLock, // data
+  s13: drawCleanGrid,// why
+  s14: drawAscend,   // go live
+};
+
+function renderSlideCanvases(){
+  Object.keys(slideCanvases).forEach(id=>{
+    const s = slideCanvases[id];
+    s.t += 0.016;
+    const fn = SLIDE_DRAW_FNS[id];
+    if (fn) fn(s.ctx, s.canvas.width, s.canvas.height, s.t);
+  });
+  requestAnimationFrame(renderSlideCanvases);
+}
+renderSlideCanvases();
+
+// ═══ HERO WAVEFORM (full-screen, welcome + closing slides) ═══
+function buildHeroWaveform(containerId, barCount){
+  const el = document.getElementById(containerId);
+  if (!el) return [];
+  const bars = [];
+  for(let i=0;i<barCount;i++){
+    const b = document.createElement('div');
+    b.className = 'hw-bar';
+    b.style.height = '20%';
+    el.appendChild(b);
+    bars.push(b);
+  }
+  return bars;
+}
+const heroBars0 = buildHeroWaveform('heroWaveform0', 48);
+const heroBars15 = buildHeroWaveform('heroWaveform15', 48);
+
+function animateHeroWaveform(bars, seed){
+  bars.forEach((b,i)=>{
+    const wave = Math.sin(i*0.22 + seed) * 0.5 + 0.5; // 0..1
+    const h = 12 + wave * 78; // 12% to 90% of container height
+    b.style.height = h + '%';
+  });
+}
+let heroSeed = 0;
+setInterval(()=>{
+  heroSeed += 0.45;
+  animateHeroWaveform(heroBars0, heroSeed);
+  animateHeroWaveform(heroBars15, heroSeed + 3);
+}, 700);
+animateHeroWaveform(heroBars0, 0);
+animateHeroWaveform(heroBars15, 3);
+
+// ═══ DECK NAV ═══
 const slides=document.querySelectorAll('.slide'),total=slides.length;
 let cur=0,busy=false;
 const dotsEl=document.getElementById('navDots');
 slides.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.addEventListener('click',()=>goTo(i));dotsEl.appendChild(d);});
+
 function ui(){
   document.getElementById('progress').style.width=((cur+1)/total*100)+'%';
   document.getElementById('counter').textContent=String(cur+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');
   document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
-  // Animate special elements on last slides
-  setTimeout(()=>{
-    const wg=document.querySelector('.why-grid');if(wg&&cur===13){wg.style.opacity='1';wg.style.transform='none';}
-    const st=document.querySelector('.solution-teaser');if(st&&cur===3){st.style.opacity='1';st.style.transform='none';}
-    const et=document.querySelector('.end-tags');if(et&&cur===14){et.style.opacity='1';et.style.transform='none';}
-  },700);
+  animateWaveform(cur);
 }
+
 function goTo(idx){
   if(busy||idx===cur||idx<0||idx>=total)return;busy=true;
   const prev=slides[cur],next=slides[idx],dir=idx>cur?1:-1;
-  prev.style.transition='opacity .4s ease,transform .4s ease';
-  prev.style.opacity='0';prev.style.transform=`translateY(${dir*-26}px)`;
-  prev.classList.remove('active');
+
+  prev.style.transition='opacity .5s cubic-bezier(.55,0,.85,.35),transform .6s cubic-bezier(.55,0,.85,.35),filter .5s ease';
+  prev.style.opacity='0';
+  prev.style.transform=`perspective(2000px) rotateX(5deg) rotateY(${dir*-4}deg) translateY(${dir*-10}px) translateZ(-140px) scale(.93)`;
+  prev.style.filter='blur(4px) brightness(.75)';
+
+  next.style.transition='none';
+  next.style.opacity='0';
+  next.style.transform=`perspective(2000px) rotateX(-7deg) rotateY(${dir*5}deg) translateY(${dir*36}px) translateZ(-100px) scale(.95)`;
+  next.style.filter='blur(9px) brightness(1.25)';
+  next.classList.add('active');
+  cur=idx;
+
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    next.style.transition='opacity .75s cubic-bezier(.16,1,.3,1) .08s,transform .95s cubic-bezier(.16,1,.3,1) .08s,filter .8s ease .08s';
+    next.style.opacity='1';
+    next.style.transform='perspective(2000px) rotateX(0) rotateY(0) translateY(0) translateZ(0) scale(1)';
+    next.style.filter='blur(0px) brightness(1)';
+  }));
+
+  ui();
+
   setTimeout(()=>{
-    prev.style.cssText='';cur=idx;
-    next.style.cssText=`opacity:0;transform:translateY(${dir*26}px)`;
-    next.classList.add('active');
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-      next.style.transition='opacity .55s ease,transform .55s cubic-bezier(.16,1,.3,1)';
-      next.style.opacity='1';next.style.transform='none';
-      ui();setTimeout(()=>{next.style.cssText='';busy=false;},560);
-    }));
-  },420);
+    prev.classList.remove('active');
+    prev.style.cssText='';
+    next.style.cssText='';
+    busy=false;
+  },1050);
 }
+
 function go(d){goTo(cur+d);}
-document.addEventListener('keydown',e=>{if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();go(1);}if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();go(-1);}});
-// Desktop only — click deck to advance
-if(window.innerWidth > 768) {
-  document.getElementById('deck').addEventListener('click',e=>{if(!e.target.closest('.arr')&&!e.target.closest('.nav-dots')&&!e.target.closest('.mobile-next')&&!e.target.closest('.mobile-prev'))go(1);});
+function toggleFullscreen(){
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(()=>{});
+  } else {
+    document.exitFullscreen().catch(()=>{});
+  }
 }
-// Swipe only on desktop-size screens
-let tx=0,ty=0;
-document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
-document.addEventListener('touchend',e=>{
-  const dx=tx-e.changedTouches[0].clientX;
-  const dy=ty-e.changedTouches[0].clientY;
-  // Only horizontal swipe on desktop-width, ignore on mobile (let scroll work)
-  if(window.innerWidth>768&&Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50)go(dx>0?1:-1);
-},{passive:true});
+document.addEventListener('fullscreenchange', ()=>{
+  const btn = document.getElementById('fsBtn');
+  if (btn) btn.textContent = document.fullscreenElement ? '⛶' : '⛶';
+});
+
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowDown',' '].includes(e.key)){e.preventDefault();go(1);}
+  if(['ArrowLeft','ArrowUp'].includes(e.key)){e.preventDefault();go(-1);}
+  if(e.key==='f' || e.key==='F'){e.preventDefault();toggleFullscreen();}
+});
+if(window.innerWidth>768){document.getElementById('deck').addEventListener('click',e=>{if(!e.target.closest('.arr')&&!e.target.closest('.nav-dots'))go(1);});}
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;},{passive:true});
+document.addEventListener('touchend',e=>{const d=tx-e.changedTouches[0].clientX;if(window.innerWidth>768&&Math.abs(d)>50)go(d>0?1:-1);},{passive:true});
+
 ui();
 </script>
 </body>
