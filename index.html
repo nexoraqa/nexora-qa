@@ -937,6 +937,10 @@ a { color:var(--purple-l); text-decoration:none; }
         <div>
           <div class="card">
             <div class="card-title">Agent Information</div>
+            <div class="field" id="field-case">
+              <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
+              <input type="text" id="c-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
+            </div>
             <div class="field" id="field-proj">
               <label>Project <span style="color:var(--red);">*</span></label>
               <select id="c-proj" onchange="clearFieldError('field-proj')"><option value="">Select project</option><option>MOPH_MCI</option><option>PHCC</option><option>MOPH</option></select>
@@ -1809,6 +1813,10 @@ a { color:var(--purple-l); text-decoration:none; }
         <div>
           <div class="card">
             <div class="card-title">Agent Information</div>
+            <div class="field">
+              <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
+              <input type="text" id="op-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
+            </div>
             <div class="field">
               <label>Agent Name <span style="color:var(--red);">*</span></label>
               <select id="op-agent" onchange="opUpdateAgent()"><option value="">Select agent</option></select>
@@ -3431,6 +3439,7 @@ function computeScore() {
     proj:  document.getElementById('c-proj').value,
     lang:  document.getElementById('c-lang').value,
     country: document.getElementById('c-country')?.value || '',
+    caseNumber: document.getElementById('c-case')?.value.trim() || '',
     holdNA: naSelected,
     today: new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}),
     overall, ncScore, ncPct, ccPct, cbPct, cc, cb,
@@ -4352,6 +4361,7 @@ function saveToGoogleSheets(eval_data, errors) {
       agent:      eval_data.agent,
       tl:         eval_data.tl,
       project:    eval_data.proj,
+      caseNumber: eval_data.caseNumber || '',
       country:    AGENTS.find(a=>a.n===eval_data.agent)?.country || eval_data.country || AGENT_META[eval_data.agent]?.country || '',
       language:   eval_data.lang || '',
       assessor:   eval_data.qa,
@@ -4406,6 +4416,7 @@ function saveToHistory(d, errors) {
     qa:       d.qa,
     lang:     d.lang      || '',
     country:  AGENTS.find(a=>a.n===d.agent)?.country || AGENT_META[d.agent]?.country || '',
+    caseNumber: d.caseNumber || '',
     overall:  d.overall,
     ncScore:  d.ncScore,
     ccPct:    d.ccPct,
@@ -6024,6 +6035,7 @@ function syncCoachingItem(item) {
       tl:          item.tl,
       project:     item.project,
       country:     item.country,
+      caseNumber:  item.caseNumber || '',
       qaAuthor:    item.qaAuthor,
       errorType:   item.errorType,
       priority:    item.priority,
@@ -6075,6 +6087,7 @@ function mergeCoachingFromSheets(sheetItems) {
       tl:           row.tl || '',
       project:      row.project || '',
       country:      row.country || '',
+      caseNumber:   row.caseNumber || '',
       qaAuthor:     row.qaAuthor || '',
       errorType:    row.errorType || 'nc',
       priority:     row.priority || 'MEDIUM',
@@ -6133,6 +6146,7 @@ function autoGenerateCoaching(evalObj) {
     tl:          evalObj.tl || '',
     project:     evalObj.proj || '',
     country:     evalObj.country || '',
+    caseNumber:  evalObj.caseNumber || '',
     qaAuthor:    _currentUser?.name || 'QA',
     errorType:   hasCC ? 'cc' : hasCB ? 'cb' : 'nc', // primary type for tab filtering
     hasCC, hasCB, hasNC,
@@ -6402,7 +6416,7 @@ function renderCoaching() {
         <div style="flex:1;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:700;">${dots}</div>
           <div style="font-size:14px;font-weight:700;margin-bottom:3px;">${c.agent}</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${c.project} · ${c.tl} · ${fmtDate(c.date)} · by ${c.qaAuthor}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${c.project} · ${c.tl} · ${fmtDate(c.date)} · by ${c.qaAuthor}${c.caseNumber ? ` · <span style="color:var(--gold);">Case: ${c.caseNumber}</span>` : ''}</div>
           ${attrPreview}
           ${c.qaComment ? `<div style="font-size:12px;color:var(--text-2);margin-top:8px;padding:8px;background:var(--bg);border-radius:6px;border-left:2px solid var(--purple);">"${c.qaComment.slice(0,80)}${c.qaComment.length>80?'...':''}"</div>` : ''}
         </div>
@@ -6984,6 +6998,7 @@ function submitOperation() {
   var agent  = document.getElementById('op-agent')?.value;
   var proj   = document.getElementById('op-proj')?.value;
   var lang   = document.getElementById('op-lang')?.value;
+  var caseNum = document.getElementById('op-case')?.value.trim() || '';
   var tlName = _currentUser?.tl || _currentUser?.name || '';
   if (!agent || !proj) { alert('Please select agent and project.'); return; }
 
@@ -7004,6 +7019,7 @@ function submitOperation() {
     action: 'save_operation',
     id, date, time, agent, tl: tlName, project: proj,
     country: AGENTS.find(a=>a.n===agent)?.country || AGENT_META[agent]?.country || '',
+    caseNumber: caseNum,
     language: lang,
     assessor: _currentUser?.name || tlName,
     overall: d.overall.toFixed(1),
@@ -7031,7 +7047,7 @@ function submitOperation() {
     body: JSON.stringify(payload),
   }).catch(err => console.warn('Operation save failed:', err));
 
-  var opRecord = { id, date, time, agent, tl:tlName, proj, country:AGENT_META[agent]?.country||'', lang, assessor:_currentUser?.name||tlName, overall:d.overall };
+  var opRecord = { id, date, time, agent, tl:tlName, proj, country:AGENT_META[agent]?.country||'', lang, caseNumber:caseNum, assessor:_currentUser?.name||tlName, overall:d.overall };
   if (!window._operationHistory) window._operationHistory = [];
   window._operationHistory.unshift(opRecord);
   try { localStorage.setItem('nexora_op_history', JSON.stringify(window._operationHistory.slice(0,200))); } catch(e) {}
