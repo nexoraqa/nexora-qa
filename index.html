@@ -3877,24 +3877,47 @@ function applyIntelFilters() {
     return;
   }
 
-  // ── Pattern levels: show table ────────────────────────────
+  // ── Pattern levels: show expandable table ────────────────────────────
   document.getElementById('drill-content').innerHTML =
     `<div style="overflow-x:auto;">
       <table class="tbl" style="width:100%;font-size:12px;">
         <thead><tr>
-          <th>Agent</th><th>TL</th><th>Error</th><th>Type</th><th>Repeats</th><th>Project</th>
+          <th></th><th>Agent</th><th>TL</th><th>Error</th><th>Type</th><th>Repeats</th><th>Project</th>
         </tr></thead>
-        <tbody>${patterns.map(p => {
+        <tbody>${patterns.map((p, idx) => {
           const typeColor = p.type==='cc'?'var(--red)':p.type==='cb'?'var(--orange)':'var(--gold)';
           const typeLabel = p.type==='cc'?'CC Critical':p.type==='cb'?'CB Critical':'NC Recurring';
-          return `<tr>
+          // Gather sub-attributes and eval instances for this agent+error
+          const subAttrs = [];
+          const evalInstances = [];
+          _evalHistory.filter(ev => ev.agent === p.agent).forEach(ev => {
+            (ev.errors||[]).forEach(e => {
+              if ((e.v === p.error || e.attrName === p.error || e.attr === p.error) && !e.isNA) {
+                const sub = e.v || e.subError || '';
+                if (sub && sub !== p.error && !subAttrs.includes(sub)) subAttrs.push(sub);
+                if (!evalInstances.find(x=>x.date===ev.date && x.time===ev.time)) {
+                  evalInstances.push({date: ev.date, time: ev.time, qa: ev.qa, overall: ev.overall});
+                }
+              }
+            });
+          });
+          const expandId = 'drill-expand-' + idx;
+          const detailHTML = `
+            ${subAttrs.length ? `<div style="margin-bottom:10px;"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:var(--font-mono);">Specific Sub-Errors</div>
+              ${subAttrs.map(s=>`<div style="display:inline-block;padding:5px 10px;background:${typeColor}15;border:1px solid ${typeColor}30;border-radius:6px;margin:0 5px 5px 0;font-size:11px;font-weight:600;color:${typeColor};">↳ ${s}</div>`).join('')}</div>` : ''}
+            ${evalInstances.length ? `<div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;font-family:var(--font-mono);">Evaluation History</div>
+              ${evalInstances.slice(0,5).map(ev=>`<div style="display:flex;justify-content:space-between;padding:6px 10px;background:var(--bg);border-radius:6px;margin-bottom:3px;font-size:11px;"><span style="color:var(--muted);">${fmtDate(ev.date)} · by ${ev.qa||'QA'}</span><span style="font-family:var(--font-mono);font-weight:700;color:${ev.overall>=90?'var(--green)':ev.overall>=80?'var(--gold)':'var(--red)'};">${ev.overall?.toFixed(1)}%</span></div>`).join('')}</div>` : ''}
+          `;
+          return `<tr onclick="const el=document.getElementById('${expandId}');el.style.display=el.style.display==='none'?'table-row':'none';this.querySelector('.drill-arrow').textContent=el.style.display==='none'?'▶':'▼';" style="cursor:pointer;">
+            <td style="width:20px;"><span class="drill-arrow" style="font-size:10px;color:var(--muted);">▶</span></td>
             <td style="font-weight:700;">${p.agent}</td>
             <td style="color:var(--muted);">${p.meta?.tl||'—'}</td>
             <td>${p.error}</td>
             <td><span style="background:${typeColor}22;color:${typeColor};border-radius:4px;padding:2px 6px;font-size:10px;font-weight:700;">${typeLabel}</span></td>
-            <td style="font-family:var(--font-h);font-weight:800;color:${typeColor};">×${p.count}</td>
+            <td style="font-family:var(--font-mono);font-weight:800;color:${typeColor};">×${p.count}</td>
             <td style="color:var(--muted);">${p.meta?.proj||'—'}</td>
-          </tr>`;
+          </tr>
+          <tr id="${expandId}" style="display:none;"><td colspan="7" style="background:var(--bg);padding:14px 16px;border-radius:0 0 8px 8px;">${detailHTML}</td></tr>`;
         }).join('')}
         </tbody>
       </table>
