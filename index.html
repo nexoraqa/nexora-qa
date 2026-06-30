@@ -8330,19 +8330,35 @@ function renderTLHome(user) {
   const teamEvals = _evalHistory.filter(e => e.tl === tlName).slice(0, 8);
   const recentEl  = document.getElementById('tl-recent-evals');
   if (teamEvals.length > 0) {
-    recentEl.innerHTML = teamEvals.map(e => {
+    recentEl.innerHTML = teamEvals.map((e, idx) => {
       const col = e.overall>=90?'var(--green)':e.overall>=80?'var(--gold)':'var(--red)';
       const badges = [
         e.cc>0?`<span style="font-size:10px;background:var(--red-dim);color:var(--red);border-radius:4px;padding:1px 6px;">CC</span>`:'',
         e.cb>0?`<span style="font-size:10px;background:var(--orange-dim);color:var(--orange);border-radius:4px;padding:1px 6px;">CB</span>`:'',
         e.ncCount>2?`<span style="font-size:10px;background:var(--gold-dim);color:var(--gold);border-radius:4px;padding:1px 6px;">NC</span>`:'',
       ].filter(Boolean).join(' ');
-      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
-        <div style="flex:1;min-width:0;">
-          <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.agent}</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${fmtDate(e.date)} · ${fmtTime(e.time)} ${badges}</div>
+      const hasErrors = (e.errors||[]).filter(er=>!er.isNA).length > 0;
+      const expandId = 'tl-eval-expand-' + idx;
+      const errorRows = (e.errors||[]).filter(er=>!er.isNA).map(er => {
+        const tColor = er.t==='cc'?'var(--red)':er.t==='cb'?'var(--orange)':'var(--gold)';
+        const tBg    = er.t==='cc'?'var(--red-dim)':er.t==='cb'?'var(--orange-dim)':'var(--gold-dim)';
+        return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;background:${tBg};border-radius:6px;margin-bottom:4px;">
+          <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;color:${tColor};flex-shrink:0;margin-top:1px;">${(er.t||'nc').toUpperCase()}</span>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text);">${er.v || er.subError || er.attr || 'Unknown'}</div>
+            ${er.attrName && er.attrName !== (er.v||er.subError) ? `<div style="font-size:10px;color:var(--muted);margin-top:1px;">in ${er.attrName}</div>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+      return `<div style="border-bottom:1px solid var(--border);">
+        <div ${hasErrors ? `onclick="const el=document.getElementById('${expandId}');el.style.display=el.style.display==='none'?'block':'none';"` : ''} style="display:flex;align-items:center;gap:10px;padding:8px 0;${hasErrors?'cursor:pointer;':''}">
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e.agent} ${hasErrors?'<span style="font-size:9px;color:var(--muted);">▼</span>':''}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px;">${fmtDate(e.date)} · ${fmtTime(e.time)} ${badges}</div>
+          </div>
+          <div style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:${col};flex-shrink:0;">${e.overall.toFixed(1)}%</div>
         </div>
-        <div style="font-family:var(--font-mono);font-size:16px;font-weight:800;color:${col};flex-shrink:0;">${e.overall.toFixed(1)}%</div>
+        ${hasErrors ? `<div id="${expandId}" style="display:none;padding:0 0 10px;">${errorRows}</div>` : ''}
       </div>`;
     }).join('');
   } else {
