@@ -1323,42 +1323,6 @@ a { color:var(--purple-l); text-decoration:none; }
       .mon-sum-card.active { transform:translateY(-2px); box-shadow:0 0 0 2px var(--card-glow, #fff3); }
     </style>
 
-    <!-- Summary counts — clickable -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
-      <div class="mon-sum-card" onclick="drillDown('escalate')" style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--red);border-radius:var(--radius);padding:14px;text-align:center;position:relative;">
-        <div class="mon-tooltip-wrap" style="position:absolute;top:6px;right:6px;" onclick="event.stopPropagation()">
-          <button class="mon-info-btn" tabindex="0">ℹ️</button>
-          <div class="mon-tooltip"><b><span class="si-dot si-dot-red"></span> Escalate</b><br>Agent made the same error <b>4+ times</b>. Chronic pattern — supervisor action required immediately.</div>
-        </div>
-        <div style="font-family:var(--font-h);font-size:28px;font-weight:900;color:var(--red);" id="mon-esc">0</div>
-        <div style="font-size:10px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-top:4px;"><span class="si-dot si-dot-red"></span> Escalate</div>
-      </div>
-      <div class="mon-sum-card" onclick="drillDown('intervene')" style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--orange);border-radius:var(--radius);padding:14px;text-align:center;position:relative;">
-        <div class="mon-tooltip-wrap" style="position:absolute;top:6px;right:6px;" onclick="event.stopPropagation()">
-          <button class="mon-info-btn" tabindex="0">ℹ️</button>
-          <div class="mon-tooltip"><b><span class="si-dot si-dot-orange"></span> Intervene</b><br>Agent made the same error <b>3 times</b>. Confirmed pattern — immediate coaching session needed.</div>
-        </div>
-        <div style="font-family:var(--font-h);font-size:28px;font-weight:900;color:var(--orange);" id="mon-int">0</div>
-        <div style="font-size:10px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-top:4px;"><span class="si-dot si-dot-orange"></span> Intervene</div>
-      </div>
-      <div class="mon-sum-card" onclick="drillDown('monitor')" style="background:var(--card);border:1px solid var(--border);border-top:3px solid #4a86e8;border-radius:var(--radius);padding:14px;text-align:center;position:relative;">
-        <div class="mon-tooltip-wrap" style="position:absolute;top:6px;right:6px;" onclick="event.stopPropagation()">
-          <button class="mon-info-btn" tabindex="0">ℹ️</button>
-          <div class="mon-tooltip"><b><span class="si-dot si-dot-blue"></span> Monitor</b><br>Agent made the same error <b>2 times</b>. Emerging pattern — watch closely and prepare coaching if it happens again.</div>
-        </div>
-        <div style="font-family:var(--font-h);font-size:28px;font-weight:900;color:#6da8ff;" id="mon-mon">0</div>
-        <div style="font-size:10px;color:#6da8ff;text-transform:uppercase;letter-spacing:1px;margin-top:4px;"><span class="si-dot si-dot-blue"></span> Monitor</div>
-      </div>
-      <div class="mon-sum-card" onclick="drillDown('atrisk')" style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:var(--radius);padding:14px;text-align:center;position:relative;" id="card-atrisk">
-        <div class="mon-tooltip-wrap" style="position:absolute;top:6px;right:6px;" onclick="event.stopPropagation()">
-          <button class="mon-info-btn" tabindex="0">ℹ️</button>
-          <div class="mon-tooltip"><b><span class="si-dot si-dot-gold"></span> At Risk</b><br>Agent score is <b>below 90%</b>. Not yet a pattern but performance needs attention before it becomes one.</div>
-        </div>
-        <div style="font-family:var(--font-h);font-size:28px;font-weight:900;color:var(--gold);" id="mon-risk">0</div>
-        <div style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-top:4px;"><span class="si-dot si-dot-gold"></span> At Risk</div>
-      </div>
-    </div>
-
     <!-- Tab Navigation — Single Row -->
     <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:4px;flex-wrap:wrap;">
       <button onclick="switchMonTab('cc')"       id="tab-cc"       style="flex:1;min-width:80px;padding:8px 10px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;"><span class="si-dot si-dot-red"></span> CC</button>
@@ -1372,9 +1336,6 @@ a { color:var(--purple-l); text-decoration:none; }
 
     <!-- TAB 1: Pattern Intelligence -->
     <div id="mon-tab-patterns">
-      <div style="margin-bottom:16px;">
-        <button onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1]);setTimeout(()=>{const pos=window._dashScrollPos||0;const m=document.querySelector('.main');if(m)m.scrollTop=pos;},50)" style="display:inline-flex;align-items:center;gap:7px;background:var(--blue-dim);border:1px solid #4a86e850;color:var(--blue-l);border-radius:var(--radius-s);padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);" onmouseover="this.style.background='#4a86e825'" onmouseout="this.style.background='var(--blue-dim)'">← Dashboard</button>
-      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;">
         <div onclick="drillDown('escalate')" id="card-escalate" style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--red);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;position:relative;" onmouseover="this.style.background='#1a0a0a'" onmouseout="this.style.background='var(--card)'">
           <div class="mon-tooltip-wrap" style="position:absolute;top:8px;right:8px;" onclick="event.stopPropagation()">
