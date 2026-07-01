@@ -635,7 +635,7 @@ a { color:var(--purple-l); text-decoration:none; }
     <div class="nav-item"        onclick="nav('profiles',this)">    <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span> Agent Profiles</div>
     <div class="nav-item"        onclick="nav('coaching',this)" id="nav-coaching">  <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span> Coaching <span id="coaching-badge" style="display:none;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:4px;font-family:var(--font-mono);">0</span></div>
     <div class="nav-item" id="nav-operation" style="display:none;" onclick="nav('operation',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><rect x="5" y="6" width="14" height="15" rx="1.5"/><path d="M9 12h6M9 16h6"/></svg></span> Operation Form</div>
-    <div class="nav-item" id="nav-calibration" style="display:none;" onclick="nav('calibration',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/><path d="M12 7v1M12 16v1M7 12h1M16 12h1"/></svg></span> Calibration</div>
+    <div class="nav-item" id="nav-calibration" style="display:none;" onclick="nav('calibration',this)"><span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/><path d="M12 7v1M12 16v1M7 12h1M16 12h1"/></svg></span> Calibration <span id="calib-nav-badge" style="display:none;background:var(--purple);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:10px;margin-left:4px;font-family:var(--font-mono);">0</span></div>
     <div class="nav-item"        onclick="nav('reports',this)">     <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5M9 13h6M9 17h6"/></svg></span> Reports</div>
     <div class="nav-item"        onclick="nav('upload',this)">      <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/></svg></span> Upload Data</div>
     <div class="nav-item"        onclick="nav('settings',this)">    <span class="nav-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V19a2 2 0 11-4 0v-.09A1.65 1.65 0 009.5 17.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9.5a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span> Settings</div>
@@ -1602,7 +1602,7 @@ a { color:var(--purple-l); text-decoration:none; }
     <!-- Tabs -->
     <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:4px;">
       <button onclick="switchCalibTab('active')" id="calib-tab-active" style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:var(--purple);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;">Active Sessions</button>
-      <button onclick="switchCalibTab('create')" id="calib-tab-create" style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;">+ New Session</button>
+      <button onclick="switchCalibTab('create')" id="calib-tab-create" style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:none;">+ New Session</button>
       <button onclick="switchCalibTab('history')" id="calib-tab-history" style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;">History</button>
     </div>
 
@@ -1614,7 +1614,17 @@ a { color:var(--purple-l); text-decoration:none; }
     <!-- Create Session Tab -->
     <div id="calib-tab-create-content" style="display:none;">
       <div class="card" style="max-width:600px;">
-        <div class="card-title" style="margin-bottom:18px;">Create New Calibration Session</div>
+        <div style="margin-bottom:18px;">
+          <div class="card-title" style="margin:0 0 4px;">New Calibration Session</div>
+          <div style="font-size:11px;color:var(--muted);">You are automatically assigned as the QA Assessor</div>
+        </div>
+
+        <!-- QA Auto-assigned -->
+        <div style="margin-bottom:14px;padding:10px 12px;background:var(--bg);border:1px solid rgba(22,167,102,.3);border-radius:var(--radius-s);display:flex;align-items:center;gap:10px;">
+          <span style="font-size:11px;font-weight:700;color:var(--green);background:rgba(22,167,102,.15);padding:2px 8px;border-radius:4px;font-family:var(--font-mono);">QA</span>
+          <span style="font-size:13px;font-weight:600;" id="calib-qa-display">—</span>
+          <span style="font-size:11px;color:var(--muted);">Auto-assigned</span>
+        </div>
 
         <div style="margin-bottom:14px;">
           <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Agent</div>
@@ -1624,31 +1634,22 @@ a { color:var(--purple-l); text-decoration:none; }
         </div>
 
         <div style="margin-bottom:14px;">
-          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Call Date (reference)</div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Call Date</div>
           <input type="date" id="calib-date" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;">
         </div>
 
         <div style="margin-bottom:14px;">
-          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Case Number (optional)</div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Case Number <span style="font-size:10px;color:var(--muted);font-weight:400;">(optional)</span></div>
           <input type="text" id="calib-case" placeholder="e.g. CASE-1234" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;">
         </div>
 
-        <div style="margin-bottom:14px;">
-          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">QA Assessor</div>
-          <select id="calib-qa1" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;">
-            <option value="">Select QA...</option>
-          </select>
-        </div>
-
         <div style="margin-bottom:20px;">
-          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Team Lead</div>
-          <select id="calib-tl" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;">
-            <option value="">Select Team Lead...</option>
-          </select>
+          <div style="font-size:12px;font-weight:600;margin-bottom:10px;">Team Lead(s) to calibrate with</div>
+          <div id="calib-tl-checkboxes" style="display:flex;flex-direction:column;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:12px;"></div>
         </div>
 
         <div style="padding:12px;background:rgba(74,134,232,.08);border:1px solid rgba(74,134,232,.2);border-radius:8px;margin-bottom:18px;font-size:12px;color:var(--blue-l);">
-          🔒 <b>Blind Mode ON</b> — each evaluator submits independently and cannot see others' scores until all have submitted.
+          🔒 <b>Blind Mode ON</b> — TL submits independently and cannot see your score until both have submitted.
         </div>
 
         <button onclick="createCalibSession()" style="width:100%;background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Create Calibration Session</button>
@@ -5102,7 +5103,15 @@ function nav(id, el) {
   if(id === 'home')      { updateHomeKPIs(); try { buildIntelligence(); } catch(e) {} }
   if(id === 'monitor')     { try { clearMonitorBadge(); } catch(e) {} }
   if(id === 'coaching')    { try { clearCoachingBadge(); } catch(e) {} }
-  if(id === 'calibration') { try { renderCalibPage(); } catch(e) {} }
+  if(id === 'calibration') {
+    try { renderCalibPage(); } catch(e) {}
+    // Mark as seen — clear badge
+    const nm = _currentUser?.name||'';
+    const pending = (_calibSessions||[]).filter(s => s.status==='active' && s.participants.some(p=>p.name===nm&&!p.submitted)).length;
+    localStorage.setItem('nexora_calib_last_seen_'+nm, String(pending));
+    const badge = document.getElementById('calib-nav-badge');
+    if(badge){badge.textContent='0';badge.style.display='none';}
+  }
   if(id === 'operation') {
     initOperationForm(_currentUser);
   }
@@ -9172,6 +9181,7 @@ function loadFromGoogleSheets() {
           try { buildIntelligence(); } catch(e) {}
           try { updateHomeKPIs(); } catch(e) {}
           try { updateNavBadges(); } catch(e) {}
+          try { updateCalibBadge(); } catch(e) {}
         }, 500);
         console.log(`✅ Loaded ${added} new evals from Google Sheets`);
       }
@@ -9464,22 +9474,30 @@ function switchCalibTab(tab) {
 }
 
 function populateCalibForm() {
-  // Qatar team agents from eval history
+  // Show QA auto-assignment
+  const qaDisplay = document.getElementById('calib-qa-display');
+  if (qaDisplay) qaDisplay.textContent = _currentUser?.name || '—';
+
+  // Qatar agents from eval history
   const agentSel = document.getElementById('calib-agent');
   if (agentSel) {
     const agents = [...new Set(_evalHistory.filter(e => !e.country || e.country === 'Qatar').map(e => e.agent))].sort();
-    // Fallback: all agents if no Qatar filter
     const allAgents = agents.length > 0 ? agents : [...new Set(_evalHistory.map(e => e.agent))].sort();
     agentSel.innerHTML = '<option value="">Select agent...</option>' + allAgents.map(a => `<option value="${a}">${a}</option>`).join('');
   }
-  // QA + Manager users from USERS constant
-  const qaUsers = Object.values(USERS).filter(u => u.role === 'qa' || u.role === 'manager');
-  const qa1 = document.getElementById('calib-qa1');
-  if (qa1) qa1.innerHTML = '<option value="">Select QA...</option>' + qaUsers.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
-  // TL users from USERS constant
-  const tlUsers = Object.values(USERS).filter(u => u.role === 'tl');
-  const tlSel = document.getElementById('calib-tl');
-  if (tlSel) tlSel.innerHTML = '<option value="">Select Team Lead...</option>' + tlUsers.map(u => `<option value="${u.name}">${u.tl||u.name}</option>`).join('');
+
+  // TL checkboxes
+  const tlBox = document.getElementById('calib-tl-checkboxes');
+  if (tlBox) {
+    const tlUsers = Object.values(USERS).filter(u => u.role === 'tl');
+    tlBox.innerHTML = tlUsers.map(u => `
+      <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;cursor:pointer;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+        <input type="checkbox" value="${u.name}" style="width:16px;height:16px;accent-color:var(--gold);cursor:pointer;">
+        <span style="font-size:13px;font-weight:600;">${u.tl||u.name}</span>
+        <span style="font-size:11px;color:var(--muted);">${u.role.toUpperCase()}</span>
+      </label>`).join('');
+  }
+
   // Set today's date
   const dateEl = document.getElementById('calib-date');
   if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
@@ -9489,13 +9507,20 @@ function createCalibSession() {
   const agent = document.getElementById('calib-agent')?.value;
   const date  = document.getElementById('calib-date')?.value;
   const caseN = document.getElementById('calib-case')?.value || '';
-  const qa1 = document.getElementById('calib-qa1')?.value;
-  const tl  = document.getElementById('calib-tl')?.value;
+  const qa1 = _currentUser?.name; // Auto-assigned from logged-in QA
+  const checkedBoxes = document.querySelectorAll('#calib-tl-checkboxes input[type=checkbox]:checked');
+  const selectedTLs = [...checkedBoxes].map(cb => cb.value).filter(Boolean);
 
-  if (!agent) { showToast('Please select an agent','warn'); return; }
-  if (!date)  { showToast('Please select a call date','warn'); return; }
-  if (!qa1)   { showToast('Please select a QA Assessor','warn'); return; }
-  if (!tl)    { showToast('Please select a Team Lead','warn'); return; }
+  if (!agent)              { showToast('Please select an agent','warn'); return; }
+  if (!date)               { showToast('Please select a call date','warn'); return; }
+  if (!selectedTLs.length) { showToast('Please select at least one Team Lead','warn'); return; }
+
+  // Block duplicate case number
+  if (caseN) {
+    loadCalibSessions();
+    const duplicate = _calibSessions.find(s => s.caseNumber && s.caseNumber.trim().toLowerCase() === caseN.trim().toLowerCase());
+    if (duplicate) { showToast('A calibration with this case number already exists','warn'); return; }
+  }
 
   const session = {
     id: 'CAL-' + Date.now(),
@@ -9505,7 +9530,7 @@ function createCalibSession() {
     status: 'active',
     participants: [
       { name: qa1, role: 'qa', submitted: false, score: null, errors: [] },
-      { name: tl,  role: 'tl', submitted: false, score: null, errors: [] }
+      ...selectedTLs.map(tl => ({ name: tl, role: 'tl', submitted: false, score: null, errors: [] }))
     ],
     report: null
   };
@@ -9522,11 +9547,16 @@ function renderCalibActive() {
   const el = document.getElementById('calib-active-list');
   if (!el) return;
   const active = _calibSessions.filter(s => s.status === 'active');
+  const managerControls = _currentUser?.role === 'manager' && active.length > 0
+    ? `<div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+        <button onclick="clearAllCalibSessions()" style="background:none;border:1px solid var(--border);color:var(--red);border-radius:var(--radius-s);padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">🗑 Clear All Sessions</button>
+      </div>` : '';
+
   if (!active.length) {
     el.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">No active calibration sessions.<br>Click <b style="color:var(--text);">+ New Session</b> to create one.</div>';
     return;
   }
-  el.innerHTML = active.map(s => {
+  el.innerHTML = managerControls + active.map(s => {
     const submitted = s.participants.filter(p => p.submitted).length;
     const total = s.participants.length;
     const allDone = submitted === total;
@@ -9587,41 +9617,54 @@ function openCalibEval(sessionId) {
     </div>
     <div style="margin-top:8px;padding:7px 10px;background:rgba(74,134,232,.08);border-radius:6px;font-size:11px;color:var(--blue-l);">🔒 Blind mode — you cannot see other evaluators' scores until all have submitted.</div>`;
 
-  // Build simplified scoring form
+  // Build scoring form matching the QA form style
+  const mkRow = (attr, type) => {
+    const isHold = attr === 'HOLD';
+    const failCol = type==='nc'?'var(--gold)':type==='cc'?'var(--red)':'var(--orange)';
+    const failBg  = type==='nc'?'rgba(232,162,61,.2)':type==='cc'?'rgba(240,79,79,.2)':'rgba(240,120,48,.2)';
+    const failBc  = type==='nc'?'rgba(232,162,61,.4)':type==='cc'?'rgba(240,79,79,.4)':'rgba(240,120,48,.4)';
+    const fn = type==='nc' ? `calibSetNC(this,'fail','${attr}')` : `calibSetCritical(this,'fail','${type}','${attr}')`;
+    const pn = type==='nc' ? `calibSetNC(this,'pass','${attr}')` : `calibSetCritical(this,'pass','${type}','${attr}')`;
+    const nan = `calibSetNC(this,'na','${attr}')`;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;">
+      <div style="font-size:13px;font-weight:600;">${attr}</div>
+      <div style="display:flex;gap:5px;">
+        <button onclick="${fn}" data-attr="${attr}" data-type="${type}" data-val="fail"
+          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-mono);transition:all .15s;">Fail</button>
+        <button onclick="${pn}" data-attr="${attr}" data-type="${type}" data-val="pass"
+          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-mono);transition:all .15s;">Pass</button>
+        ${isHold ? `<button onclick="${nan}" data-attr="${attr}" data-type="${type}" data-val="na"
+          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-mono);transition:all .15s;">N/A</button>` : ''}
+      </div>
+    </div>`;
+  };
+
   document.getElementById('calib-eval-form').innerHTML = `
-    <div style="margin-bottom:16px;">
-      <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;">NC — Non-Critical (30 pts)</div>
-      ${['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'].map(attr => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:7px;margin-bottom:6px;">
-          <div style="font-size:12px;font-weight:600;">${attr}</div>
-          <div style="display:flex;gap:4px;">
-            <button onclick="calibSetNC(this,'fail','${attr}')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-mono);">Fail</button>
-            <button onclick="calibSetNC(this,'pass','${attr}')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-mono);">Pass</button>
-            ${attr==='HOLD'?`<button onclick="calibSetNC(this,'na','${attr}')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-mono);">N/A</button>`:''}
-          </div>
-        </div>`).join('')}
+    <!-- NC Section -->
+    <div style="background:rgba(232,162,61,.05);border:1px solid rgba(232,162,61,.2);border-radius:10px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="background:rgba(232,162,61,.15);color:var(--gold);font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;font-family:var(--font-mono);">NC</span>
+        <span style="font-size:13px;font-weight:700;color:var(--gold);">Non-Critical — 30 Points</span>
+      </div>
+      ${['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'].map(a => mkRow(a,'nc')).join('')}
     </div>
-    <div style="margin-bottom:16px;">
-      <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:10px;">CC — Critical to Customer</div>
-      ${['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'].map(attr => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:7px;margin-bottom:6px;">
-          <div style="font-size:12px;font-weight:600;">${attr}</div>
-          <div style="display:flex;gap:4px;">
-            <button onclick="calibSetCritical(this,'fail','cc','${attr}')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-mono);">Fail</button>
-            <button onclick="calibSetCritical(this,'pass','cc','${attr}')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-mono);">Pass</button>
-          </div>
-        </div>`).join('')}
+    <!-- CC Section -->
+    <div style="background:rgba(240,79,79,.05);border:1px solid rgba(240,79,79,.2);border-radius:10px;padding:14px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="background:rgba(240,79,79,.15);color:var(--red);font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;font-family:var(--font-mono);">CC</span>
+        <span style="font-size:13px;font-weight:700;color:var(--red);">Critical to Customer</span>
+        <span style="font-size:11px;color:var(--muted);">— any fail = score 0</span>
+      </div>
+      ${['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'].map(a => mkRow(a,'cc')).join('')}
     </div>
-    <div style="margin-bottom:20px;">
-      <div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:10px;">CB — Critical to Business</div>
-      ${['Ticket Creation','Control the Call','Ticketing Tree'].map(attr => `
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:7px;margin-bottom:6px;">
-          <div style="font-size:12px;font-weight:600;">${attr}</div>
-          <div style="display:flex;gap:4px;">
-            <button onclick="calibSetCritical(this,'fail','cb','${attr}')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-mono);">Fail</button>
-            <button onclick="calibSetCritical(this,'pass','cb','${attr}')" style="padding:4px 10px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-mono);">Pass</button>
-          </div>
-        </div>`).join('')}
+    <!-- CB Section -->
+    <div style="background:rgba(240,120,48,.05);border:1px solid rgba(240,120,48,.2);border-radius:10px;padding:14px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="background:rgba(240,120,48,.15);color:var(--orange);font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;font-family:var(--font-mono);">CB</span>
+        <span style="font-size:13px;font-weight:700;color:var(--orange);">Critical to Business</span>
+        <span style="font-size:11px;color:var(--muted);">— any fail = score 0</span>
+      </div>
+      ${['Ticket Creation','Control the Call','Ticketing Tree'].map(a => mkRow(a,'cb')).join('')}
     </div>
     <div id="calib-live-score" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;margin-bottom:16px;">
       <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green);" id="calib-score-num">—</div>
@@ -9691,7 +9734,12 @@ function submitCalibScore(sessionId) {
   const s = _calibSessions.find(s => s.id === sessionId);
   if (!s) return;
   const p = s.participants.find(p => p.name === _currentUser?.name);
-  if (!p) return;
+  if (!p) { showToast('You are not a participant in this session','warn'); return; }
+  if (p.submitted) {
+    showToast('You have already submitted your calibration score for this session','warn');
+    closeCalibEval();
+    return;
+  }
 
   const errors = [];
   Object.entries(fd.nc).forEach(([attr, val]) => { if (val === 'fail') errors.push({t:'nc', attr}); });
@@ -9716,9 +9764,19 @@ function submitCalibScore(sessionId) {
 
   saveCalibSessions();
   closeCalibEval();
-  showToast('Calibration score submitted ✓', 'success');
+  // Show confirmation popup
+  const confirmHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;" id="calib-confirm-popup">
+    <div style="background:var(--card);border:1px solid var(--green);border-radius:var(--radius);padding:28px;text-align:center;max-width:340px;margin:16px;box-shadow:0 24px 60px #000a;">
+      <div style="font-size:36px;margin-bottom:12px;">✅</div>
+      <div style="font-family:var(--font-h);font-size:16px;font-weight:800;margin-bottom:8px;">Score Submitted!</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Your calibration score has been recorded.</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px;">${allDone ? '🎉 All participants have submitted — report is ready!' : 'Waiting for other participants to submit.'}</div>
+      <button onclick="document.getElementById('calib-confirm-popup').remove()" style="background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">OK</button>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend', confirmHTML);
   renderCalibActive();
-  if (allDone) setTimeout(() => openCalibReport(sessionId), 500);
+  if (allDone) setTimeout(() => { document.getElementById('calib-confirm-popup')?.remove(); openCalibReport(sessionId); }, 2000);
 }
 
 function buildCalibReport(s) {
@@ -9816,6 +9874,14 @@ function deleteCalibSession(id) {
   renderCalibActive();
 }
 
+function clearAllCalibSessions() {
+  if (!confirm('Delete ALL calibration sessions? This cannot be undone.')) return;
+  _calibSessions = [];
+  saveCalibSessions();
+  renderCalibActive();
+  showToast('All calibration sessions cleared', 'success');
+}
+
 function renderCalibHistory() {
   loadCalibSessions();
   const el = document.getElementById('calib-history-list');
@@ -9844,7 +9910,28 @@ function renderCalibHistory() {
 // Hook calibration into nav system
 function renderCalibPage() {
   loadCalibSessions();
+  // Show New Session tab only for QA
+  const createTab = document.getElementById('calib-tab-create');
+  if (createTab) createTab.style.display = (_currentUser?.role === 'qa') ? 'flex' : 'none';
   switchCalibTab('active');
+  updateCalibBadge();
+}
+
+function updateCalibBadge() {
+  // Badge on nav for TL — shows count of sessions pending their submission
+  loadCalibSessions();
+  const name = _currentUser?.name || '';
+  const pending = _calibSessions.filter(s =>
+    s.status === 'active' &&
+    s.participants.some(p => p.name === name && !p.submitted)
+  ).length;
+  const lastSeen = parseInt(localStorage.getItem('nexora_calib_last_seen_' + name) || '0');
+  const badge = document.getElementById('calib-nav-badge');
+  if (badge) {
+    const newCount = Math.max(0, pending - lastSeen);
+    badge.textContent = newCount;
+    badge.style.display = newCount > 0 ? 'inline' : 'none';
+  }
 }
 
 </script>
