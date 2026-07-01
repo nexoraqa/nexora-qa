@@ -1359,11 +1359,17 @@ a { color:var(--purple-l); text-decoration:none; }
       </div>
     </div>
 
-    <!-- Tab Navigation -->
+    <!-- Tab Navigation — Row 1: Error Analysis -->
+    <div style="display:flex;gap:4px;margin-bottom:6px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:4px;">
+      <button onclick="switchMonTab('cc')" id="tab-cc" style="flex:1;padding:8px 12px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;"><span class="si-dot si-dot-red"></span> CC Critical</button>
+      <button onclick="switchMonTab('cb')" id="tab-cb" style="flex:1;padding:8px 12px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;"><span class="si-dot si-dot-orange"></span> CB Critical</button>
+      <button onclick="switchMonTab('nc')" id="tab-nc" style="flex:1;padding:8px 12px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;"><span class="si-dot si-dot-gold"></span> NC Quality</button>
+    </div>
+    <!-- Tab Navigation — Row 2: Intelligence -->
     <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:4px;">
-      <button onclick="switchMonTab('patterns')" id="tab-patterns" style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:var(--purple);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span> Pattern Intelligence</button>
-      <button onclick="switchMonTab('radar')"    id="tab-radar"    style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;"><span class="si-dot si-dot-gold"></span> At Risk Radar</button>
-      <button onclick="switchMonTab('actions')"  id="tab-actions"  style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a6 6 0 00-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0012 2z"/></svg></span> Recommended Actions</button>
+      <button onclick="switchMonTab('patterns')" id="tab-patterns" style="flex:1;padding:8px 12px;border:none;border-radius:8px;background:var(--purple);color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span> Patterns</button>
+      <button onclick="switchMonTab('radar')"    id="tab-radar"    style="flex:1;padding:8px 12px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;"><span class="si-dot si-dot-gold"></span> At Risk</button>
+      <button onclick="switchMonTab('actions')"  id="tab-actions"  style="flex:1;padding:8px 12px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a6 6 0 00-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0012 2z"/></svg></span> Actions</button>
     </div>
 
     <!-- TAB 1: Pattern Intelligence -->
@@ -1445,6 +1451,15 @@ a { color:var(--purple-l); text-decoration:none; }
     </div>
 
     <!-- TAB 3: Recommended Actions — VISIBLE BY DEFAULT -->
+    <!-- TAB: CC Critical -->
+    <div id="mon-tab-cc" style="display:none;"></div>
+
+    <!-- TAB: CB Critical -->
+    <div id="mon-tab-cb" style="display:none;"></div>
+
+    <!-- TAB: NC Quality -->
+    <div id="mon-tab-nc" style="display:none;"></div>
+
     <div id="mon-tab-actions" style="display:none;">
       <div id="intel-actions">
         <!-- Default state — always show general actions -->
@@ -5211,31 +5226,327 @@ function renderMonitor() {
 }
 
 function switchMonTab(tab) {
-  // Hide all tabs
-  ['patterns','radar','actions'].forEach(t => {
+  const allTabs = ['patterns','radar','actions','cc','cb','nc'];
+  // Tab accent colors
+  const tabColors = {
+    patterns:'var(--purple)', radar:'var(--gold)', actions:'var(--green)',
+    cc:'var(--red)', cb:'var(--orange)', nc:'var(--gold)'
+  };
+  // Hide all
+  allTabs.forEach(t => {
     const el = document.getElementById('mon-tab-'+t);
     const btn = document.getElementById('tab-'+t);
     if(el) el.style.display = 'none';
-    if(btn) {
-      btn.style.background = 'transparent';
-      btn.style.color = 'var(--muted)';
-    }
+    if(btn) { btn.style.background = 'transparent'; btn.style.color = 'var(--muted)'; }
   });
-  // Show selected tab
+  // Show selected
   const tabEl = document.getElementById('mon-tab-'+tab);
   const tabBtn = document.getElementById('tab-'+tab);
   if(tabEl) tabEl.style.display = 'block';
   if(tabBtn) {
-    tabBtn.style.background = 'var(--purple)';
+    tabBtn.style.background = tabColors[tab] || 'var(--purple)';
     tabBtn.style.color = '#fff';
   }
-  // Render Actions tab default content
+  // Render tab content
   if(tab === 'actions') {
     const actEl = document.getElementById('intel-actions');
     if(actEl && !_currentDrillLevel) {
-      actEl.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:13px;text-align:center;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V6a1.5 1.5 0 013 0v6M11 12V4a1.5 1.5 0 013 0v8M14 12.5V6a1.5 1.5 0 013 0v9"/><path d="M5 14l1.5 5a3 3 0 003 2h4a4 4 0 004-3l1-6"/></svg></span> Go to <b style="color:var(--text);">Pattern Intelligence</b> tab and click a level card to see specific recommended actions here</div>';
+      actEl.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:13px;text-align:center;">Go to <b style="color:var(--text);">Pattern Intelligence</b> tab and click a level card to see specific recommended actions here</div>';
     }
   }
+  if(tab === 'cc') renderErrorTab('cc');
+  if(tab === 'cb') renderErrorTab('cb');
+  if(tab === 'nc') renderNCTab();
+}
+
+// ── CC / CB TAB RENDERER ────────────────────────────────────────────────────
+function renderErrorTab(type) {
+  const el = document.getElementById('mon-tab-'+type);
+  if (!el) return;
+
+  const fp = document.getElementById('mon-f-proj')?.value    || 'all';
+  const ft = document.getElementById('mon-f-tl')?.value      || 'all';
+  const fc = document.getElementById('mon-f-country')?.value || 'all';
+
+  // Filter evals
+  const evals = _evalHistory.filter(e => {
+    if (fp !== 'all' && e.proj !== fp) return false;
+    if (ft !== 'all' && e.tl !== ft) return false;
+    if (fc !== 'all' && (e.country||'') !== fc) return false;
+    return true;
+  });
+
+  const isCC = type === 'cc';
+  const color = isCC ? 'var(--red)' : 'var(--orange)';
+  const dimColor = isCC ? 'rgba(240,79,79,.12)' : 'rgba(240,120,48,.12)';
+  const borderColor = isCC ? 'rgba(240,79,79,.3)' : 'rgba(240,120,48,.3)';
+  const label = isCC ? 'CC — Critical to Customer' : 'CB — Critical to Business';
+
+  // Get eval form sub-attributes for this type
+  const subAttrs = isCC ? [
+    'Customer Profile','Wrong Information','Missing Information',
+    'Ticket Escalation','Transfer Process','Professionalism','Ticket Description'
+  ] : [
+    'Ticket Creation','Control the Call','Ticketing Tree'
+  ];
+
+  // Count failures per sub-attribute from eval errors
+  const attrCounts = {};
+  subAttrs.forEach(a => attrCounts[a] = 0);
+  let totalFails = 0, totalEvals = evals.length;
+  const failedAgents = new Set();
+
+  evals.forEach(ev => {
+    const hasError = isCC ? ev.cc > 0 : ev.cb > 0;
+    if (!hasError) return;
+    totalFails++;
+    failedAgents.add(ev.agent);
+    (ev.errors||[]).filter(e => e.t === type && !e.isNA).forEach(e => {
+      const name = e.v || e.attrName || e.attr || '';
+      // Match to known sub-attributes
+      subAttrs.forEach(sa => {
+        if (name.toLowerCase().includes(sa.toLowerCase()) || sa.toLowerCase().includes(name.toLowerCase())) {
+          attrCounts[sa]++;
+        }
+      });
+    });
+  });
+
+  // Pattern levels for agents
+  const patterns = buildPatterns(evalHistoryToPatternData(_evalHistory))
+    .filter(p => p.type === type)
+    .filter(p => {
+      if (fp !== 'all' && p.proj !== fp) return false;
+      if (ft !== 'all' && (p.meta?.tl||p.tl) !== ft) return false;
+      if (fc !== 'all' && (p.country||'') !== fc) return false;
+      return true;
+    })
+    .sort((a,b) => b.count - a.count);
+
+  const escalate = patterns.filter(p => p.level.key === 'escalate').length;
+  const intervene = patterns.filter(p => p.level.key === 'intervene').length;
+  const monitor = patterns.filter(p => p.level.key === 'monitor').length;
+  const passRate = totalEvals > 0 ? (((totalEvals - totalFails) / totalEvals) * 100).toFixed(1) : '—';
+
+  // Max count for bar chart
+  const maxCount = Math.max(...Object.values(attrCounts), 1);
+
+  el.innerHTML = `
+    <!-- KPI Row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+      <div style="background:var(--card);border:1px solid ${borderColor};border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:${color};">${totalFails}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Failed Evals</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--text);">${failedAgents.size}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Agents Affected</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:${passRate >= 90 ? 'var(--green)' : passRate >= 70 ? 'var(--gold)' : 'var(--red)'};">${passRate}%</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Pass Rate</div>
+      </div>
+      <div style="background:var(--card);border:1px solid rgba(240,79,79,.2);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--red);">${escalate}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Escalate</div>
+      </div>
+    </div>
+
+    <!-- Sub-attribute bar chart -->
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="card-title">${label} — Failure Breakdown</div>
+        <div style="font-size:11px;color:var(--muted);">from evaluation form</div>
+      </div>
+      ${subAttrs.map(attr => {
+        const count = attrCounts[attr];
+        const pct = Math.round((count / maxCount) * 100);
+        return `<div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <div style="font-size:12px;font-weight:600;">${attr}</div>
+            <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:${count>0?color:'var(--muted)'};">${count > 0 ? count+'x' : '—'}</div>
+          </div>
+          <div style="background:var(--bg);border-radius:4px;height:7px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;transition:width .6s ease;"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Pattern levels summary -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+      <div style="background:rgba(240,79,79,.07);border:1px solid rgba(240,79,79,.2);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--red);">${escalate}</div>
+        <div style="font-size:10px;color:var(--red);margin-top:3px;font-weight:700;letter-spacing:.5px;">ESCALATE</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;">3+ repeats</div>
+      </div>
+      <div style="background:rgba(240,120,48,.07);border:1px solid rgba(240,120,48,.2);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--orange);">${intervene}</div>
+        <div style="font-size:10px;color:var(--orange);margin-top:3px;font-weight:700;letter-spacing:.5px;">INTERVENE</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;">2 repeats</div>
+      </div>
+      <div style="background:rgba(74,134,232,.07);border:1px solid rgba(74,134,232,.2);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--blue-l);">${monitor}</div>
+        <div style="font-size:10px;color:var(--blue-l);margin-top:3px;font-weight:700;letter-spacing:.5px;">MONITOR</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;">1 repeat</div>
+      </div>
+    </div>
+
+    <!-- Agent list -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">Agents with ${type.toUpperCase()} Errors</div>
+      ${patterns.length === 0 ? `<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px;">No ${type.toUpperCase()} patterns detected with current filters</div>` :
+        `<div style="overflow-x:auto;"><table class="tbl" style="width:100%;font-size:12px;">
+          <thead><tr><th></th><th>Agent</th><th>TL</th><th>Repeats</th><th>Level</th><th>Project</th></tr></thead>
+          <tbody>${patterns.map((p,idx) => {
+            const expandId = 'err-expand-' + type + '-' + idx;
+            const subList = [];
+            _evalHistory.filter(ev => ev.agent === p.agent).forEach(ev => {
+              (ev.errors||[]).filter(e => e.t === type && !e.isNA).forEach(e => {
+                const sub = e.v || e.subError || '';
+                if (sub && !subList.includes(sub)) subList.push(sub);
+              });
+            });
+            return `<tr onclick="const el=document.getElementById('${expandId}');el.style.display=el.style.display==='none'?'table-row':'none';this.querySelector('.earr').textContent=el.style.display==='none'?'▶':'▼';" style="cursor:pointer;">
+              <td><span class="earr" style="font-size:10px;color:var(--muted);">▶</span></td>
+              <td style="font-weight:700;">${p.agent}</td>
+              <td style="color:var(--muted);">${p.meta?.tl||p.tl||'—'}</td>
+              <td style="font-family:var(--font-mono);font-weight:800;color:${color};">×${p.count}</td>
+              <td>${p.level.label.replace(/<[^>]+>/g,'').trim()}</td>
+              <td style="color:var(--muted);">${p.meta?.proj||p.proj||'—'}</td>
+            </tr>
+            <tr id="${expandId}" style="display:none;"><td colspan="6" style="background:var(--bg);padding:12px 16px;">
+              <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;">Sub-errors found:</div>
+              ${subList.length ? subList.map(s=>`<span style="display:inline-block;padding:4px 10px;background:${dimColor};border:1px solid ${borderColor};border-radius:6px;font-size:11px;font-weight:600;color:${color};margin:0 5px 5px 0;">↳ ${s}</span>`).join('') : '<span style="color:var(--muted);font-size:11px;">No sub-error detail available</span>'}
+            </td></tr>`;
+          }).join('')}</tbody>
+        </table></div>`}
+    </div>`;
+}
+
+// ── NC TAB RENDERER ──────────────────────────────────────────────────────────
+function renderNCTab() {
+  const el = document.getElementById('mon-tab-nc');
+  if (!el) return;
+
+  const fp = document.getElementById('mon-f-proj')?.value    || 'all';
+  const ft = document.getElementById('mon-f-tl')?.value      || 'all';
+  const fc = document.getElementById('mon-f-country')?.value || 'all';
+
+  const evals = _evalHistory.filter(e => {
+    if (fp !== 'all' && e.proj !== fp) return false;
+    if (ft !== 'all' && e.tl !== ft) return false;
+    if (fc !== 'all' && (e.country||'') !== fc) return false;
+    return true;
+  });
+
+  // NC attributes from evaluation form
+  const ncAttrs = [
+    'Call Opening / Closure','Choice of Words','Tone of Voice',
+    'Showing Empathy','Active Listening','HOLD'
+  ];
+
+  const attrCounts = {};
+  ncAttrs.forEach(a => attrCounts[a] = 0);
+
+  let totalNC = 0, totalEvals = evals.length;
+  let ncScores = [];
+  let atRisk = 0;
+
+  evals.forEach(ev => {
+    const ncScore = ev.ncScore || (ev.overall >= 70 ? ev.overall - 70 : 0);
+    ncScores.push(ncScore);
+    totalNC += ncScore;
+    if (ncScore < 24) atRisk++; // NC below 80% of 30pts
+    (ev.errors||[]).filter(e => e.t === 'nc' && !e.isNA).forEach(e => {
+      const name = e.attrName || e.attr || e.v || '';
+      ncAttrs.forEach(na => {
+        if (name.toLowerCase().includes(na.toLowerCase().split('/')[0]) || 
+            na.toLowerCase().includes(name.toLowerCase())) {
+          attrCounts[na]++;
+        }
+      });
+    });
+  });
+
+  const avgNC = totalEvals > 0 ? (totalNC / totalEvals).toFixed(1) : '—';
+  const maxCount = Math.max(...Object.values(attrCounts), 1);
+
+  // Agents with lowest NC scores
+  const agentNC = {};
+  evals.forEach(ev => {
+    if (!agentNC[ev.agent]) agentNC[ev.agent] = {scores:[], tl:ev.tl, proj:ev.proj};
+    const ns = ev.ncScore || 0;
+    agentNC[ev.agent].scores.push(ns);
+  });
+  const agentList = Object.entries(agentNC).map(([name, d]) => ({
+    name, tl:d.tl, proj:d.proj,
+    avg: d.scores.reduce((a,b)=>a+b,0) / d.scores.length,
+    count: d.scores.length
+  })).filter(a => a.avg < 28).sort((a,b) => a.avg - b.avg).slice(0,10);
+
+  el.innerHTML = `
+    <!-- KPI Row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--gold);">${avgNC}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Avg NC Score</div>
+        <div style="font-size:10px;color:var(--muted);">out of 30</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--text);">${totalEvals}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Total Evals</div>
+      </div>
+      <div style="background:var(--card);border:1px solid rgba(240,120,48,.2);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--orange);">${atRisk}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Below NC 24</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+        <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--green);">${avgNC >= 27 ? '✓ Good' : avgNC >= 24 ? 'Watch' : 'Low'}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">NC Health</div>
+      </div>
+    </div>
+
+    <!-- NC attribute bar chart -->
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="card-title">NC Attributes — Failure Frequency</div>
+        <div style="font-size:11px;color:var(--muted);">from evaluation form</div>
+      </div>
+      ${ncAttrs.map(attr => {
+        const count = attrCounts[attr];
+        const pct = Math.round((count / maxCount) * 100);
+        const col = count === 0 ? 'var(--muted)' : count >= 5 ? 'var(--red)' : count >= 3 ? 'var(--orange)' : 'var(--gold)';
+        return `<div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+            <div style="font-size:12px;font-weight:600;">${attr}</div>
+            <div style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:${col};">${count > 0 ? count+'x' : '—'}</div>
+          </div>
+          <div style="background:var(--bg);border-radius:4px;height:7px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:${col};border-radius:4px;transition:width .6s ease;"></div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Agents with low NC scores -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">Agents with Low NC Scores <span style="font-size:11px;color:var(--muted);font-weight:400;">(below 24/30)</span></div>
+      ${agentList.length === 0 ? `<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px;">All agents scoring NC 24+ with current filters</div>` :
+        `<div style="overflow-x:auto;"><table class="tbl" style="width:100%;font-size:12px;">
+          <thead><tr><th>Agent</th><th>TL</th><th>Avg NC</th><th>Evals</th><th>Project</th></tr></thead>
+          <tbody>${agentList.map(a => {
+            const col = a.avg < 18 ? 'var(--red)' : a.avg < 24 ? 'var(--orange)' : 'var(--gold)';
+            return `<tr>
+              <td style="font-weight:700;">${a.name}</td>
+              <td style="color:var(--muted);">${a.tl||'—'}</td>
+              <td style="font-family:var(--font-mono);font-weight:700;color:${col};">${a.avg.toFixed(1)}/30</td>
+              <td style="color:var(--muted);">${a.count}</td>
+              <td style="color:var(--muted);">${a.proj||'—'}</td>
+            </tr>`;
+          }).join('')}</tbody>
+        </table></div>`}
+    </div>`;
 }
 
 function renderMonitorRadar() {
