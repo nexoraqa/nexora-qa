@@ -8443,12 +8443,12 @@ const ROLE_CONFIG = {
   qa: {
     label:'<span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><rect x="5" y="6" width="14" height="15" rx="1.5"/><path d="M9 12h6M9 16h6"/></svg></span> QA Assessor', color:'var(--purple-l)', bg:'var(--purple-dim)',
     desc:'Submit evals, view own history, read QA Monitor',
-    pages:['home','dashboard','monitor','calc','history','profiles','reports','coaching','upload'],
+    pages:['home','dashboard','monitor','calc','history','profiles','reports','coaching','upload','calibration'],
   },
   tl: {
     label:'<span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span> Team Lead', color:'var(--blue-l)', bg:'var(--blue-dim)',
     desc:'Your team only — dashboard, profiles, monitor',
-    pages:['home','dashboard','tl-home','monitor','history','coaching','operation','reports'],
+    pages:['home','dashboard','tl-home','monitor','history','coaching','operation','reports','calibration'],
   },
   agent: {
     label:'<span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span> Agent', color:'var(--green)', bg:'var(--green-dim)',
@@ -8639,9 +8639,9 @@ function applyRoleAccess(user) {
   // My Team nav — TL only
   const navTLHome = document.getElementById('nav-tl-home');
   if (navTLHome) navTLHome.style.display = isTL ? 'flex' : 'none';
-  // Calibration nav — Manager only
+  // Calibration nav — Manager, QA and TL
   const navCalib = document.getElementById('nav-calibration');
-  if (navCalib) navCalib.style.display = isManager ? 'flex' : 'none';
+  if (navCalib) navCalib.style.display = (isManager || isQA || isTL) ? 'flex' : 'none';
 
   // Operation Form nav — TL only
   const navOp = document.getElementById('nav-operation');
@@ -9464,20 +9464,22 @@ function switchCalibTab(tab) {
 }
 
 function populateCalibForm() {
-  // Populate agent dropdown
+  // Qatar team agents from eval history
   const agentSel = document.getElementById('calib-agent');
   if (agentSel) {
-    const agents = [...new Set(_evalHistory.map(e => e.agent))].sort();
-    agentSel.innerHTML = '<option value="">Select agent...</option>' + agents.map(a => `<option value="${a}">${a}</option>`).join('');
+    const agents = [...new Set(_evalHistory.filter(e => !e.country || e.country === 'Qatar').map(e => e.agent))].sort();
+    // Fallback: all agents if no Qatar filter
+    const allAgents = agents.length > 0 ? agents : [...new Set(_evalHistory.map(e => e.agent))].sort();
+    agentSel.innerHTML = '<option value="">Select agent...</option>' + allAgents.map(a => `<option value="${a}">${a}</option>`).join('');
   }
-  // Populate QA dropdown
-  const qaUsers = Object.values(window.USERS || {}).filter(u => u.role === 'qa' || u.role === 'manager');
+  // QA + Manager users from USERS constant
+  const qaUsers = Object.values(USERS).filter(u => u.role === 'qa' || u.role === 'manager');
   const qa1 = document.getElementById('calib-qa1');
   if (qa1) qa1.innerHTML = '<option value="">Select QA...</option>' + qaUsers.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
-  // Populate TL dropdown
-  const tlUsers = Object.values(window.USERS || {}).filter(u => u.role === 'tl');
+  // TL users from USERS constant
+  const tlUsers = Object.values(USERS).filter(u => u.role === 'tl');
   const tlSel = document.getElementById('calib-tl');
-  if (tlSel) tlSel.innerHTML = '<option value="">Select Team Lead...</option>' + tlUsers.map(u => `<option value="${u.tl||u.name}">${u.tl||u.name}</option>`).join('');
+  if (tlSel) tlSel.innerHTML = '<option value="">Select Team Lead...</option>' + tlUsers.map(u => `<option value="${u.name}">${u.tl||u.name}</option>`).join('');
   // Set today's date
   const dateEl = document.getElementById('calib-date');
   if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
