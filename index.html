@@ -5027,6 +5027,7 @@ function nav(id, el) {
   // Init specific pages
   if(id === 'home')      { updateHomeKPIs(); try { buildIntelligence(); } catch(e) {} }
   if(id === 'monitor')   { try { clearMonitorBadge(); } catch(e) {} }
+  if(id === 'coaching')  { try { clearCoachingBadge(); } catch(e) {} }
   if(id === 'operation') {
     initOperationForm(_currentUser);
   }
@@ -6170,39 +6171,47 @@ function autoGenerateCoaching(evalObj) {
   updateCoachingBadge();
 }
 
-function updateCoachingBadge() {
+function getCoachingPendingCount() {
   loadCoaching();
   const role = _currentUser?.role || '';
   const name = _currentUser?.name || '';
-  let pending = 0;
-
   if (role === 'manager') {
-    // Manager sees: items needing QA comment + disputed items
-    pending = _coachingData.filter(c =>
-      c.status === 'pending_comment' || c.status === 'disputed'
-    ).length;
+    return _coachingData.filter(c => c.status === 'pending_comment' || c.status === 'disputed').length;
   } else if (role === 'qa') {
-    // QA sees: items they created that need comment OR were disputed back to them
-    pending = _coachingData.filter(c =>
-      c.qaAuthor === name && (c.status === 'pending_comment' || c.status === 'disputed')
-    ).length;
+    return _coachingData.filter(c => c.qaAuthor === name && (c.status === 'pending_comment' || c.status === 'disputed')).length;
   } else if (role === 'tl') {
-    // TL sees: items for their team waiting for their review
-    pending = _coachingData.filter(c =>
-      c.tl === name && c.status === 'pending_tl'
-    ).length;
+    return _coachingData.filter(c => c.tl === name && c.status === 'pending_tl').length;
   } else if (role === 'agent') {
-    // Agent sees: items pending acknowledgement + items pending TL review (so they know it's coming)
-    pending = _coachingData.filter(c =>
-      c.agent === name && (c.status === 'pending_agent' || c.status === 'pending_tl')
-    ).length;
+    return _coachingData.filter(c => c.agent === name && (c.status === 'pending_agent' || c.status === 'pending_tl')).length;
   }
+  return 0;
+}
 
+function updateCoachingBadge() {
+  const pending = getCoachingPendingCount();
+  const lastSeen = parseInt(localStorage.getItem('nexora_coaching_last_seen_' + (_currentUser?.name||'')) || '0');
   const badge = document.getElementById('coaching-badge');
+  const agentBadge = document.getElementById('agent-coaching-badge');
+  // Only show badge if there are MORE pending items than last time user visited coaching page
+  const newCount = Math.max(0, pending - lastSeen);
   if (badge) {
-    badge.textContent = pending;
-    badge.style.display = pending > 0 ? 'inline' : 'none';
+    badge.textContent = newCount;
+    badge.style.display = newCount > 0 ? 'inline' : 'none';
   }
+  if (agentBadge) {
+    agentBadge.textContent = newCount;
+    agentBadge.style.display = newCount > 0 ? 'inline' : 'none';
+  }
+}
+
+function clearCoachingBadge() {
+  // Called when user visits Coaching page — mark current count as seen
+  const pending = getCoachingPendingCount();
+  localStorage.setItem('nexora_coaching_last_seen_' + (_currentUser?.name||''), String(pending));
+  const badge = document.getElementById('coaching-badge');
+  const agentBadge = document.getElementById('agent-coaching-badge');
+  if (badge) { badge.textContent = '0'; badge.style.display = 'none'; }
+  if (agentBadge) { agentBadge.textContent = '0'; agentBadge.style.display = 'none'; }
 }
 
 function coachingGoBack() {
