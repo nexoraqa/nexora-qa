@@ -865,15 +865,15 @@ a { color:var(--purple-l); text-decoration:none; }
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
           <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('patterns');drillDown('escalate');},150)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid var(--red);cursor:pointer;" onmouseover="this.style.background='#ff4d4d15'" onmouseout="this.style.background='var(--bg)'">
-            <div><div style="font-size:13px;font-weight:600;"><span class="si-dot si-dot-red"></span> Escalate</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">Chronic — 4+ repeats · Supervisor action</div></div>
+            <div><div style="font-size:13px;font-weight:600;"><span class="si-dot si-dot-red"></span> Escalate</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">CC/CB 3+ repeats · Supervisor action</div></div>
             <div style="font-family:var(--font-mono);font-size:22px;font-weight:800;color:var(--red);" id="po-escalate">0</div>
           </div>
           <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('patterns');drillDown('intervene');},150)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid var(--orange);cursor:pointer;" onmouseover="this.style.background='#ff8c0015'" onmouseout="this.style.background='var(--bg)'">
-            <div><div style="font-size:13px;font-weight:600;"><span class="si-dot si-dot-orange"></span> Intervene</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">Confirmed — 3 repeats · Coaching needed</div></div>
+            <div><div style="font-size:13px;font-weight:600;"><span class="si-dot si-dot-orange"></span> Intervene</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">CC/CB 2 repeats · Coach now</div></div>
             <div style="font-family:var(--font-mono);font-size:22px;font-weight:800;color:var(--orange);" id="po-intervene">0</div>
           </div>
           <div onclick="window._dashScrollPos=document.querySelector('.main')?.scrollTop||0;nav('monitor',document.querySelectorAll('.nav-item')[2]);setTimeout(()=>{switchMonTab('patterns');drillDown('monitor');},150)" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border-left:3px solid #6da8ff;cursor:pointer;" onmouseover="this.style.background='#4a86e815'" onmouseout="this.style.background='var(--bg)'">
-            <div><div style="font-size:13px;font-weight:600;"><span class="si-dot si-dot-blue"></span> Monitor</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">Emerging — 2 repeats · Watch closely</div></div>
+            <div><div style="font-size:13px;font-weight:600;"><span class="si-dot si-dot-blue"></span> Monitor</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">CC/CB 1 repeat · Watch closely</div></div>
             <div style="font-family:var(--font-mono);font-size:22px;font-weight:800;color:#6da8ff;" id="po-monitor">0</div>
           </div>
         </div>
@@ -1332,31 +1332,31 @@ a { color:var(--purple-l); text-decoration:none; }
         <div onclick="drillDown('escalate')" id="card-escalate" style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--red);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;position:relative;" onmouseover="this.style.background='#1a0a0a'" onmouseout="this.style.background='var(--card)'">
           <div class="mon-tooltip-wrap" style="position:absolute;top:8px;right:8px;" onclick="event.stopPropagation()">
             <button class="mon-info-btn" tabindex="0">ℹ️</button>
-            <div class="mon-tooltip"><b><span class="si-dot si-dot-red"></span> Escalate</b><br>Same error repeated <b>4+ times</b>. Chronic pattern. Supervisor must take action.</div>
+            <div class="mon-tooltip"><b><span class="si-dot si-dot-red"></span> Escalate</b><br>CC or CB error repeated <b>3+ times</b>. Chronic pattern. Supervisor action required immediately.</div>
           </div>
           <div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><span class="si-dot si-dot-red"></span> Escalate</div>
           <div style="font-family:var(--font-h);font-size:40px;font-weight:900;color:var(--red);line-height:1;" id="intel-escalate">0</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:8px;">Chronic — 4+ repeats</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;">CC/CB 3+ repeats</div>
           <div style="font-size:10px;color:#ff4d4d88;margin-top:3px;border-top:1px solid #ff4d4d22;padding-top:6px;">Supervisor action required</div>
         </div>
         <div onclick="drillDown('intervene')" id="card-intervene" style="background:var(--card);border:1px solid var(--border);border-top:3px solid var(--orange);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;position:relative;" onmouseover="this.style.background='#1a1200'" onmouseout="this.style.background='var(--card)'">
           <div class="mon-tooltip-wrap" style="position:absolute;top:8px;right:8px;" onclick="event.stopPropagation()">
             <button class="mon-info-btn" tabindex="0">ℹ️</button>
-            <div class="mon-tooltip"><b><span class="si-dot si-dot-orange"></span> Intervene</b><br>Same error repeated <b>3 times</b>. Confirmed pattern. Immediate coaching session needed.</div>
+            <div class="mon-tooltip"><b><span class="si-dot si-dot-orange"></span> Intervene</b><br>CC or CB error repeated <b>2 times</b>. Confirmed pattern. Immediate coaching session needed.</div>
           </div>
           <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><span class="si-dot si-dot-orange"></span> Intervene</div>
           <div style="font-family:var(--font-h);font-size:40px;font-weight:900;color:var(--orange);line-height:1;" id="intel-intervene">0</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:8px;">Confirmed — 3 repeats</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;">CC/CB 2 repeats</div>
           <div style="font-size:10px;color:#ff8c0088;margin-top:3px;border-top:1px solid #ff8c0022;padding-top:6px;">Immediate coaching needed</div>
         </div>
         <div onclick="drillDown('monitor')" id="card-monitor" style="background:var(--card);border:1px solid var(--border);border-top:3px solid #4a86e8;border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .2s;position:relative;" onmouseover="this.style.background='#000d1a'" onmouseout="this.style.background='var(--card)'">
           <div class="mon-tooltip-wrap" style="position:absolute;top:8px;right:8px;" onclick="event.stopPropagation()">
             <button class="mon-info-btn" tabindex="0">ℹ️</button>
-            <div class="mon-tooltip"><b><span class="si-dot si-dot-blue"></span> Monitor</b><br>Same error repeated <b>2 times</b>. Emerging pattern. Watch closely — coach if it happens again.</div>
+            <div class="mon-tooltip"><b><span class="si-dot si-dot-blue"></span> Monitor</b><br>CC or CB error detected <b>1 time</b>. Emerging pattern. Watch closely in next evaluation.</div>
           </div>
           <div style="font-size:11px;font-weight:700;color:#6da8ff;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;"><span class="si-dot si-dot-blue"></span> Monitor</div>
           <div style="font-family:var(--font-h);font-size:40px;font-weight:900;color:#6da8ff;line-height:1;" id="intel-monitor">0</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:8px;">Emerging — 2 repeats</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;">CC/CB 1 repeat</div>
           <div style="font-size:10px;color:#4a86e888;margin-top:3px;border-top:1px solid #4a86e822;padding-top:6px;">Watch closely</div>
         </div>
       </div>
@@ -2359,8 +2359,8 @@ a { color:var(--purple-l); text-decoration:none; }
           <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🎯 Pattern Intelligence</div>
           <div style="font-size:12px;color:var(--text-2);line-height:1.7;">
             Tracks when the <b style="color:var(--text);">same agent</b> makes the <b style="color:var(--text);">same error</b> across multiple evaluations:<br><br>
-            <span class="si-dot si-dot-blue" style="vertical-align:middle;"></span> <b style="color:#6da8ff;">Monitor</b> — 2 repeats · Watch this agent<br>
-            <span class="si-dot si-dot-orange" style="vertical-align:middle;"></span> <b style="color:var(--orange);">Intervene</b> — 3 repeats · Coach now (CC/CB errors: 2 repeats)<br>
+            <span class="si-dot si-dot-blue" style="vertical-align:middle;"></span> <b style="color:#6da8ff;">Monitor</b> — CC/CB 1 repeat · Watch this agent<br>
+            <span class="si-dot si-dot-orange" style="vertical-align:middle;"></span> <b style="color:var(--orange);">Intervene</b> — CC/CB 2 repeats · Coach now<br>
             <span class="si-dot si-dot-red" style="vertical-align:middle;"></span> <b style="color:var(--red);">Escalate</b> — 4+ repeats · Supervisor action required
           </div>
         </div>
@@ -8579,8 +8579,17 @@ function applyRoleAccess(user) {
   window._sessionTL      = user.tl;
   window._sessionIsManager = user.role === 'manager';
 
-  // Update coaching badge for all roles
-  try { updateCoachingBadge(); } catch(e) {}
+  // On login — initialize lastSeen to current count so badge only fires for NEW items
+  try {
+    const currentPending = getCoachingPendingCount();
+    const key = 'nexora_coaching_last_seen_' + (user?.name||'');
+    const alreadySeen = localStorage.getItem(key);
+    // Only reset if never seen before (first login ever)
+    if (alreadySeen === null) {
+      localStorage.setItem(key, String(currentPending));
+    }
+    updateCoachingBadge();
+  } catch(e) {}
 }
 
 function renderTLHome(user) {
