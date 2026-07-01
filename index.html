@@ -5162,6 +5162,11 @@ function renderMonitor() {
   buildIntelligence(fp, ft, fc);
   renderMonitorRadar();
 
+  // Re-render active CC/CB/NC tab on filter change
+  if (_currentMonTab === 'cc') renderErrorTab('cc');
+  else if (_currentMonTab === 'cb') renderErrorTab('cb');
+  else if (_currentMonTab === 'nc') renderNCTab();
+
   // Summary counts — filtered
   const allPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory)).filter(p =>
     (fp==='all' || p.meta.proj===fp) &&
@@ -5182,7 +5187,9 @@ function renderMonitor() {
   if(el_r) el_r.textContent = uniqueRisk;
 }
 
+let _currentMonTab = 'patterns';
 function switchMonTab(tab) {
+  _currentMonTab = tab;
   const allTabs = ['patterns','radar','actions','cc','cb','nc'];
   // Tab accent colors
   const tabColors = {
