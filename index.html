@@ -5550,6 +5550,24 @@ function renderMonitorRadar() {
     });
   }
 
+  // Update card counts with filtered data
+  const allFiltered = Object.values(agentMap).filter(a =>
+    (fp==='all'||a.proj===fp) &&
+    (ft==='all'||a.tl===ft) &&
+    (fc==='all'||a.country===fc)
+  );
+  const multipleCount = allFiltered.filter(a => a.type==='multiple').length;
+  const thresholdCount = getLiveAgents().filter(a =>
+    a.o < 80 &&
+    (fp==='all'||a.proj===fp) &&
+    (ft==='all'||a.tl===ft) &&
+    (fc==='all'||a.country===fc)
+  ).length;
+  const escEl  = document.getElementById('radar-total-esc');
+  const thrEl  = document.getElementById('radar-total-thr');
+  if(escEl) escEl.textContent = multipleCount;
+  if(thrEl) thrEl.textContent = thresholdCount;
+
   const cardsEl = document.getElementById('radar-page-cards');
   const emptyEl = document.getElementById('radar-page-empty');
   if(!cardsEl) return;
@@ -5643,9 +5661,14 @@ function renderRadar(fp, ft, fc) {
   const thr = getLiveAgents().filter(a=>a.o<80 && (fp==='all'||a.proj===fp) && (ft==='all'||a.tl===ft) && (fc==='all'||a.country===fc)).length;
   const atRisk = agents.length;
 
-  ['radar-count-esc','home-escalate'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=esc; });
-  ['radar-count-int','home-intervene'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=int; });
-  ['radar-count-mon','home-monitor'].forEach(id   => { const el=document.getElementById(id); if(el) el.textContent=mon; });
+  // Home page pattern circles (NC removed from pattern detection)
+  ['home-escalate'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=esc; });
+  ['home-intervene'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent=int; });
+  ['home-monitor'].forEach(id   => { const el=document.getElementById(id); if(el) el.textContent=mon; });
+  // Home At Risk cards — Multiple Issues + Below 80%
+  const multipleAgt = agents.filter(a=>a.type==='multiple').length;
+  const escHome = document.getElementById('radar-count-esc');
+  if(escHome) escHome.textContent = multipleAgt;
   const dashThr = document.getElementById('radar-count-thr');
   if(dashThr) dashThr.textContent = thr;
 
