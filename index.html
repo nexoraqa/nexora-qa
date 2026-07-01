@@ -2786,6 +2786,12 @@ function applyFilters() {
   if (monProj && !monProj.disabled) monProj.value = p;
   if (monTL   && !monTL.disabled)   monTL.value   = t;
   if (monC    && !monC.disabled)    monC.value    = c;
+  // Re-render QA Monitor if it's currently open
+  try {
+    if (document.getElementById('page-monitor')?.classList.contains('active')) {
+      renderMonitor();
+    }
+  } catch(e) {}
   // Build a map of agent → projects from eval history
   const agentProjs = {};
   _evalHistory.forEach(e => {
