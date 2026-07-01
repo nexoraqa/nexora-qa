@@ -3675,9 +3675,10 @@ const TL_SIZE = {Walid:15, Mustafa:18, Lotfi:18, Duaa:16};
 
 // RULES:
 //  Flagged = CC or CB (any count) OR same NC error >= 3
-//  Escalate  = count >= 4
-//  Intervene = count >= 3 OR (CC/CB count >= 2)
+//  Escalate  = CC/CB only, count >= 3
+//  Intervene = CC/CB count >= 2
 //  Monitor   = CC/CB count = 1
+//  NC errors = NO pattern levels (never flagged)
 function evalHistoryToPatternData(evals) {
   // Convert _evalHistory (one row per eval) to pattern format (one row per error)
   const rows = [];
@@ -3714,12 +3715,13 @@ function buildPatterns(histData) {
   const flagged = [];
   Object.values(map).forEach(p => {
     const isCritical = p.type === 'cc' || p.type === 'cb';
-    const isNCRepeat = p.type === 'nc' && p.count >= 3;
-    if (!isCritical && !isNCRepeat) return;
+    // NC errors never get pattern levels — only CC and CB
+    if (!isCritical) return;
     let level;
-    if (p.count >= 4) {
+    // CC/CB only: Escalate=3+, Intervene=2, Monitor=1
+    if (p.count >= 3) {
       level = {key:'escalate',  label:'<span class="si-dot si-dot-red"></span> ESCALATE',  color:'var(--red)',    bg:'var(--red-dim)'};
-    } else if (p.count >= 3 || (isCritical && p.count >= 2)) {
+    } else if (p.count >= 2) {
       level = {key:'intervene', label:'<span class="si-dot si-dot-orange"></span> INTERVENE', color:'var(--orange)', bg:'var(--orange-dim)'};
     } else {
       level = {key:'monitor',   label:'<span class="si-dot si-dot-blue"></span> MONITOR',   color:'var(--blue-l)', bg:'var(--blue-dim)'};
