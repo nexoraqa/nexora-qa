@@ -5077,7 +5077,7 @@ function nav(id, el) {
     _pageScroll[currentId] = mainEl.scrollTop;
   }
   // Hide all pages
-  ['home','dashboard','monitor','calc','history','profiles','reports','coaching','upload','settings','agent','tl-home','operation'].forEach(p => {
+  ['home','dashboard','monitor','calc','history','profiles','reports','coaching','upload','settings','agent','tl-home','operation','calibration'].forEach(p => {
     const pg = document.getElementById('page-'+p);
     if(pg) pg.classList.remove('active');
   });
@@ -9580,7 +9580,7 @@ function renderCalibActive() {
             <div style="font-family:var(--font-h);font-size:15px;font-weight:800;">Case: ${s.caseNumber || s.id}</div>
             <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;background:${allDone?'var(--green-dim)':'var(--gold-dim)'};color:${allDone?'var(--green)':'var(--gold)'};">${allDone?'✓ COMPLETE':'⏳ IN PROGRESS'}</span>
           </div>
-          <div style="font-size:12px;color:var(--muted);">Agent: <b style="color:var(--text);">${s.agent}</b>${s.caseNumber?' · <b style="color:var(--gold);">'+s.caseNumber+'</b>':''}</div>
+          <div style="font-size:12px;color:var(--muted);">Agent: <b style="color:var(--text);">${s.agent}</b> · Created by ${s.createdBy}</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Created by ${s.createdBy}</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -9638,32 +9638,53 @@ function openCalibEval(sessionId) {
   window._calibActiveCat = null;
   window._calibActiveSessionId = sessionId;
 
-  var calibFormHTML = [
-    '<div style="display:flex;gap:6px;margin-bottom:14px;">',
-      '<button onclick="calibShowCat(\'NC\')" id="ctab-NC" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(232,162,61,.4);background:rgba(232,162,61,.13);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;"><span class=\"si-dot si-dot-gold\"></span> NC</button>',
-      '<button onclick="calibShowCat(\'CC\')" id="ctab-CC" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(240,79,79,.4);background:rgba(240,79,79,.13);color:var(--red);font-size:12px;font-weight:700;cursor:pointer;"><span class=\"si-dot si-dot-red\"></span> CC</button>',
-      '<button onclick="calibShowCat(\'CB\')" id="ctab-CB" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(240,120,48,.4);background:rgba(240,120,48,.13);color:var(--orange);font-size:12px;font-weight:700;cursor:pointer;"><span class=\"si-dot si-dot-orange\"></span> CB</button>',
-    '</div>',
-    '<div id="calib-cat-NC" style="display:none;"></div>' +
-    '<div id="calib-cat-CC" style="display:none;"></div>' +
-    '<div id="calib-cat-CB" style="display:none;"></div>' +
-    '<div id="calib-err-summary" style="display:none;margin-top:12px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border);">' +
-      '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Selected Errors</div>' +
-      '<div id="calib-err-tags"></div>' +
-    '</div>' +
-    '<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;margin:14px 0;">' +
-      '<div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green);" id="calib-score-num">—</div>' +
-      '<div style="font-size:11px;color:var(--muted);margin-top:4px;">Live Score Preview</div>' +
-    '</div>' +
-    '<button onclick="submitCalibScore(window._calibActiveSessionId)" style="width:100%;background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-b);">&#10003; Submit My Calibration Score</button>'
-  ].join('');
-  document.getElementById('calib-eval-form').innerHTML = calibFormHTML;
+  // Build form using DOM — avoids all quote and string issues
+  var formEl = document.getElementById('calib-eval-form');
+  formEl.innerHTML = '';
 
-  // Pre-build all panels
-  ['NC','CC','CB'].forEach(function(cat) {
-    var el = document.getElementById('calib-cat-' + cat);
-    if (el) calibBuildAttrs(cat, el);
+  // Tab buttons
+  var tabRow = document.createElement('div');
+  tabRow.style.cssText = 'display:flex;gap:6px;margin-bottom:14px;';
+  [['NC','var(--gold)','rgba(232,162,61,.4)','rgba(232,162,61,.13)'],
+   ['CC','var(--red)','rgba(240,79,79,.4)','rgba(240,79,79,.13)'],
+   ['CB','var(--orange)','rgba(240,120,48,.4)','rgba(240,120,48,.13)']].forEach(function(tab) {
+    var btn = document.createElement('button');
+    btn.id = 'ctab-' + tab[0];
+    btn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1px solid '+tab[2]+';background:'+tab[3]+';color:'+tab[1]+';font-size:12px;font-weight:700;cursor:pointer;';
+    btn.textContent = tab[0];
+    btn.onclick = (function(c){ return function(){ calibShowCat(c); }; })(tab[0]);
+    tabRow.appendChild(btn);
   });
+  formEl.appendChild(tabRow);
+
+  // Category panels
+  ['NC','CC','CB'].forEach(function(cat) {
+    var panel = document.createElement('div');
+    panel.id = 'calib-cat-' + cat;
+    panel.style.display = 'none';
+    formEl.appendChild(panel);
+    calibBuildAttrs(cat, panel);
+  });
+
+  // Error summary
+  var summary = document.createElement('div');
+  summary.id = 'calib-err-summary';
+  summary.style.cssText = 'display:none;margin-top:12px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border);';
+  summary.innerHTML = '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Selected Errors</div><div id="calib-err-tags"></div>';
+  formEl.appendChild(summary);
+
+  // Live score
+  var scoreBox = document.createElement('div');
+  scoreBox.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;margin:14px 0;';
+  scoreBox.innerHTML = '<div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green);" id="calib-score-num">—</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Live Score Preview</div>';
+  formEl.appendChild(scoreBox);
+
+  // Submit button
+  var submitBtn = document.createElement('button');
+  submitBtn.style.cssText = 'width:100%;background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-b);';
+  submitBtn.textContent = '✓ Submit My Calibration Score';
+  submitBtn.onclick = function() { submitCalibScore(window._calibActiveSessionId); };
+  formEl.appendChild(submitBtn);
   const modal = document.getElementById('calib-eval-modal');
   modal.style.display = 'none';
   void modal.offsetHeight;
