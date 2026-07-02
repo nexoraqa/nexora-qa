@@ -9918,41 +9918,52 @@ function buildCalibReport(s) {
   const CB_ATTRS = ['Ticket Creation','Control the Call','Ticketing Tree'];
   const NC_ATTRS = ['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'];
 
-  // Per participant — which attrs they failed
+  // Build per-participant data
   const pData = s.participants.map(p => {
     const failedCC = CC_ATTRS.filter(a => (p.errors||[]).some(e => (e.attr===a||e.v===a) && e.t==='cc'));
     const failedCB = CB_ATTRS.filter(a => (p.errors||[]).some(e => (e.attr===a||e.v===a) && e.t==='cb'));
     const failedNC = NC_ATTRS.filter(a => (p.errors||[]).some(e => (e.attr===a||e.v===a) && e.t==='nc'));
-    return { name:p.name, role:p.role, score:p.score, failedCC, failedCB, failedNC, hasCC:failedCC.length>0, hasCB:failedCB.length>0 };
+    return { name:p.name, role:p.role, score:p.score, failedCC, failedCB, failedNC };
   });
 
-  // CC calibration — all participants agree on same CC failures
-  const ccDisagree = CC_ATTRS.filter(a => {
-    const votes = pData.map(p => p.failedCC.includes(a) ? 'fail' : 'pass');
-    return new Set(votes).size > 1;
+  // QA is the reference
+  const qa = pData.find(p => p.role === 'qa');
+  const tls = pData.filter(p => p.role === 'tl');
+
+  // Compare each TL against QA
+  const tlResults = tls.map(tl => {
+    // CC: TL must match QA exactly on every attribute
+    const ccDiff = CC_ATTRS.filter(a => {
+      const qaFailed = qa ? qa.failedCC.includes(a) : false;
+      const tlFailed = tl.failedCC.includes(a);
+      return qaFailed !== tlFailed;
+    });
+    // CB: same
+    const cbDiff = CB_ATTRS.filter(a => {
+      const qaFailed = qa ? qa.failedCB.includes(a) : false;
+      const tlFailed = tl.failedCB.includes(a);
+      return qaFailed !== tlFailed;
+    });
+    // NC: difference in failed count < 3
+    const qaNcCount = qa ? qa.failedNC.length : 0;
+    const tlNcCount = tl.failedNC.length;
+    const ncDiff = Math.abs(qaNcCount - tlNcCount);
+    const ncCalibrated = ncDiff < 3;
+    // NC attrs where they differ
+    const ncAttrDiff = NC_ATTRS.filter(a => {
+      const qaFailed = qa ? qa.failedNC.includes(a) : false;
+      const tlFailed = tl.failedNC.includes(a);
+      return qaFailed !== tlFailed;
+    });
+
+    const calibrated = ccDiff.length === 0 && cbDiff.length === 0 && ncCalibrated;
+    return { name:tl.name, role:tl.role, score:tl.score, failedCC:tl.failedCC, failedCB:tl.failedCB, failedNC:tl.failedNC, ccDiff, cbDiff, ncDiff, ncCalibrated, ncAttrDiff, calibrated };
   });
 
-  // CB calibration — all participants agree on same CB failures
-  const cbDisagree = CB_ATTRS.filter(a => {
-    const votes = pData.map(p => p.failedCB.includes(a) ? 'fail' : 'pass');
-    return new Set(votes).size > 1;
-  });
+  // Overall: all TLs calibrated
+  const calibrated = tlResults.every(t => t.calibrated);
 
-  // NC calibration — difference in number of failed NC attrs < 3
-  const ncCounts = pData.map(p => p.failedNC.length);
-  const ncMaxDiff = Math.max(...ncCounts) - Math.min(...ncCounts);
-  const ncCalibrated = ncMaxDiff < 3;
-
-  // NC disagreed attrs
-  const ncDisagree = NC_ATTRS.filter(a => {
-    const votes = pData.map(p => p.failedNC.includes(a) ? 'fail' : 'pass');
-    return new Set(votes).size > 1;
-  });
-
-  // Overall calibrated
-  const calibrated = ccDisagree.length === 0 && cbDisagree.length === 0 && ncCalibrated;
-
-  return { pData, ccDisagree, cbDisagree, ncDisagree, ncMaxDiff, ncCalibrated, calibrated };
+  return { qa, tlResults, pData, calibrated };
 }
 
 function openCalibReport(sessionId) {
@@ -9961,80 +9972,114 @@ function openCalibReport(sessionId) {
   if (!s || !s.report) { showToast('Report not available yet','warn'); return; }
   const r = s.report;
 
-  const calibColor  = r.calibrated ? 'var(--green)' : 'var(--red)';
-  const calibBg     = r.calibrated ? 'rgba(22,167,102,.08)' : 'rgba(240,79,79,.08)';
-  const calibBorder = r.calibrated ? 'rgba(22,167,102,.3)'  : 'rgba(240,79,79,.3)';
-  const calibIcon   = r.calibrated ? '✅' : '❌';
-  const calibLabel  = r.calibrated ? 'CALIBRATED' : 'NOT CALIBRATED';
+  const overallColor  = r.calibrated ? 'var(--green)' : 'var(--red)';
+  const overallBg     = r.calibrated ? 'rgba(22,167,102,.08)' : 'rgba(240,79,79,.08)';
+  const overallBorder = r.calibrated ? 'rgba(22,167,102,.3)'  : 'rgba(240,79,79,.3)';
+  const overallIcon   = r.calibrated ? '✅' : '❌';
+  const overallLabel  = r.calibrated ? 'ALL CALIBRATED' : 'NOT CALIBRATED';
 
-  // Build disagreement summary line
-  const issues = [];
-  if (r.ccDisagree.length > 0) issues.push('CC: ' + r.ccDisagree.length + ' disagreement(s)');
-  if (r.cbDisagree.length > 0) issues.push('CB: ' + r.cbDisagree.length + ' disagreement(s)');
-  if (!r.ncCalibrated) issues.push('NC: diff of ' + r.ncMaxDiff + ' attributes');
+  const CC_ATTRS = ['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'];
+  const CB_ATTRS = ['Ticket Creation','Control the Call','Ticketing Tree'];
+  const NC_ATTRS = ['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'];
 
-  // Build per-participant expandable rows
-  const participantRows = r.pData.map(function(p, idx) {
-    const scoreCol = p.score >= 90 ? 'var(--green)' : p.score >= 80 ? 'var(--gold)' : 'var(--red)';
-    const expandId = 'calib-rep-p-' + idx;
+  // QA reference block
+  const qaBlock = r.qa ? `
+    <div class="card" style="margin-bottom:14px;border:1px solid rgba(74,134,232,.25);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="background:rgba(74,134,232,.15);color:#4a86e8;font-size:10px;font-weight:800;padding:2px 8px;border-radius:4px;font-family:var(--font-mono);">QA REFERENCE</span>
+            <span style="font-size:14px;font-weight:700;">${r.qa.name}</span>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">This is the reference evaluation — all TLs are measured against this</div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:${r.qa.score>=90?'var(--green)':r.qa.score>=80?'var(--gold)':'var(--red)'};">${r.qa.score.toFixed(1)}%</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:120px;background:var(--bg);border-radius:8px;padding:10px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">CC Failed</div>
+          ${r.qa.failedCC.length ? r.qa.failedCC.map(a => `<div style="font-size:11px;color:var(--red);padding:2px 0;">↳ ${a}</div>`).join('') : '<div style="font-size:11px;color:var(--green);">All passed ✓</div>'}
+        </div>
+        <div style="flex:1;min-width:120px;background:var(--bg);border-radius:8px;padding:10px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">CB Failed</div>
+          ${r.qa.failedCB.length ? r.qa.failedCB.map(a => `<div style="font-size:11px;color:var(--orange);padding:2px 0;">↳ ${a}</div>`).join('') : '<div style="font-size:11px;color:var(--green);">All passed ✓</div>'}
+        </div>
+        <div style="flex:1;min-width:120px;background:var(--bg);border-radius:8px;padding:10px;">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">NC Failed (${r.qa.failedNC.length})</div>
+          ${r.qa.failedNC.length ? r.qa.failedNC.map(a => `<div style="font-size:11px;color:var(--gold);padding:2px 0;">↳ ${a}</div>`).join('') : '<div style="font-size:11px;color:var(--green);">All passed ✓</div>'}
+        </div>
+      </div>
+    </div>` : '';
 
-    // Their full attribute breakdown
-    const CC_ATTRS = ['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'];
-    const CB_ATTRS = ['Ticket Creation','Control the Call','Ticketing Tree'];
-    const NC_ATTRS = ['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'];
+  // Each TL result vs QA
+  const tlBlocks = (r.tlResults||[]).map((tl, idx) => {
+    const tlColor  = tl.calibrated ? 'var(--green)' : 'var(--red)';
+    const tlBg     = tl.calibrated ? 'rgba(22,167,102,.06)' : 'rgba(240,79,79,.06)';
+    const tlBorder = tl.calibrated ? 'rgba(22,167,102,.25)' : 'rgba(240,79,79,.25)';
+    const expandId = 'calib-tl-exp-' + idx;
 
-    function attrList(attrs, type, failedList, disagreeList) {
-      const col = type==='cc'?'var(--red)':type==='cb'?'var(--orange)':'var(--gold)';
-      return attrs.map(function(a) {
-        const failed = failedList.includes(a);
-        const disagreed = disagreeList.includes(a);
-        return '<div style="display:flex;justify-content:space-between;padding:5px 10px;border-radius:5px;margin-bottom:3px;background:'+(disagreed?'rgba(240,79,79,.06)':'var(--bg)')+';">' +
-          '<span style="font-size:11px;">' + (disagreed?'⚠ ':'') + a + '</span>' +
-          '<span style="font-size:11px;font-weight:700;color:'+(failed?col:'var(--muted)')+';">' + (failed?'FAIL':'PASS') + '</span>' +
-        '</div>';
-      }).join('');
-    }
+    const diffSummary = [];
+    if (tl.ccDiff.length) diffSummary.push(`CC: ${tl.ccDiff.length} diff`);
+    if (tl.cbDiff.length) diffSummary.push(`CB: ${tl.cbDiff.length} diff`);
+    if (!tl.ncCalibrated) diffSummary.push(`NC: diff of ${tl.ncDiff}`);
 
-    const detailHTML =
-      '<div style="padding:12px 14px;background:var(--bg);border-top:1px solid var(--border);">' +
-        '<div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">CC Attributes</div>' +
-        attrList(CC_ATTRS, 'cc', p.failedCC, r.ccDisagree) +
-        '<div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;">CB Attributes</div>' +
-        attrList(CB_ATTRS, 'cb', p.failedCB, r.cbDisagree) +
-        '<div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;">NC Attributes</div>' +
-        attrList(NC_ATTRS, 'nc', p.failedNC, r.ncDisagree) +
-      '</div>';
+    // Full breakdown for expand
+    const attrRow = (attr, qaFailed, tlFailed) => {
+      const differs = qaFailed !== tlFailed;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;border-radius:5px;margin-bottom:3px;background:${differs?'rgba(240,79,79,.06)':'var(--bg)'};">
+        <span style="font-size:11px;">${differs?'⚠ ':''}${attr}</span>
+        <div style="display:flex;gap:8px;">
+          <span style="font-size:10px;color:var(--muted);">QA: <b style="color:${qaFailed?'var(--red)':'var(--green)'};">${qaFailed?'FAIL':'PASS'}</b></span>
+          <span style="font-size:10px;color:var(--muted);">TL: <b style="color:${tlFailed?'var(--red)':'var(--green)'};">${tlFailed?'FAIL':'PASS'}</b></span>
+        </div>
+      </div>`;
+    };
 
-    return '<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;">' +
-      '<div onclick="calibToggleParticipant(\'' + expandId + '\')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;background:var(--card);">' +
-        '<div>' +
-          '<div style="font-size:13px;font-weight:700;">' + p.name + ' <span style="font-size:10px;color:var(--muted);background:var(--bg);padding:1px 6px;border-radius:4px;">' + p.role.toUpperCase() + '</span></div>' +
-          '<div style="font-size:11px;color:var(--muted);margin-top:3px;">Tap to see full evaluation</div>' +
-        '</div>' +
-        '<div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:' + scoreCol + ';">' + p.score.toFixed(1) + '%</div>' +
-      '</div>' +
-      '<div id="' + expandId + '" style="display:none;">' + detailHTML + '</div>' +
-    '</div>';
+    const ccRows = CC_ATTRS.map(a => attrRow(a, r.qa?.failedCC.includes(a), tl.failedCC.includes(a))).join('');
+    const cbRows = CB_ATTRS.map(a => attrRow(a, r.qa?.failedCB.includes(a), tl.failedCB.includes(a))).join('');
+    const ncRows = NC_ATTRS.map(a => attrRow(a, r.qa?.failedNC.includes(a), tl.failedNC.includes(a))).join('');
+
+    return `<div style="border:1px solid ${tlBorder};border-radius:12px;overflow:hidden;margin-bottom:10px;">
+      <div onclick="calibToggleParticipant('${expandId}')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;background:${tlBg};">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:14px;font-weight:700;">${tl.name}</span>
+            <span style="background:rgba(232,162,61,.15);color:var(--gold);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);">TL</span>
+            <span style="font-size:13px;font-weight:800;color:${tlColor};">${tl.calibrated?'✅ Calibrated':'❌ Not Calibrated'}</span>
+          </div>
+          ${diffSummary.length ? `<div style="font-size:11px;color:var(--muted);margin-top:4px;">${diffSummary.join(' · ')}</div>` : '<div style="font-size:11px;color:var(--green);margin-top:4px;">Full agreement with QA</div>'}
+        </div>
+        <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:${tl.score>=90?'var(--green)':tl.score>=80?'var(--gold)':'var(--red)'};">${tl.score.toFixed(1)}%</div>
+      </div>
+      <div id="${expandId}" style="display:none;padding:14px;">
+        <div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">CC Attributes</div>
+        ${ccRows}
+        <div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;">CB Attributes</div>
+        ${cbRows}
+        <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;">NC Attributes</div>
+        ${ncRows}
+      </div>
+    </div>`;
   }).join('');
 
   document.getElementById('calib-report-content').innerHTML =
     // Session info
-    '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--muted);">' +
-      'Agent: <b style="color:var(--text);">' + s.agent + '</b>' +
-      (s.caseNumber ? ' &nbsp;·&nbsp; Case: <b style="color:var(--gold);">' + s.caseNumber + '</b>' : '') +
-      ' &nbsp;·&nbsp; Created by ' + s.createdBy +
-    '</div>' +
-
-    // Verdict
-    '<div style="background:' + calibBg + ';border:2px solid ' + calibBorder + ';border-radius:14px;padding:22px;text-align:center;margin-bottom:18px;">' +
-      '<div style="font-size:42px;margin-bottom:8px;">' + calibIcon + '</div>' +
-      '<div style="font-family:var(--font-h);font-size:22px;font-weight:800;color:' + calibColor + ';letter-spacing:1px;">' + calibLabel + '</div>' +
-      (issues.length ? '<div style="font-size:12px;color:var(--muted);margin-top:8px;">' + issues.join(' &nbsp;·&nbsp; ') + '</div>' : '<div style="font-size:12px;color:var(--green);margin-top:8px;">Full agreement on all attributes</div>') +
-    '</div>' +
-
-    // Participants
-    '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Evaluators — tap name to see full form</div>' +
-    participantRows;
+    `<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--muted);">
+      Agent: <b style="color:var(--text);">${s.agent}</b>
+      ${s.caseNumber ? ' &nbsp;·&nbsp; Case: <b style="color:var(--gold);">' + s.caseNumber + '</b>' : ''}
+      &nbsp;·&nbsp; Created by ${s.createdBy}
+    </div>` +
+    // Overall verdict
+    `<div style="background:${overallBg};border:2px solid ${overallBorder};border-radius:14px;padding:20px;text-align:center;margin-bottom:18px;">
+      <div style="font-size:38px;margin-bottom:6px;">${overallIcon}</div>
+      <div style="font-family:var(--font-h);font-size:20px;font-weight:800;color:${overallColor};letter-spacing:1px;">${overallLabel}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">${r.tlResults&&r.tlResults.length} TL(s) compared against QA reference</div>
+    </div>` +
+    // QA reference
+    qaBlock +
+    // TL results
+    `<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Team Lead Results vs QA — tap to see full breakdown</div>` +
+    tlBlocks;
 
   const modal = document.getElementById('calib-report-modal');
   modal.style.display = 'none';
@@ -10043,19 +10088,26 @@ function openCalibReport(sessionId) {
 }
 
 
-function calibToggleParticipant(id) {
-  var el = document.getElementById(id);
-  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+function closeCalibDelConfirm() {
+  var el = document.getElementById('calib-del-confirm');
+  if (el) el.remove();
 }
-function closeCalibEval()   { document.getElementById('calib-eval-modal').style.display   = 'none'; }
-function closeCalibReport() { document.getElementById('calib-report-modal').style.display = 'none'; }
 
-function deleteCalibSession(id) {
-  if (!confirm('Delete this calibration session?')) return;
+function confirmDeleteCalib(id) {
+  document.getElementById('calib-del-confirm')?.remove();
   loadCalibSessions();
   _calibSessions = _calibSessions.filter(s => s.id !== id);
   saveCalibSessions();
   renderCalibActive();
+  renderCalibHistory();
+  // Success feedback
+  const successHTML =
+    '<div id="calib-del-success" style="position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--green);border-radius:20px;padding:12px 24px;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:0 8px 32px #000a;">' +
+      '<span style="font-size:18px;">✅</span>' +
+      '<span style="font-size:13px;font-weight:700;color:var(--green);">Session deleted successfully</span>' +
+    '</div>';
+  document.body.insertAdjacentHTML('beforeend', successHTML);
+  setTimeout(function(){ document.getElementById('calib-del-success')?.remove(); }, 2500);
 }
 
 function clearAllCalibSessions() {
