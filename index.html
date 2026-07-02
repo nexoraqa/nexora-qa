@@ -9953,6 +9953,36 @@ function submitCalibScore(sessionId) {
   }
 
   saveCalibSessions();
+
+  // Save to Google Sheets if complete
+  if (allDone && s.report) {
+    const r = s.report;
+    const tlSummary = (r.tlResults||[]).map(t =>
+      t.name + ':' + (t.calibrated?'CALIBRATED':'NOT_CALIBRATED') + '(' + t.score.toFixed(1) + '%)'
+    ).join(' | ');
+    try {
+      fetch(GOOGLE_SHEET_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          action: 'save_calibration',
+          id: s.id,
+          caseNumber: s.caseNumber||'',
+          agent: s.agent,
+          createdBy: s.createdBy,
+          completedAt: s.completedAt||'',
+          qaName: r.qa?.name||'',
+          qaScore: r.qa?.score?.toFixed(1)||'',
+          qaCC: (r.qa?.failedCC||[]).join(', ')||'PASS',
+          qaCB: (r.qa?.failedCB||[]).join(', ')||'PASS',
+          qaNC: (r.qa?.failedNC||[]).length + ' failed',
+          verdict: r.calibrated ? 'CALIBRATED' : 'NOT CALIBRATED',
+          tlResults: tlSummary
+        })
+      }).catch(()=>{});
+    } catch(e) {}
+  }
+
   closeCalibEval();
   // Show confirmation popup
   const confirmHTML = `<div style="position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center;" id="calib-confirm-popup">
@@ -10336,6 +10366,14 @@ function confirmDeleteCalib(id) {
   saveCalibSessions();
   renderCalibActive();
   renderCalibHistory();
+  // Soft-delete in Google Sheets
+  try {
+    fetch(GOOGLE_SHEET_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'delete_calibration', id: String(id) })
+    }).catch(()=>{});
+  } catch(e) {}
   // Success feedback
   const successHTML =
     '<div id="calib-del-success" style="position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--green);border-radius:20px;padding:12px 24px;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:0 8px 32px #000a;">' +
