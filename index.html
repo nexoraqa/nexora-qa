@@ -9517,27 +9517,54 @@ function createCalibSession() {
   const checkedBoxes = document.querySelectorAll('#calib-tl-checkboxes input[type=checkbox]:checked');
   const selectedTLs = [...checkedBoxes].map(cb => cb.value).filter(Boolean);
 
-  if (!caseN)              { showToast('Please enter a case number','warn'); return; }
+  // Validate — highlight missing fields and scroll to them
+  let firstError = null;
 
-  // Block duplicate case number FIRST — show popup before anything else
-  loadCalibSessions();
-  if (caseN) {
-    const duplicate = _calibSessions.find(s => s.caseNumber && s.caseNumber.trim().toLowerCase() === caseN.trim().toLowerCase());
-    if (duplicate) {
-      const dupPopHTML = '<div id="calib-dup-popup" style="position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;">' +
-        '<div style="background:var(--card);border:1px solid rgba(240,79,79,.4);border-radius:var(--radius);padding:28px;text-align:center;max-width:340px;margin:16px;box-shadow:0 24px 60px #000a;">' +
-          '<div style="font-size:36px;margin-bottom:12px;">⚠️</div>' +
-          '<div style="font-family:var(--font-h);font-size:16px;font-weight:800;margin-bottom:8px;color:var(--red);">Duplicate Case Number</div>' +
-          '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;">A calibration session with case number <b style="color:var(--gold);">' + caseN + '</b> already exists. Please use a different case number.</div>' +
-          '<button onclick="var p=document.getElementById(\'calib-dup-popup\');if(p)p.remove();" style="background:var(--red);border:none;color:#fff;border-radius:var(--radius-s);padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">OK</button>' +
-        '</div></div>';
-      document.body.insertAdjacentHTML('beforeend', dupPopHTML);
-      return;
-    }
+  // Clear previous highlights
+  ['calib-agent','calib-case','calib-tl-checkboxes'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.style.border = ''; el.style.borderRadius = ''; }
+    var err = document.getElementById(id + '-err');
+    if (err) err.remove();
+  });
+
+  function markError(elementId, message) {
+    var el = document.getElementById(elementId);
+    if (!el) return;
+    el.style.border = '2px solid var(--red)';
+    el.style.borderRadius = '8px';
+    var existing = document.getElementById(elementId + '-err');
+    if (existing) existing.remove();
+    var errDiv = document.createElement('div');
+    errDiv.id = elementId + '-err';
+    errDiv.style.cssText = 'font-size:11px;color:var(--red);margin-top:4px;font-weight:600;';
+    errDiv.textContent = '⚠ ' + message;
+    el.parentNode.insertBefore(errDiv, el.nextSibling);
+    if (!firstError) firstError = el;
+    // Clear error when user interacts
+    el.addEventListener('change', function() {
+      el.style.border = '';
+      errDiv.remove();
+    }, { once: true });
   }
 
-  if (!agent)              { showToast('Please select an agent','warn'); return; }
-  if (!selectedTLs.length) { showToast('Please select at least one Team Lead','warn'); return; }
+  if (!agent)              markError('calib-agent', 'Please select an agent');
+  if (!caseN)              markError('calib-case', 'Please enter a case number');
+  if (!selectedTLs.length) markError('calib-tl-checkboxes', 'Please select at least one Team Lead');
+
+  if (firstError) {
+    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    firstError.focus();
+    return;
+  }
+
+  // Block duplicate case number
+  loadCalibSessions();
+  const duplicate = _calibSessions.find(s => s.caseNumber && s.caseNumber.trim().toLowerCase() === caseN.trim().toLowerCase());
+  if (duplicate) {
+    showCalibAlert('⚠️', 'Duplicate Case Number', 'A calibration session with case number <b style="color:var(--gold);">' + caseN + '</b> already exists.', 'var(--red)');
+    return;
+  }
 
   const session = {
     id: caseN ? 'CALIB-' + caseN : 'CALIB-' + Date.now(),
@@ -9840,11 +9867,17 @@ function calibLiveScore() {
   var errors = window._calibSelectedErrors || [];
   var hasCC = errors.some(function(e){ return (e.type==='cc'||e.t==='cc') && !e.isNA; });
   var hasCB = errors.some(function(e){ return (e.type==='cb'||e.t==='cb') && !e.isNA; });
-  var ncFails = errors.filter(function(e){ return (e.type==='nc'||e.t==='nc') && !e.isNA; }).length;
-  var holdNA  = errors.some(function(e){ return e.isNA; });
-  // NC scoring: max 30 (or 24 if HOLD N/A), 5pts per failed attribute
-  var ncMax = holdNA ? 24 : 30;
-  var ncScore = Math.max(0, ncMax - (ncFails * 5));
+  var ncErrors = errors.filter(function(e){ return (e.type==='nc'||e.t==='nc') && !e.isNA; });
+  var ncFails = ncErrors.length;
+  var holdNA = errors.some(function(e){ return e.isNA; });
+  var holdFail = errors.some(function(e){ return (e.type==='nc'||e.t==='nc') && !e.isNA && (e.subError||e.v||'').indexOf('HOLD') >= 0; });
+
+  // NC scoring: always out of 30
+  // HOLD N/A → divide by 5 (6pts each for 5 attributes)
+  // HOLD Pass/Fail → divide by 6 (5pts each for 6 attributes)
+  var ptsEach = holdNA ? 6 : 5;
+  var ncScore = Math.max(0, 30 - (ncFails * ptsEach));
+
   // CC or CB fail = score is NC only (not NC + 70)
   var total = (hasCC || hasCB) ? ncScore : ncScore + 70;
   var pct = Math.min(100, total);
@@ -9867,12 +9900,21 @@ function submitCalibScore(sessionId) {
 
   loadCalibSessions();
   const s = _calibSessions.find(s => s.id === sid);
-  if (!s) { showToast('Session not found in storage','warn'); return; }
+  if (!s) { showCalibAlert('❌', 'Error', 'Session not found. Please close and reopen.', 'var(--red)'); return; }
   const p = s.participants.find(p => p.name === (_currentUser?.name || ''));
-  if (!p) { showToast('You are not a participant in this session','warn'); return; }
+  if (!p) { showCalibAlert('❌', 'Not a Participant', 'You are not listed as a participant in this session.', 'var(--red)'); return; }
   if (p.submitted) {
-    showToast('You have already submitted your score for this session','warn');
+    showCalibAlert('✅', 'Already Submitted', 'You have already submitted your calibration score for this session.', 'var(--green)');
     closeCalibEval();
+    return;
+  }
+
+  // Warn if no categories opened at all — scroll to NC tab
+  const hasAnyInput = (window._calibSelectedErrors||[]).length > 0 || window._calibActiveCat;
+  if (!hasAnyInput) {
+    const tabRow = document.querySelector('#calib-eval-form div');
+    if (tabRow) { tabRow.style.border = '2px solid var(--red)'; tabRow.style.borderRadius = '8px'; tabRow.scrollIntoView({ behavior:'smooth', block:'center' }); }
+    showCalibAlert('⚠️', 'Form Not Completed', 'Please open at least one category (NC, CC or CB) and review the attributes before submitting.', 'var(--gold)');
     return;
   }
 
@@ -10103,6 +10145,23 @@ function closeCalibEval() {
 function closeCalibReport() {
   var el = document.getElementById('calib-report-modal');
   if (el) el.style.display = 'none';
+}
+
+function showCalibAlert(icon, title, message, color) {
+  var existing = document.getElementById('calib-alert-popup');
+  if (existing) existing.remove();
+  var div = document.createElement('div');
+  div.id = 'calib-alert-popup';
+  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  div.innerHTML =
+    '<div style="background:var(--card);border:1px solid ' + (color||'var(--gold)') + '44;border-radius:var(--radius);padding:28px;text-align:center;max-width:320px;margin:16px;box-shadow:0 24px 60px #000a;">' +
+      '<div style="font-size:36px;margin-bottom:12px;">' + icon + '</div>' +
+      '<div style="font-family:var(--font-h);font-size:16px;font-weight:800;margin-bottom:10px;color:' + (color||'var(--text)') + ';">' + title + '</div>' +
+      '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7;">' + message + '</div>' +
+      '<button style="background:' + (color||'var(--green)') + ';border:none;color:#fff;border-radius:var(--radius-s);padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">OK</button>' +
+    '</div>';
+  div.querySelector('button').onclick = function(){ div.remove(); };
+  document.body.appendChild(div);
 }
 
 function deleteCalibSession(id) {
