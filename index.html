@@ -9661,32 +9661,33 @@ function openCalibEval(sessionId) {
   window._calibActiveCat = null;
   window._calibActiveSessionId = sessionId;
 
-  // Build form using DOM — avoids all quote and string issues
+  // Build form — identical structure to QA eval form
   var formEl = document.getElementById('calib-eval-form');
   formEl.innerHTML = '';
+  window._calibSelectedErrors = [];
+  window._calibActiveCat = null;
 
-  // Tab buttons
+  // Tab buttons — same as QA form
   var tabRow = document.createElement('div');
-  tabRow.style.cssText = 'display:flex;gap:6px;margin-bottom:14px;';
-  [['NC','var(--gold)','rgba(232,162,61,.4)','rgba(232,162,61,.13)'],
-   ['CC','var(--red)','rgba(240,79,79,.4)','rgba(240,79,79,.13)'],
-   ['CB','var(--orange)','rgba(240,120,48,.4)','rgba(240,120,48,.13)']].forEach(function(tab) {
+  tabRow.style.cssText = 'display:flex;gap:8px;margin-bottom:12px;';
+  [['NC','var(--gold)','var(--gold-dim)'],['CC','var(--red)','var(--red-dim)'],['CB','var(--orange)','var(--orange-dim)']].forEach(function(tab) {
     var btn = document.createElement('button');
-    btn.id = 'ctab-' + tab[0];
-    btn.style.cssText = 'flex:1;padding:8px;border-radius:8px;border:1px solid '+tab[2]+';background:'+tab[3]+';color:'+tab[1]+';font-size:12px;font-weight:700;cursor:pointer;';
-    btn.textContent = tab[0];
+    btn.style.cssText = 'flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:'+tab[1]+';font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);';
+    btn.innerHTML = '<span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+tab[1]+';margin-right:6px;vertical-align:middle;"></span>'+tab[0];
     btn.onclick = (function(c){ return function(){ calibShowCat(c); }; })(tab[0]);
     tabRow.appendChild(btn);
   });
   formEl.appendChild(tabRow);
 
-  // Category panels
+  // Category panels — same IDs pattern as QA but with calib- prefix
   ['NC','CC','CB'].forEach(function(cat) {
     var panel = document.createElement('div');
-    panel.id = 'calib-cat-' + cat;
+    panel.id = 'calib-cat-panel-' + cat;
     panel.style.display = 'none';
+    var attrsEl = document.createElement('div');
+    attrsEl.id = 'calib-attrs-' + cat;
+    panel.appendChild(attrsEl);
     formEl.appendChild(panel);
-    calibBuildAttrs(cat, panel);
   });
 
   // Error summary
@@ -9715,32 +9716,39 @@ function openCalibEval(sessionId) {
   modal.scrollTop = 0;
 }
 
-// ── Calibration form functions — mirror QA form using ERROR_STRUCTURE ──
+// ── Calibration form — uses same ERROR_STRUCTURE as QA form ──
+// Uses calib-specific state: _calibSelectedErrors, calib-cat-*, calib-subs-*, calib-arrow-*
+
 function calibShowCat(cat) {
   if (window._calibActiveCat === cat) {
-    document.getElementById('calib-cat-' + cat).style.display = 'none';
+    var el = document.getElementById('calib-cat-panel-' + cat);
+    if (el) el.style.display = 'none';
     window._calibActiveCat = null;
     return;
   }
   ['NC','CC','CB'].forEach(function(c) {
-    var el = document.getElementById('calib-cat-' + c);
+    var el = document.getElementById('calib-cat-panel-' + c);
     if (el) el.style.display = 'none';
   });
   window._calibActiveCat = cat;
-  var panel = document.getElementById('calib-cat-' + cat);
-  if (panel) panel.style.display = 'block';
+  var panel = document.getElementById('calib-cat-panel-' + cat);
+  if (panel) {
+    panel.style.display = 'block';
+    var attrsEl = document.getElementById('calib-attrs-' + cat);
+    if (attrsEl && !attrsEl.innerHTML) calibBuildAttrs(cat, attrsEl);
+  }
 }
 
 function calibBuildAttrs(cat, container) {
   var catData = ERROR_STRUCTURE[cat];
   if (!catData) return;
-  container.innerHTML = '';
+  var frag = document.createDocumentFragment();
   catData.attributes.forEach(function(attr, i) {
     var wrap = document.createElement('div');
     wrap.style.marginBottom = '4px';
     var header = document.createElement('div');
     header.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;';
-    header.onclick = function() { calibToggleAttr(cat, i); };
+    header.addEventListener('click', function() { calibToggleAttrPanel(cat, i); });
     var dot = document.createElement('div');
     dot.style.cssText = 'width:8px;height:8px;border-radius:2px;flex-shrink:0;background:' + attr.color + ';';
     var name = document.createElement('div');
@@ -9748,15 +9756,12 @@ function calibBuildAttrs(cat, container) {
     name.textContent = attr.name;
     var cnt = document.createElement('div');
     cnt.style.cssText = 'font-size:10px;color:var(--muted);';
-    cnt.textContent = attr.subs.length + ' items';
+    cnt.textContent = (attr.subs.length + (attr.naOption?1:0)) + ' items';
     var arrow = document.createElement('div');
     arrow.id = 'calib-arrow-' + cat + '-' + i;
-    arrow.style.cssText = 'font-size:10px;color:var(--muted);';
+    arrow.style.cssText = 'font-size:10px;color:var(--muted);margin-left:4px;';
     arrow.textContent = '▼';
-    header.appendChild(dot);
-    header.appendChild(name);
-    header.appendChild(cnt);
-    header.appendChild(arrow);
+    header.appendChild(dot); header.appendChild(name); header.appendChild(cnt); header.appendChild(arrow);
     var subPanel = document.createElement('div');
     subPanel.id = 'calib-subs-' + cat + '-' + i;
     subPanel.style.cssText = 'display:none;padding:4px 0 4px 12px;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;';
@@ -9764,13 +9769,11 @@ function calibBuildAttrs(cat, container) {
       subPanel.appendChild(calibBuildSubRow(sub, cat, catData.type, attr.name, false));
     });
     if (attr.naOption) {
-      var naRow = calibBuildSubRow(attr.naOption, cat, catData.type, attr.name, true);
-      subPanel.appendChild(naRow);
+      subPanel.appendChild(calibBuildSubRow(attr.naOption, cat, catData.type, attr.name, true));
     }
-    wrap.appendChild(header);
-    wrap.appendChild(subPanel);
-    container.appendChild(wrap);
+    wrap.appendChild(header); wrap.appendChild(subPanel); frag.appendChild(wrap);
   });
+  container.appendChild(frag);
 }
 
 function calibBuildSubRow(sub, cat, type, attrName, isNA) {
@@ -9780,9 +9783,7 @@ function calibBuildSubRow(sub, cat, type, attrName, isNA) {
   var cb = document.createElement('input');
   cb.type = 'checkbox';
   cb.style.cssText = 'accent-color:var(--purple);width:14px;height:14px;cursor:pointer;flex-shrink:0;';
-  cb.dataset.cat = cat;
-  cb.dataset.type = type;
-  cb.dataset.attr = attrName;
+  cb.dataset.cat = cat; cb.dataset.type = type; cb.dataset.attr = attrName;
   if (isNA) cb.dataset.isna = 'true';
   var lbl = document.createElement('label');
   lbl.style.cssText = 'font-size:12px;color:' + (isNA?'var(--gold)':'#ccc') + ';cursor:pointer;flex:1;';
@@ -9791,18 +9792,17 @@ function calibBuildSubRow(sub, cat, type, attrName, isNA) {
     if (e.target !== cb) cb.checked = !cb.checked;
     calibOnSubChange(cb, sub);
   });
-  row.appendChild(cb);
-  row.appendChild(lbl);
+  row.appendChild(cb); row.appendChild(lbl);
   return row;
 }
 
-function calibToggleAttr(cat, idx) {
-  var el = document.getElementById('calib-subs-' + cat + '-' + idx);
-  var arr = document.getElementById('calib-arrow-' + cat + '-' + idx);
-  if (!el) return;
-  var open = el.style.display !== 'none';
-  el.style.display = open ? 'none' : 'block';
-  if (arr) arr.textContent = open ? '▼' : '▲';
+function calibToggleAttrPanel(cat, idx) {
+  var subEl = document.getElementById('calib-subs-' + cat + '-' + idx);
+  var arrEl = document.getElementById('calib-arrow-' + cat + '-' + idx);
+  if (!subEl) return;
+  var isOpen = subEl.style.display !== 'none';
+  subEl.style.display = isOpen ? 'none' : 'block';
+  if (arrEl) arrEl.textContent = isOpen ? '▼' : '▲';
 }
 
 function calibOnSubChange(cb, sub) {
@@ -9826,10 +9826,14 @@ function calibUpdateSummary() {
   var errors = (window._calibSelectedErrors||[]).filter(function(e){ return !e.isNA; });
   if (!errors.length) { summary.style.display = 'none'; return; }
   summary.style.display = 'block';
-  tags.innerHTML = errors.map(function(e) {
+  tags.innerHTML = '';
+  errors.forEach(function(e) {
     var col = e.type==='nc'?'var(--gold)':e.type==='cc'?'var(--red)':'var(--orange)';
-    return '<span style="display:inline-flex;align-items:center;gap:6px;background:'+col+'22;color:'+col+';border:1px solid '+col+'44;border-radius:10px;padding:3px 10px;font-size:11px;margin:3px;"><b>'+e.type.toUpperCase()+'</b> · '+e.subError+'</span>';
-  }).join('');
+    var span = document.createElement('span');
+    span.style.cssText = 'display:inline-flex;align-items:center;gap:6px;background:'+col+'22;color:'+col+';border:1px solid '+col+'44;border-radius:10px;padding:3px 10px;font-size:11px;margin:3px;';
+    span.innerHTML = '<b>'+e.type.toUpperCase()+'</b> · '+e.subError;
+    tags.appendChild(span);
+  });
 }
 
 function calibLiveScore() {
@@ -9914,9 +9918,10 @@ function submitCalibScore(sessionId) {
 }
 
 function buildCalibReport(s) {
-  const CC_ATTRS = ['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'];
-  const CB_ATTRS = ['Ticket Creation','Control the Call','Ticketing Tree'];
-  const NC_ATTRS = ['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'];
+  // Use exact attribute names from ERROR_STRUCTURE
+  const CC_ATTRS = ['Customer Profile','Wrong Information','Missing Information','Ticket Escalation and Status','Transfer Process','Professionalism / Attitude','Ticket Description'];
+  const CB_ATTRS = ['Ticket Creation and Categorization','Control the Call / Comprehension','Ticketing Tree'];
+  const NC_ATTRS = ['Call Opening/Closure','Choice of Words / Avoid Slang / Technical Terms','Tone of Voice','Showing Empathy / handling objection','Active Listening','HOLD'];
 
   // Build per-participant data
   const pData = s.participants.map(p => {
@@ -9978,9 +9983,9 @@ function openCalibReport(sessionId) {
   const overallIcon   = r.calibrated ? '✅' : '❌';
   const overallLabel  = r.calibrated ? 'ALL CALIBRATED' : 'NOT CALIBRATED';
 
-  const CC_ATTRS = ['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'];
-  const CB_ATTRS = ['Ticket Creation','Control the Call','Ticketing Tree'];
-  const NC_ATTRS = ['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'];
+  const CC_ATTRS = ['Customer Profile','Wrong Information','Missing Information','Ticket Escalation and Status','Transfer Process','Professionalism / Attitude','Ticket Description'];
+  const CB_ATTRS = ['Ticket Creation and Categorization','Control the Call / Comprehension','Ticketing Tree'];
+  const NC_ATTRS = ['Call Opening/Closure','Choice of Words / Avoid Slang / Technical Terms','Tone of Voice','Showing Empathy / handling objection','Active Listening','HOLD'];
 
   // QA reference block
   const qaBlock = r.qa ? `
@@ -10040,7 +10045,7 @@ function openCalibReport(sessionId) {
     const ncRows = NC_ATTRS.map(a => attrRow(a, r.qa?.failedNC.includes(a), tl.failedNC.includes(a))).join('');
 
     return `<div style="border:1px solid ${tlBorder};border-radius:12px;overflow:hidden;margin-bottom:10px;">
-      <div onclick="calibToggleParticipant('${expandId}')" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;background:${tlBg};">
+      <div data-eid="${expandId}" onclick="calibToggleParticipant(this.dataset.eid)" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;background:${tlBg};">
         <div>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:14px;font-weight:700;">${tl.name}</span>
