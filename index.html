@@ -1634,12 +1634,7 @@ a { color:var(--purple-l); text-decoration:none; }
         </div>
 
         <div style="margin-bottom:14px;">
-          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Call Date</div>
-          <input type="date" id="calib-date" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;">
-        </div>
-
-        <div style="margin-bottom:14px;">
-          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Case Number <span style="font-size:10px;color:var(--muted);font-weight:400;">(optional)</span></div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Case Number <span style="font-size:10px;color:var(--muted);font-weight:400;">(used as session identifier)</span></div>
           <input type="text" id="calib-case" placeholder="e.g. CASE-1234" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;">
         </div>
 
@@ -9498,21 +9493,18 @@ function populateCalibForm() {
       </label>`).join('');
   }
 
-  // Set today's date
-  const dateEl = document.getElementById('calib-date');
-  if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+  // Case number input — focus it
 }
 
 function createCalibSession() {
   const agent = document.getElementById('calib-agent')?.value;
-  const date  = document.getElementById('calib-date')?.value;
-  const caseN = document.getElementById('calib-case')?.value || '';
+  const caseN = document.getElementById('calib-case')?.value?.trim() || '';
   const qa1 = _currentUser?.name; // Auto-assigned from logged-in QA
   const checkedBoxes = document.querySelectorAll('#calib-tl-checkboxes input[type=checkbox]:checked');
   const selectedTLs = [...checkedBoxes].map(cb => cb.value).filter(Boolean);
 
   if (!agent)              { showToast('Please select an agent','warn'); return; }
-  if (!date)               { showToast('Please select a call date','warn'); return; }
+  if (!caseN)              { showToast('Please enter a case number','warn'); return; }
   if (!selectedTLs.length) { showToast('Please select at least one Team Lead','warn'); return; }
 
   // Block duplicate case number
@@ -9523,9 +9515,9 @@ function createCalibSession() {
   }
 
   const session = {
-    id: 'CAL-' + Date.now(),
-    agent, date, caseNumber: caseN,
-    createdBy: _currentUser?.name || 'Manager',
+    id: caseN ? 'CALIB-' + caseN : 'CALIB-' + Date.now(),
+    agent, caseNumber: caseN,
+    createdBy: _currentUser?.name || 'QA',
     createdAt: new Date().toISOString(),
     status: 'active',
     participants: [
@@ -9538,7 +9530,21 @@ function createCalibSession() {
   loadCalibSessions();
   _calibSessions.push(session);
   saveCalibSessions();
-  showToast('Calibration session created ✓', 'success');
+
+  // Session created confirmation popup
+  const popHTML = `<div id="calib-created-popup" style="position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;">
+    <div style="background:var(--card);border:1px solid var(--green);border-radius:var(--radius);padding:28px;text-align:center;max-width:340px;margin:16px;box-shadow:0 24px 60px #000a;">
+      <div style="font-size:40px;margin-bottom:14px;">✅</div>
+      <div style="font-family:var(--font-h);font-size:17px;font-weight:800;margin-bottom:8px;">Session Created!</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Case: <b style="color:var(--gold);">${caseN||session.id}</b></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:20px;">${selectedTLs.length} Team Lead(s) have been notified to submit their score.</div>
+      <button onclick="document.getElementById('calib-created-popup').remove()" style="background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">OK</button>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend', popHTML);
+
+  // Update badge for TLs and Manager
+  try { updateCalibBadge(); } catch(e) {}
   switchCalibTab('active');
 }
 
@@ -9567,10 +9573,10 @@ function renderCalibActive() {
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
         <div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-            <div style="font-family:var(--font-h);font-size:15px;font-weight:800;">${s.id}</div>
+            <div style="font-family:var(--font-h);font-size:15px;font-weight:800;">Case: ${s.caseNumber || s.id}</div>
             <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;background:${allDone?'var(--green-dim)':'var(--gold-dim)'};color:${allDone?'var(--green)':'var(--gold)'};">${allDone?'✓ COMPLETE':'⏳ IN PROGRESS'}</span>
           </div>
-          <div style="font-size:12px;color:var(--muted);">Agent: <b style="color:var(--text);">${s.agent}</b> · Date: ${fmtDate(s.date)} ${s.caseNumber?'· Case: <b style="color:var(--gold);">'+s.caseNumber+'</b>':''}</div>
+          <div style="font-size:12px;color:var(--muted);">Agent: <b style="color:var(--text);">${s.agent}</b>${s.caseNumber?' · <b style="color:var(--gold);">'+s.caseNumber+'</b>':''}</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Created by ${s.createdBy}</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -9604,18 +9610,23 @@ function renderCalibActive() {
 function openCalibEval(sessionId) {
   loadCalibSessions();
   const s = _calibSessions.find(s => s.id === sessionId);
-  if (!s) return;
-  const participant = s.participants.find(p => p.name === _currentUser?.name);
-  if (!participant || participant.submitted) return;
+  if (!s) { showToast('Session not found','warn'); return; }
 
-  document.getElementById('calib-eval-title').textContent = `Calibrate: ${s.agent}`;
-  document.getElementById('calib-eval-info').innerHTML = `
-    <div style="display:flex;gap:16px;flex-wrap:wrap;">
-      <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Agent</div><div style="font-size:13px;font-weight:600;">${s.agent}</div></div>
-      <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Call Date</div><div style="font-size:13px;font-weight:600;">${fmtDate(s.date)}</div></div>
-      ${s.caseNumber?`<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Case</div><div style="font-size:13px;font-weight:600;color:var(--gold);">${s.caseNumber}</div></div>`:''}
-    </div>
-    <div style="margin-top:8px;padding:7px 10px;background:rgba(74,134,232,.08);border-radius:6px;font-size:11px;color:var(--blue-l);">🔒 Blind mode — you cannot see other evaluators' scores until all have submitted.</div>`;
+  // Find participant — match by name
+  const myName = _currentUser?.name || '';
+  const participant = s.participants.find(p => p.name === myName);
+
+  if (!participant) { showToast('You are not a participant in this session','warn'); return; }
+  if (participant.submitted) { showToast('You have already submitted your score','warn'); return; }
+
+  document.getElementById('calib-eval-title').textContent = 'Calibrate: ' + s.agent;
+  document.getElementById('calib-eval-info').innerHTML =
+    '<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;">' +
+    '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Agent</div><div style="font-size:13px;font-weight:600;">' + s.agent + '</div></div>' +
+    (s.caseNumber ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Case Number</div><div style="font-size:13px;font-weight:700;color:var(--gold);">' + s.caseNumber + '</div></div>' : '') +
+    '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;">Your Role</div><div style="font-size:13px;font-weight:600;color:var(--purple);">' + participant.role.toUpperCase() + '</div></div>' +
+    '</div>' +
+    '<div style="padding:8px 10px;background:rgba(74,134,232,.08);border:1px solid rgba(74,134,232,.2);border-radius:6px;font-size:11px;color:var(--blue-l);">🔒 Blind mode — scores are hidden until all participants submit.</div>';
 
   // Build scoring form matching the QA form style
   const mkRow = (attr, type) => {
@@ -9675,7 +9686,10 @@ function openCalibEval(sessionId) {
 
   // Track selections
   window._calibFormData = { sessionId, nc: {}, cc: {}, cb: {} };
-  document.getElementById('calib-eval-modal').style.display = 'flex';
+  const modal = document.getElementById('calib-eval-modal');
+  modal.style.display = 'none';
+  void modal.offsetHeight; // force reflow
+  modal.style.display = 'flex';
 }
 
 function calibSetNC(btn, val, attr) {
@@ -9918,13 +9932,20 @@ function renderCalibPage() {
 }
 
 function updateCalibBadge() {
-  // Badge on nav for TL — shows count of sessions pending their submission
   loadCalibSessions();
   const name = _currentUser?.name || '';
-  const pending = _calibSessions.filter(s =>
-    s.status === 'active' &&
-    s.participants.some(p => p.name === name && !p.submitted)
-  ).length;
+  const role = _currentUser?.role || '';
+  let pending = 0;
+  if (role === 'tl') {
+    // TL: sessions where they haven't submitted yet
+    pending = _calibSessions.filter(s =>
+      s.status === 'active' &&
+      s.participants.some(p => p.name === name && !p.submitted)
+    ).length;
+  } else if (role === 'manager') {
+    // Manager: any active sessions (they should review)
+    pending = _calibSessions.filter(s => s.status === 'active').length;
+  }
   const lastSeen = parseInt(localStorage.getItem('nexora_calib_last_seen_' + name) || '0');
   const badge = document.getElementById('calib-nav-badge');
   if (badge) {
