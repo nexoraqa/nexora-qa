@@ -9330,6 +9330,14 @@ document.addEventListener('DOMContentLoaded', function() {
         }).catch(() => {});
     } catch(e) {}
   }, 30000);
+
+  // 5-second badge refresh — calibration + coaching notifications update instantly
+  setInterval(() => {
+    if (_currentUser) {
+      try { updateCalibBadge(); } catch(e) {}
+      try { updateCoachingBadge(); } catch(e) {}
+    }
+  }, 5000);
 });
 
 // ── NAV BADGES ──────────────────────────────────────────────
@@ -9757,11 +9765,6 @@ function calibBuildAttrs(cat, container) {
     });
     if (attr.naOption) {
       var naRow = calibBuildSubRow(attr.naOption, cat, catData.type, attr.name, true);
-      var naCb = naRow.querySelector('input');
-      if (naCb) {
-        naCb.checked = true;
-        window._calibSelectedErrors.push({cat:cat, type:catData.type, attrName:attr.name, subError:attr.naOption, isNA:true});
-      }
       subPanel.appendChild(naRow);
     }
     wrap.appendChild(header);
@@ -9831,14 +9834,14 @@ function calibUpdateSummary() {
 
 function calibLiveScore() {
   var errors = window._calibSelectedErrors || [];
-  // errors use e.type (from calibBuildSubRow dataset.type)
   var hasCC = errors.some(function(e){ return (e.type==='cc'||e.t==='cc') && !e.isNA; });
   var hasCB = errors.some(function(e){ return (e.type==='cb'||e.t==='cb') && !e.isNA; });
-  var ncErrors = errors.filter(function(e){ return (e.type==='nc'||e.t==='nc') && !e.isNA; });
-  var holdNA = errors.some(function(e){ return e.isNA; });
+  var ncFails = errors.filter(function(e){ return (e.type==='nc'||e.t==='nc') && !e.isNA; }).length;
+  var holdNA  = errors.some(function(e){ return e.isNA; });
+  // NC scoring: max 30 (or 24 if HOLD N/A), 5pts per failed attribute
   var ncMax = holdNA ? 24 : 30;
-  var ncPtsEach = ncMax / 6;
-  var ncScore = Math.max(0, ncMax - (ncErrors.length * ncPtsEach));
+  var ncScore = Math.max(0, ncMax - (ncFails * 5));
+  // CC or CB fail = score is NC only (not NC + 70)
   var total = (hasCC || hasCB) ? ncScore : ncScore + 70;
   var pct = Math.min(100, total);
   var el = document.getElementById('calib-score-num');
@@ -9873,7 +9876,9 @@ function submitCalibScore(sessionId) {
   p.score = scoreData.pct;
   p.hasCC = scoreData.hasCC;
   p.hasCB = scoreData.hasCB;
-  p.errors = errors.map(e => ({ t: e.type, attr: e.attrName, v: e.subError }));
+  p.errors = errors.map(function(e) {
+    return { t: (e.type||e.t||'nc'), attr: (e.attrName||e.attr||''), v: (e.subError||e.v||'') };
+  });
   p.submittedAt = new Date().toISOString();
 
   // Check if all submitted
