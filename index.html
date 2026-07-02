@@ -6642,6 +6642,52 @@ function setHistMainTab(tab) {
   if (tab === 'qa') renderHistory();
 }
 
+function closeOpDelConfirm() {
+  var el = document.getElementById('op-del-confirm');
+  if (el) el.remove();
+}
+
+function deleteOperationEval(id) {
+  const op = (window._operationHistory||[]).find(r => r.id === id);
+  const label = op ? (op.agent + ' · ' + (op.date||'')) : id;
+  var div = document.createElement('div');
+  div.id = 'op-del-confirm';
+  div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  div.innerHTML =
+    '<div style="background:var(--card);border:1px solid rgba(240,79,79,.3);border-radius:var(--radius);padding:28px;text-align:center;max-width:320px;margin:16px;box-shadow:0 24px 60px #000a;">' +
+      '<div style="font-size:36px;margin-bottom:12px;">🗑</div>' +
+      '<div style="font-family:var(--font-h);font-size:16px;font-weight:800;margin-bottom:8px;">Delete Operation Eval?</div>' +
+      '<div style="font-size:13px;color:var(--muted);margin-bottom:22px;"><b style="color:var(--text);">' + label + '</b> will be permanently removed.</div>' +
+      '<div style="display:flex;gap:10px;justify-content:center;">' +
+        '<button onclick="closeOpDelConfirm()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Cancel</button>' +
+        '<button data-delid="' + id + '" onclick="confirmDeleteOpEval(this.dataset.delid)" style="flex:1;background:var(--red);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Delete</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(div);
+}
+
+function confirmDeleteOpEval(id) {
+  document.getElementById('op-del-confirm')?.remove();
+  // Remove from localStorage
+  window._operationHistory = (window._operationHistory||[]).filter(r => r.id !== id);
+  try { localStorage.setItem('nexora_op_history', JSON.stringify(window._operationHistory)); } catch(e) {}
+  // Soft delete in Google Sheets
+  try {
+    fetch(GOOGLE_SHEET_URL, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'delete_operation', id: String(id) })
+    }).catch(()=>{});
+  } catch(e) {}
+  renderOperationHistory();
+  // Success toast
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--green);border-radius:20px;padding:12px 24px;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:0 8px 32px #000a;';
+  toast.innerHTML = '<span style="font-size:18px;">✅</span><span style="font-size:13px;font-weight:700;color:var(--green);">Operation eval deleted</span>';
+  document.body.appendChild(toast);
+  setTimeout(function(){ toast.remove(); }, 2500);
+}
+
 function renderOperationHistory() {
   try { window._operationHistory = JSON.parse(localStorage.getItem('nexora_op_history')||'[]'); } catch(e) {}
   const data = window._operationHistory || [];
@@ -6686,7 +6732,7 @@ function renderOperationHistory() {
     ${items.sort((a,b) => new Date(b.date) - new Date(a.date)).map(r => {
       const col = r.overall>=90?'var(--green)':r.overall>=80?'var(--gold)':'var(--red)';
       const status = r.overall>=90?iconCheck()+' Pass':r.overall>=80?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Fail';
-      return `<div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:0;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;">
+      return `<div style="display:grid;grid-template-columns:1fr auto auto auto auto auto;gap:0;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;">
         <div>
           <div style="font-size:13px;font-weight:600;">${r.agent}</div>
           <div style="font-size:10px;color:var(--muted);margin-top:2px;">${r.lang||''} · ${r.country||''}</div>
@@ -6694,9 +6740,12 @@ function renderOperationHistory() {
         <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.tl||'—'}</div>
         <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.proj||'—'}</div>
         <div style="text-align:right;padding-right:16px;font-size:11px;color:var(--muted);">${r.date||'—'}</div>
-        <div style="text-align:right;">
+        <div style="text-align:right;padding-right:12px;">
           <div style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:${col};">${Number(r.overall).toFixed(1)}%</div>
           <div style="font-size:10px;color:${col};margin-top:2px;">${status}</div>
+        </div>
+        <div style="text-align:right;">
+          ${role==='manager' ? `<button onclick="deleteOperationEval('${r.id}')" style="background:none;border:1px solid var(--border);color:var(--red);border-radius:var(--radius-s);padding:4px 8px;font-size:11px;cursor:pointer;" title="Delete">🗑</button>` : ''}
         </div>
       </div>`;
     }).join('')}`;
