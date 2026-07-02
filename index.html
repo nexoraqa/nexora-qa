@@ -10085,6 +10085,7 @@ function renderCalibHistory() {
       <div style="display:flex;align-items:center;gap:12px;">
         <div style="font-size:12px;font-weight:700;color:${verdictColor};">${verdictLabel}</div>
         <button onclick="openCalibReport('${s.id}')" style="background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">View Report</button>
+        ${_currentUser?.role==='manager'?`<button onclick="deleteCalibSession('${s.id}')" style="background:none;border:1px solid var(--border);color:var(--red);border-radius:var(--radius-s);padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;">🗑</button>`:''}
       </div>
     </div>`;
   }).join('');
