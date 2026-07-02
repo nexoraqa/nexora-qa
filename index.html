@@ -9511,11 +9511,21 @@ function createCalibSession() {
   if (!caseN)              { showToast('Please enter a case number','warn'); return; }
   if (!selectedTLs.length) { showToast('Please select at least one Team Lead','warn'); return; }
 
-  // Block duplicate case number
+  // Block duplicate case number — show popup
   if (caseN) {
     loadCalibSessions();
     const duplicate = _calibSessions.find(s => s.caseNumber && s.caseNumber.trim().toLowerCase() === caseN.trim().toLowerCase());
-    if (duplicate) { showToast('A calibration with this case number already exists','warn'); return; }
+    if (duplicate) {
+      const dupPopHTML = '<div id="calib-dup-popup" style="position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;">' +
+        '<div style="background:var(--card);border:1px solid rgba(240,79,79,.4);border-radius:var(--radius);padding:28px;text-align:center;max-width:340px;margin:16px;box-shadow:0 24px 60px #000a;">' +
+          '<div style="font-size:36px;margin-bottom:12px;">⚠️</div>' +
+          '<div style="font-family:var(--font-h);font-size:16px;font-weight:800;margin-bottom:8px;color:var(--red);">Duplicate Case Number</div>' +
+          '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;">A calibration session with case number <b style="color:var(--gold);">' + caseN + '</b> already exists. Please use a different case number.</div>' +
+          '<button onclick="var p=document.getElementById(\'calib-dup-popup\');if(p)p.remove();" style="background:var(--red);border:none;color:#fff;border-radius:var(--radius-s);padding:10px 28px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">OK</button>' +
+        '</div></div>';
+      document.body.insertAdjacentHTML('beforeend', dupPopHTML);
+      return;
+    }
   }
 
   const session = {
@@ -9547,8 +9557,10 @@ function createCalibSession() {
   </div>`;
   document.body.insertAdjacentHTML('beforeend', popHTML);
 
-  // Update badge for TLs and Manager
+  // Update badge for all participants
   try { updateCalibBadge(); } catch(e) {}
+  // Also force badge update after short delay to ensure localStorage is written
+  setTimeout(function(){ try { updateCalibBadge(); } catch(e) {} }, 300);
   switchCalibTab('active');
 }
 
@@ -9556,7 +9568,7 @@ function renderCalibActive() {
   loadCalibSessions();
   const el = document.getElementById('calib-active-list');
   if (!el) return;
-  const active = _calibSessions.filter(s => s.status === 'active');
+  const active = _calibSessions.filter(s => s.status === 'active' || s.status === 'complete');
   const managerControls = _currentUser?.role === 'manager' && active.length > 0
     ? `<div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
         <button onclick="clearAllCalibSessions()" style="background:none;border:1px solid var(--border);color:var(--red);border-radius:var(--radius-s);padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">🗑 Clear All Sessions</button>
@@ -9931,105 +9943,83 @@ function buildCalibReport(s) {
 function openCalibReport(sessionId) {
   loadCalibSessions();
   const s = _calibSessions.find(s => s.id === sessionId);
-  if (!s || !s.report) return;
+  if (!s || !s.report) { showToast('Report not available yet','warn'); return; }
   const r = s.report;
 
-  const calibColor = r.calibrated ? 'var(--green)' : 'var(--red)';
-  const calibBg    = r.calibrated ? 'rgba(22,167,102,.08)' : 'rgba(240,79,79,.08)';
-  const calibBorder= r.calibrated ? 'rgba(22,167,102,.3)' : 'rgba(240,79,79,.3)';
-  const calibLabel = r.calibrated ? '✓ CALIBRATED' : '✕ NOT CALIBRATED';
+  const calibColor  = r.calibrated ? 'var(--green)' : 'var(--red)';
+  const calibBg     = r.calibrated ? 'rgba(22,167,102,.08)' : 'rgba(240,79,79,.08)';
+  const calibBorder = r.calibrated ? 'rgba(22,167,102,.3)'  : 'rgba(240,79,79,.3)';
+  const calibIcon   = r.calibrated ? '✅' : '❌';
+  const calibLabel  = r.calibrated ? 'CALIBRATED' : 'NOT CALIBRATED';
 
-  function attrRow(attr, type, disagreeList) {
-    const disagreed = disagreeList.includes(attr);
-    const votes = r.pData.map(p => {
-      const failed = type==='cc' ? p.failedCC.includes(attr) : type==='cb' ? p.failedCB.includes(attr) : p.failedNC.includes(attr);
-      return { name:p.name, role:p.role, val: failed?'fail':'pass' };
-    });
-    const typeColor = type==='cc'?'var(--red)':type==='cb'?'var(--orange)':'var(--gold)';
-    return `<div style="padding:10px 12px;background:${disagreed?'rgba(240,79,79,.06)':'var(--bg)'};border:1px solid ${disagreed?'rgba(240,79,79,.25)':'var(--border)'};border-radius:8px;margin-bottom:6px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          ${disagreed ? '<span style="font-size:12px;">⚠</span>' : '<span style="font-size:12px;color:var(--green);">✓</span>'}
-          <span style="font-size:12px;font-weight:600;">${attr}</span>
-        </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          ${votes.map(v => `<span style="font-size:11px;padding:2px 8px;border-radius:5px;font-weight:700;background:${v.val==='fail'?'rgba(240,79,79,.15)':'rgba(22,167,102,.12)'};color:${v.val==='fail'?'var(--red)':'var(--green)'};">${v.name.split(' ')[0]}: ${v.val==='fail'?'FAIL':'PASS'}</span>`).join('')}
-        </div>
-      </div>
-    </div>`;
-  }
+  // Build disagreement summary line
+  const issues = [];
+  if (r.ccDisagree.length > 0) issues.push('CC: ' + r.ccDisagree.length + ' disagreement(s)');
+  if (r.cbDisagree.length > 0) issues.push('CB: ' + r.cbDisagree.length + ' disagreement(s)');
+  if (!r.ncCalibrated) issues.push('NC: diff of ' + r.ncMaxDiff + ' attributes');
 
-  document.getElementById('calib-report-content').innerHTML = `
-    <!-- Session Info -->
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--muted);">
-      Agent: <b style="color:var(--text);">${s.agent}</b>
-      ${s.caseNumber ? ' · Case: <b style="color:var(--gold);">'+s.caseNumber+'</b>' : ''}
-      · Created by ${s.createdBy}
-    </div>
+  // Build per-participant expandable rows
+  const participantRows = r.pData.map(function(p, idx) {
+    const scoreCol = p.score >= 90 ? 'var(--green)' : p.score >= 80 ? 'var(--gold)' : 'var(--red)';
+    const expandId = 'calib-rep-p-' + idx;
 
-    <!-- Calibration Verdict -->
-    <div style="background:${calibBg};border:2px solid ${calibBorder};border-radius:12px;padding:18px;text-align:center;margin-bottom:18px;">
-      <div style="font-family:var(--font-mono);font-size:22px;font-weight:800;color:${calibColor};letter-spacing:2px;">${calibLabel}</div>
-      <div style="font-size:12px;color:var(--muted);margin-top:6px;">
-        CC: ${r.ccDisagree.length===0?'<span style="color:var(--green);">Agreed ✓</span>':'<span style="color:var(--red);">'+r.ccDisagree.length+' disagreement(s) ✕</span>'}
-        &nbsp;·&nbsp;
-        CB: ${r.cbDisagree.length===0?'<span style="color:var(--green);">Agreed ✓</span>':'<span style="color:var(--red);">'+r.cbDisagree.length+' disagreement(s) ✕</span>'}
-        &nbsp;·&nbsp;
-        NC diff: <span style="color:${r.ncCalibrated?'var(--green)':'var(--red)'};">${r.ncMaxDiff} attr(s) ${r.ncCalibrated?'✓':'✕'}</span>
-      </div>
-    </div>
+    // Their full attribute breakdown
+    const CC_ATTRS = ['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'];
+    const CB_ATTRS = ['Ticket Creation','Control the Call','Ticketing Tree'];
+    const NC_ATTRS = ['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'];
 
-    <!-- Individual Scores -->
-    <div class="card" style="margin-bottom:14px;">
-      <div class="card-title" style="margin-bottom:12px;">Evaluators</div>
-      ${r.pData.map(p => {
-        const col = p.score >= 90 ? 'var(--green)' : p.score >= 80 ? 'var(--gold)' : 'var(--red)';
-        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:6px;">
-          <div>
-            <div style="font-size:13px;font-weight:700;">${p.name} <span style="font-size:10px;color:var(--muted);background:var(--card);padding:1px 6px;border-radius:4px;">${p.role.toUpperCase()}</span></div>
-            <div style="font-size:11px;margin-top:4px;">
-              CC: ${p.hasCC?'<span style="color:var(--red);font-weight:700;">FAIL</span>':'<span style="color:var(--green);">PASS</span>'}
-              &nbsp;·&nbsp;
-              CB: ${p.hasCB?'<span style="color:var(--orange);font-weight:700;">FAIL</span>':'<span style="color:var(--green);">PASS</span>'}
-              &nbsp;·&nbsp;
-              NC failed: <span style="color:var(--gold);font-weight:700;">${p.failedNC.length}</span>
-            </div>
-          </div>
-          <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:${col};">${p.score.toFixed(1)}%</div>
-        </div>`;
-      }).join('')}
-    </div>
+    function attrList(attrs, type, failedList, disagreeList) {
+      const col = type==='cc'?'var(--red)':type==='cb'?'var(--orange)':'var(--gold)';
+      return attrs.map(function(a) {
+        const failed = failedList.includes(a);
+        const disagreed = disagreeList.includes(a);
+        return '<div style="display:flex;justify-content:space-between;padding:5px 10px;border-radius:5px;margin-bottom:3px;background:'+(disagreed?'rgba(240,79,79,.06)':'var(--bg)')+';">' +
+          '<span style="font-size:11px;">' + (disagreed?'⚠ ':'') + a + '</span>' +
+          '<span style="font-size:11px;font-weight:700;color:'+(failed?col:'var(--muted)')+';">' + (failed?'FAIL':'PASS') + '</span>' +
+        '</div>';
+      }).join('');
+    }
 
-    <!-- CC Detail -->
-    <div class="card" style="margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-        <span style="background:rgba(240,79,79,.15);color:var(--red);font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);">CC</span>
-        <span class="card-title" style="margin:0;">Critical to Customer</span>
-        <span style="margin-left:auto;font-size:11px;font-weight:700;color:${r.ccDisagree.length===0?'var(--green)':'var(--red)'};">${r.ccDisagree.length===0?'✓ Calibrated':'✕ '+r.ccDisagree.length+' disagreement(s)'}</span>
-      </div>
-      ${['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'].map(a => attrRow(a,'cc',r.ccDisagree)).join('')}
-    </div>
+    const detailHTML =
+      '<div style="padding:12px 14px;background:var(--bg);border-top:1px solid var(--border);">' +
+        '<div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">CC Attributes</div>' +
+        attrList(CC_ATTRS, 'cc', p.failedCC, r.ccDisagree) +
+        '<div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;">CB Attributes</div>' +
+        attrList(CB_ATTRS, 'cb', p.failedCB, r.cbDisagree) +
+        '<div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 6px;">NC Attributes</div>' +
+        attrList(NC_ATTRS, 'nc', p.failedNC, r.ncDisagree) +
+      '</div>';
 
-    <!-- CB Detail -->
-    <div class="card" style="margin-bottom:14px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-        <span style="background:rgba(240,120,48,.15);color:var(--orange);font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);">CB</span>
-        <span class="card-title" style="margin:0;">Critical to Business</span>
-        <span style="margin-left:auto;font-size:11px;font-weight:700;color:${r.cbDisagree.length===0?'var(--green)':'var(--red)'};">${r.cbDisagree.length===0?'✓ Calibrated':'✕ '+r.cbDisagree.length+' disagreement(s)'}</span>
-      </div>
-      ${['Ticket Creation','Control the Call','Ticketing Tree'].map(a => attrRow(a,'cb',r.cbDisagree)).join('')}
-    </div>
+    return '<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;">' +
+      '<div onclick="calibToggleParticipant(\"' + expandId + '\")" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;background:var(--card);">' +
+        '<div>' +
+          '<div style="font-size:13px;font-weight:700;">' + p.name + ' <span style="font-size:10px;color:var(--muted);background:var(--bg);padding:1px 6px;border-radius:4px;">' + p.role.toUpperCase() + '</span></div>' +
+          '<div style="font-size:11px;color:var(--muted);margin-top:3px;">Tap to see full evaluation</div>' +
+        '</div>' +
+        '<div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:' + scoreCol + ';">' + p.score.toFixed(1) + '%</div>' +
+      '</div>' +
+      '<div id="' + expandId + '" style="display:none;">' + detailHTML + '</div>' +
+    '</div>';
+  }).join('');
 
-    <!-- NC Detail -->
-    <div class="card">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-        <span style="background:rgba(232,162,61,.15);color:var(--gold);font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);">NC</span>
-        <span class="card-title" style="margin:0;">Non-Critical</span>
-        <span style="margin-left:auto;font-size:11px;font-weight:700;color:${r.ncCalibrated?'var(--green)':'var(--red)'};">${r.ncCalibrated?'✓ Calibrated (diff < 3)':'✕ Diff = '+r.ncMaxDiff+' attributes'}</span>
-      </div>
-      ${['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'].map(a => attrRow(a,'nc',r.ncDisagree)).join('')}
-    </div>
-  `;
+  document.getElementById('calib-report-content').innerHTML =
+    // Session info
+    '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--muted);">' +
+      'Agent: <b style="color:var(--text);">' + s.agent + '</b>' +
+      (s.caseNumber ? ' &nbsp;·&nbsp; Case: <b style="color:var(--gold);">' + s.caseNumber + '</b>' : '') +
+      ' &nbsp;·&nbsp; Created by ' + s.createdBy +
+    '</div>' +
+
+    // Verdict
+    '<div style="background:' + calibBg + ';border:2px solid ' + calibBorder + ';border-radius:14px;padding:22px;text-align:center;margin-bottom:18px;">' +
+      '<div style="font-size:42px;margin-bottom:8px;">' + calibIcon + '</div>' +
+      '<div style="font-family:var(--font-h);font-size:22px;font-weight:800;color:' + calibColor + ';letter-spacing:1px;">' + calibLabel + '</div>' +
+      (issues.length ? '<div style="font-size:12px;color:var(--muted);margin-top:8px;">' + issues.join(' &nbsp;·&nbsp; ') + '</div>' : '<div style="font-size:12px;color:var(--green);margin-top:8px;">Full agreement on all attributes</div>') +
+    '</div>' +
+
+    // Participants
+    '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Evaluators — tap name to see full form</div>' +
+    participantRows;
 
   const modal = document.getElementById('calib-report-modal');
   modal.style.display = 'none';
@@ -10037,6 +10027,11 @@ function openCalibReport(sessionId) {
   modal.style.display = 'flex';
 }
 
+
+function calibToggleParticipant(id) {
+  var el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
 function closeCalibEval()   { document.getElementById('calib-eval-modal').style.display   = 'none'; }
 function closeCalibReport() { document.getElementById('calib-report-modal').style.display = 'none'; }
 
