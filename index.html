@@ -10073,18 +10073,17 @@ function renderCalibHistory() {
   const done = _calibSessions.filter(s => s.status === 'complete').sort((a,b) => new Date(b.completedAt)-new Date(a.completedAt));
   if (!done.length) { el.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">No completed calibration sessions yet.</div>'; return; }
   el.innerHTML = done.map(s => {
-    const r = s.report;
-    const agreeColor = r.agreementPct >= 90 ? 'var(--green)' : r.agreementPct >= 75 ? 'var(--gold)' : 'var(--red)';
+    const r = s.report || {};
+    const calibrated = r.calibrated;
+    const verdictColor = calibrated ? 'var(--green)' : 'var(--red)';
+    const verdictLabel = calibrated ? '✓ Calibrated' : '✕ Not Calibrated';
     return `<div class="card" style="margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
       <div>
-        <div style="font-size:13px;font-weight:700;">${s.id} · ${s.agent}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${fmtDate(s.date)} · ${s.participants.length} evaluators · Completed ${fmtDate(s.completedAt)}</div>
+        <div style="font-size:13px;font-weight:700;">Case: ${s.caseNumber||s.id} · ${s.agent}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;">${s.participants.length} evaluators · Completed ${fmtDate(s.completedAt)} · by ${s.createdBy}</div>
       </div>
       <div style="display:flex;align-items:center;gap:12px;">
-        <div style="text-align:center;">
-          <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:${agreeColor};">${r.agreementPct.toFixed(0)}%</div>
-          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;">Agreement</div>
-        </div>
+        <div style="font-size:12px;font-weight:700;color:${verdictColor};">${verdictLabel}</div>
         <button onclick="openCalibReport('${s.id}')" style="background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">View Report</button>
       </div>
     </div>`;
