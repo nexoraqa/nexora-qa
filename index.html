@@ -10088,6 +10088,18 @@ function openCalibReport(sessionId) {
 }
 
 
+function closeCalibEval() {
+  var el = document.getElementById('calib-eval-modal');
+  if (el) el.style.display = 'none';
+  window._calibSelectedErrors = [];
+  window._calibActiveSessionId = null;
+}
+
+function closeCalibReport() {
+  var el = document.getElementById('calib-report-modal');
+  if (el) el.style.display = 'none';
+}
+
 function closeCalibDelConfirm() {
   var el = document.getElementById('calib-del-confirm');
   if (el) el.remove();
