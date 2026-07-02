@@ -1680,6 +1680,17 @@ a { color:var(--purple-l); text-decoration:none; }
     </div>
   </div>
 
+  <!-- Calibration Edit Modal -->
+  <div id="calib-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center;overflow-y:auto;" onclick="if(event.target===this)closeCalibEdit()">
+    <div onclick="event.stopPropagation()" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;width:100%;max-width:520px;margin:20px auto;box-shadow:0 24px 60px #000a;max-height:90vh;overflow-y:auto;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div style="font-family:var(--font-h);font-size:16px;font-weight:800;">✏ Edit Calibration Session</div>
+        <button onclick="closeCalibEdit()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 10px;cursor:pointer;">✕</button>
+      </div>
+      <div id="calib-edit-content"></div>
+    </div>
+  </div>
+
   <div class="page" id="page-reports">
 
     <!-- Report Tabs — at top -->
@@ -9640,6 +9651,7 @@ function renderCalibActive() {
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           ${canEvaluate ? `<button onclick="openCalibEval('${s.id}')" style="background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">⚖ Submit My Score</button>` : ''}
           ${allDone ? `<button onclick="openCalibReport('${s.id}')" style="background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">📊 View Report</button>` : ''}
+          ${(!allDone && s.createdBy === _currentUser?.name) ? `<button onclick="openCalibEdit('${s.id}')" style="background:none;border:1px solid var(--gold);color:var(--gold);border-radius:var(--radius-s);padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">✏ Edit</button>` : ''}
           ${_currentUser?.role==='manager'?`<button onclick="deleteCalibSession('${s.id}')" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius-s);padding:8px 12px;font-size:12px;cursor:pointer;">✕</button>`:''}
         </div>
       </div>
@@ -10144,6 +10156,126 @@ function closeCalibEval() {
   if (el) el.style.display = 'none';
   window._calibSelectedErrors = [];
   window._calibActiveSessionId = null;
+}
+
+function closeCalibEdit() {
+  var el = document.getElementById('calib-edit-modal');
+  if (el) el.style.display = 'none';
+}
+
+function openCalibEdit(sessionId) {
+  loadCalibSessions();
+  const s = _calibSessions.find(s => s.id === sessionId);
+  if (!s) return;
+
+  // QA participant data
+  const qaParticipant = s.participants.find(p => p.role === 'qa');
+  const qaSubmitted = qaParticipant && qaParticipant.submitted;
+
+  // Build agent options
+  const agents = [...new Set(_evalHistory.filter(e => !e.country || e.country === 'Qatar').map(e => e.agent))].sort();
+  const agentOpts = agents.map(a => `<option value="${a}" ${a===s.agent?'selected':''}>${a}</option>`).join('');
+
+  // Build TL checkboxes
+  const tlUsers = Object.values(USERS).filter(u => u.role === 'tl');
+  const currentTLNames = s.participants.filter(p => p.role === 'tl').map(p => p.name);
+  const tlBoxes = tlUsers.map(u => `
+    <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
+      <input type="checkbox" value="${u.name}" ${currentTLNames.includes(u.name)?'checked':''} style="width:16px;height:16px;accent-color:var(--gold);cursor:pointer;">
+      <span style="font-size:13px;font-weight:600;">${u.tl||u.name}</span>
+      ${s.participants.find(p=>p.name===u.name&&p.submitted) ? '<span style="font-size:10px;color:var(--green);margin-left:auto;">✓ Submitted</span>' : ''}
+    </label>`).join('');
+
+  document.getElementById('calib-edit-content').innerHTML = `
+    <div style="margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Agent</div>
+      <select id="edit-agent" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;outline:none;">
+        <option value="">Select agent...</option>${agentOpts}
+      </select>
+    </div>
+    <div style="margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Case Number</div>
+      <input type="text" id="edit-case" value="${s.caseNumber||''}" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;outline:none;">
+    </div>
+    <div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;">Team Lead(s)</div>
+      <div id="edit-tl-boxes" style="display:flex;flex-direction:column;gap:6px;">${tlBoxes}</div>
+    </div>
+    ${qaSubmitted ? `
+    <div style="padding:14px;background:rgba(240,79,79,.07);border:1px solid rgba(240,79,79,.2);border-radius:10px;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px;">⚠ Reset Your Score</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Your score was submitted. If the agent or case was wrong, you can reset your submission and re-evaluate.</div>
+      <button onclick="resetCalibQAScore('${sessionId}')" style="background:var(--red);border:none;color:#fff;border-radius:var(--radius-s);padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Reset My Score</button>
+    </div>` : ''}
+    <button onclick="saveCalibEdit('${sessionId}')" style="width:100%;background:var(--gold);border:none;color:#000;border-radius:var(--radius-s);padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Save Changes</button>
+  `;
+
+  const modal = document.getElementById('calib-edit-modal');
+  modal.style.display = 'none';
+  void modal.offsetHeight;
+  modal.style.display = 'flex';
+}
+
+function saveCalibEdit(sessionId) {
+  const newAgent = document.getElementById('edit-agent')?.value;
+  const newCase  = document.getElementById('edit-case')?.value?.trim();
+  const checkedTLs = [...document.querySelectorAll('#edit-tl-boxes input[type=checkbox]:checked')].map(cb => cb.value);
+
+  if (!newAgent)        { showCalibAlert('⚠️','Missing Field','Please select an agent.','var(--gold)'); return; }
+  if (!newCase)         { showCalibAlert('⚠️','Missing Field','Please enter a case number.','var(--gold)'); return; }
+  if (!checkedTLs.length){ showCalibAlert('⚠️','Missing Field','Please select at least one Team Lead.','var(--gold)'); return; }
+
+  loadCalibSessions();
+  const s = _calibSessions.find(s => s.id === sessionId);
+  if (!s) return;
+
+  s.agent = newAgent;
+  s.caseNumber = newCase;
+
+  // Update TL participants — keep existing submitted TLs, add new ones, remove unchecked unsubmitted ones
+  const existingTLs = s.participants.filter(p => p.role === 'tl');
+  const newTLParticipants = checkedTLs.map(name => {
+    const existing = existingTLs.find(p => p.name === name);
+    return existing || { name, role:'tl', submitted:false, score:null, errors:[] };
+  });
+  // Keep QA participant + new TL list
+  const qa = s.participants.find(p => p.role === 'qa');
+  s.participants = [qa, ...newTLParticipants].filter(Boolean);
+
+  // Reset status if was complete
+  if (s.status === 'complete') {
+    s.status = 'active';
+    s.report = null;
+    s.completedAt = null;
+  }
+
+  saveCalibSessions();
+  closeCalibEdit();
+  renderCalibActive();
+  showCalibAlert('✅','Changes Saved','Session updated successfully. All changes have been applied.','var(--green)');
+}
+
+function resetCalibQAScore(sessionId) {
+  loadCalibSessions();
+  const s = _calibSessions.find(s => s.id === sessionId);
+  if (!s) return;
+  const qa = s.participants.find(p => p.role === 'qa');
+  if (!qa) return;
+
+  qa.submitted = false;
+  qa.score = null;
+  qa.errors = [];
+  qa.submittedAt = null;
+
+  // Reset session status
+  s.status = 'active';
+  s.report = null;
+  s.completedAt = null;
+
+  saveCalibSessions();
+  closeCalibEdit();
+  renderCalibActive();
+  showCalibAlert('✅','Score Reset','Your calibration score has been cleared. You can now re-evaluate and submit again.','var(--green)');
 }
 
 function closeCalibReport() {
