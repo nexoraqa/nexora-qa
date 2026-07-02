@@ -9604,7 +9604,7 @@ function renderCalibActive() {
           <span style="width:7px;height:7px;border-radius:50%;background:${p.submitted?'var(--green)':'var(--dim)'};display:inline-block;"></span>
           <span style="font-size:11px;font-weight:600;">${p.name}</span>
           <span style="font-size:10px;color:var(--muted);">(${p.role.toUpperCase()})</span>
-          ${p.submitted?`<span style="font-size:10px;color:var(--green);">✓ ${p.score?.toFixed(1)}%</span>`:'<span style="font-size:10px;color:var(--muted);">Pending</span>'}
+          ${p.submitted ? (allDone ? `<span style="font-size:10px;color:var(--green);">✓ ${p.score?.toFixed(1)}%</span>` : '<span style="font-size:10px;color:var(--green);">✓ Submitted</span>') : '<span style="font-size:10px;color:var(--muted);">Pending</span>'}
         </div>`).join('')}
       </div>
     </div>`;
@@ -9866,23 +9866,45 @@ function submitCalibScore(sessionId) {
 }
 
 function buildCalibReport(s) {
-  const scores = s.participants.map(p => p.score);
-  const avgScore = scores.reduce((a,b) => a+b, 0) / scores.length;
-  const maxDiff = Math.max(...scores) - Math.min(...scores);
-  const agreementPct = Math.max(0, 100 - maxDiff);
+  const CC_ATTRS = ['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'];
+  const CB_ATTRS = ['Ticket Creation','Control the Call','Ticketing Tree'];
+  const NC_ATTRS = ['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'];
 
-  // Find attributes where evaluators disagreed
-  const allAttrs = ['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD',
-    'Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description',
-    'Ticket Creation','Control the Call','Ticketing Tree'];
-  const disagreements = [];
-  allAttrs.forEach(attr => {
-    const vals = s.participants.map(p => p.errors.find(e => e.attr === attr) ? 'fail' : 'pass');
-    const unique = [...new Set(vals)];
-    if (unique.length > 1) disagreements.push({ attr, votes: s.participants.map((p,i) => ({ name:p.name, val:vals[i] })) });
+  // Per participant — which attrs they failed
+  const pData = s.participants.map(p => {
+    const failedCC = CC_ATTRS.filter(a => (p.errors||[]).some(e => (e.attr===a||e.v===a) && e.t==='cc'));
+    const failedCB = CB_ATTRS.filter(a => (p.errors||[]).some(e => (e.attr===a||e.v===a) && e.t==='cb'));
+    const failedNC = NC_ATTRS.filter(a => (p.errors||[]).some(e => (e.attr===a||e.v===a) && e.t==='nc'));
+    return { name:p.name, role:p.role, score:p.score, failedCC, failedCB, failedNC, hasCC:failedCC.length>0, hasCB:failedCB.length>0 };
   });
 
-  return { avgScore, maxDiff, agreementPct, disagreements, scores: s.participants.map(p => ({ name:p.name, role:p.role, score:p.score, hasCC:p.hasCC, hasCB:p.hasCB })) };
+  // CC calibration — all participants agree on same CC failures
+  const ccDisagree = CC_ATTRS.filter(a => {
+    const votes = pData.map(p => p.failedCC.includes(a) ? 'fail' : 'pass');
+    return new Set(votes).size > 1;
+  });
+
+  // CB calibration — all participants agree on same CB failures
+  const cbDisagree = CB_ATTRS.filter(a => {
+    const votes = pData.map(p => p.failedCB.includes(a) ? 'fail' : 'pass');
+    return new Set(votes).size > 1;
+  });
+
+  // NC calibration — difference in number of failed NC attrs < 3
+  const ncCounts = pData.map(p => p.failedNC.length);
+  const ncMaxDiff = Math.max(...ncCounts) - Math.min(...ncCounts);
+  const ncCalibrated = ncMaxDiff < 3;
+
+  // NC disagreed attrs
+  const ncDisagree = NC_ATTRS.filter(a => {
+    const votes = pData.map(p => p.failedNC.includes(a) ? 'fail' : 'pass');
+    return new Set(votes).size > 1;
+  });
+
+  // Overall calibrated
+  const calibrated = ccDisagree.length === 0 && cbDisagree.length === 0 && ncCalibrated;
+
+  return { pData, ccDisagree, cbDisagree, ncDisagree, ncMaxDiff, ncCalibrated, calibrated };
 }
 
 function openCalibReport(sessionId) {
@@ -9890,41 +9912,66 @@ function openCalibReport(sessionId) {
   const s = _calibSessions.find(s => s.id === sessionId);
   if (!s || !s.report) return;
   const r = s.report;
-  const agreeColor = r.agreementPct >= 90 ? 'var(--green)' : r.agreementPct >= 75 ? 'var(--gold)' : 'var(--red)';
+
+  const calibColor = r.calibrated ? 'var(--green)' : 'var(--red)';
+  const calibBg    = r.calibrated ? 'rgba(22,167,102,.08)' : 'rgba(240,79,79,.08)';
+  const calibBorder= r.calibrated ? 'rgba(22,167,102,.3)' : 'rgba(240,79,79,.3)';
+  const calibLabel = r.calibrated ? '✓ CALIBRATED' : '✕ NOT CALIBRATED';
+
+  function attrRow(attr, type, disagreeList) {
+    const disagreed = disagreeList.includes(attr);
+    const votes = r.pData.map(p => {
+      const failed = type==='cc' ? p.failedCC.includes(attr) : type==='cb' ? p.failedCB.includes(attr) : p.failedNC.includes(attr);
+      return { name:p.name, role:p.role, val: failed?'fail':'pass' };
+    });
+    const typeColor = type==='cc'?'var(--red)':type==='cb'?'var(--orange)':'var(--gold)';
+    return `<div style="padding:10px 12px;background:${disagreed?'rgba(240,79,79,.06)':'var(--bg)'};border:1px solid ${disagreed?'rgba(240,79,79,.25)':'var(--border)'};border-radius:8px;margin-bottom:6px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${disagreed ? '<span style="font-size:12px;">⚠</span>' : '<span style="font-size:12px;color:var(--green);">✓</span>'}
+          <span style="font-size:12px;font-weight:600;">${attr}</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          ${votes.map(v => `<span style="font-size:11px;padding:2px 8px;border-radius:5px;font-weight:700;background:${v.val==='fail'?'rgba(240,79,79,.15)':'rgba(22,167,102,.12)'};color:${v.val==='fail'?'var(--red)':'var(--green)'};">${v.name.split(' ')[0]}: ${v.val==='fail'?'FAIL':'PASS'}</span>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }
 
   document.getElementById('calib-report-content').innerHTML = `
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:18px;">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Agent: <b style="color:var(--text);">${s.agent}</b> · Date: ${fmtDate(s.date)} ${s.caseNumber?'· Case: <b style="color:var(--gold);">'+s.caseNumber+'</b>':''}</div>
+    <!-- Session Info -->
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:16px;font-size:12px;color:var(--muted);">
+      Agent: <b style="color:var(--text);">${s.agent}</b>
+      ${s.caseNumber ? ' · Case: <b style="color:var(--gold);">'+s.caseNumber+'</b>' : ''}
+      · Created by ${s.createdBy}
     </div>
 
-    <!-- Agreement Score -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-        <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:${agreeColor};">${r.agreementPct.toFixed(0)}%</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Agreement Score</div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;">
-        <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;">${r.avgScore.toFixed(1)}%</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Avg Score</div>
-      </div>
-      <div style="background:var(--card);border:1px solid ${r.maxDiff>15?'rgba(240,79,79,.3)':'var(--border)'};border-radius:10px;padding:16px;text-align:center;">
-        <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:${r.maxDiff>15?'var(--red)':r.maxDiff>8?'var(--orange)':'var(--green)'};">${r.maxDiff.toFixed(1)}%</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px;">Max Difference</div>
+    <!-- Calibration Verdict -->
+    <div style="background:${calibBg};border:2px solid ${calibBorder};border-radius:12px;padding:18px;text-align:center;margin-bottom:18px;">
+      <div style="font-family:var(--font-mono);font-size:22px;font-weight:800;color:${calibColor};letter-spacing:2px;">${calibLabel}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">
+        CC: ${r.ccDisagree.length===0?'<span style="color:var(--green);">Agreed ✓</span>':'<span style="color:var(--red);">'+r.ccDisagree.length+' disagreement(s) ✕</span>'}
+        &nbsp;·&nbsp;
+        CB: ${r.cbDisagree.length===0?'<span style="color:var(--green);">Agreed ✓</span>':'<span style="color:var(--red);">'+r.cbDisagree.length+' disagreement(s) ✕</span>'}
+        &nbsp;·&nbsp;
+        NC diff: <span style="color:${r.ncCalibrated?'var(--green)':'var(--red)'};">${r.ncMaxDiff} attr(s) ${r.ncCalibrated?'✓':'✕'}</span>
       </div>
     </div>
 
     <!-- Individual Scores -->
-    <div class="card" style="margin-bottom:16px;">
-      <div class="card-title" style="margin-bottom:14px;">Individual Scores</div>
-      ${r.scores.map(p => {
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title" style="margin-bottom:12px;">Evaluators</div>
+      ${r.pData.map(p => {
         const col = p.score >= 90 ? 'var(--green)' : p.score >= 80 ? 'var(--gold)' : 'var(--red)';
-        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px;background:var(--bg);border-radius:8px;margin-bottom:6px;">
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:6px;">
           <div>
-            <div style="font-size:13px;font-weight:600;">${p.name} <span style="font-size:10px;color:var(--muted);">(${p.role.toUpperCase()})</span></div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;">
-              ${p.hasCC?'<span style="color:var(--red);font-weight:700;">CC Fail</span>':'<span style="color:var(--green);">CC Pass</span>'}
+            <div style="font-size:13px;font-weight:700;">${p.name} <span style="font-size:10px;color:var(--muted);background:var(--card);padding:1px 6px;border-radius:4px;">${p.role.toUpperCase()}</span></div>
+            <div style="font-size:11px;margin-top:4px;">
+              CC: ${p.hasCC?'<span style="color:var(--red);font-weight:700;">FAIL</span>':'<span style="color:var(--green);">PASS</span>'}
               &nbsp;·&nbsp;
-              ${p.hasCB?'<span style="color:var(--orange);font-weight:700;">CB Fail</span>':'<span style="color:var(--green);">CB Pass</span>'}
+              CB: ${p.hasCB?'<span style="color:var(--orange);font-weight:700;">FAIL</span>':'<span style="color:var(--green);">PASS</span>'}
+              &nbsp;·&nbsp;
+              NC failed: <span style="color:var(--gold);font-weight:700;">${p.failedNC.length}</span>
             </div>
           </div>
           <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:${col};">${p.score.toFixed(1)}%</div>
@@ -9932,21 +9979,41 @@ function openCalibReport(sessionId) {
       }).join('')}
     </div>
 
-    <!-- Disagreements -->
-    ${r.disagreements.length ? `
+    <!-- CC Detail -->
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="background:rgba(240,79,79,.15);color:var(--red);font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);">CC</span>
+        <span class="card-title" style="margin:0;">Critical to Customer</span>
+        <span style="margin-left:auto;font-size:11px;font-weight:700;color:${r.ccDisagree.length===0?'var(--green)':'var(--red)'};">${r.ccDisagree.length===0?'✓ Calibrated':'✕ '+r.ccDisagree.length+' disagreement(s)'}</span>
+      </div>
+      ${['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'].map(a => attrRow(a,'cc',r.ccDisagree)).join('')}
+    </div>
+
+    <!-- CB Detail -->
+    <div class="card" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="background:rgba(240,120,48,.15);color:var(--orange);font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);">CB</span>
+        <span class="card-title" style="margin:0;">Critical to Business</span>
+        <span style="margin-left:auto;font-size:11px;font-weight:700;color:${r.cbDisagree.length===0?'var(--green)':'var(--red)'};">${r.cbDisagree.length===0?'✓ Calibrated':'✕ '+r.cbDisagree.length+' disagreement(s)'}</span>
+      </div>
+      ${['Ticket Creation','Control the Call','Ticketing Tree'].map(a => attrRow(a,'cb',r.cbDisagree)).join('')}
+    </div>
+
+    <!-- NC Detail -->
     <div class="card">
-      <div class="card-title" style="margin-bottom:4px;">⚠ Disagreements Found</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">These attributes were scored differently — discuss and align.</div>
-      ${r.disagreements.map(d => `
-        <div style="padding:10px 12px;background:rgba(240,79,79,.06);border:1px solid rgba(240,79,79,.2);border-radius:8px;margin-bottom:8px;">
-          <div style="font-size:13px;font-weight:600;margin-bottom:6px;">${d.attr}</div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            ${d.votes.map(v => `<div style="font-size:11px;padding:3px 8px;border-radius:5px;background:${v.val==='fail'?'rgba(240,79,79,.15)':'rgba(22,167,102,.15)'};color:${v.val==='fail'?'var(--red)':'var(--green)'};">${v.name}: ${v.val.toUpperCase()}</div>`).join('')}
-          </div>
-        </div>`).join('')}
-    </div>` : `<div style="padding:16px;background:rgba(22,167,102,.07);border:1px solid rgba(22,167,102,.2);border-radius:10px;text-align:center;font-size:13px;color:var(--green);font-weight:600;">✓ Perfect agreement — all evaluators scored identically on all attributes</div>`}
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="background:rgba(232,162,61,.15);color:var(--gold);font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px;font-family:var(--font-mono);">NC</span>
+        <span class="card-title" style="margin:0;">Non-Critical</span>
+        <span style="margin-left:auto;font-size:11px;font-weight:700;color:${r.ncCalibrated?'var(--green)':'var(--red)'};">${r.ncCalibrated?'✓ Calibrated (diff < 3)':'✕ Diff = '+r.ncMaxDiff+' attributes'}</span>
+      </div>
+      ${['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'].map(a => attrRow(a,'nc',r.ncDisagree)).join('')}
+    </div>
   `;
-  document.getElementById('calib-report-modal').style.display = 'flex';
+
+  const modal = document.getElementById('calib-report-modal');
+  modal.style.display = 'none';
+  void modal.offsetHeight;
+  modal.style.display = 'flex';
 }
 
 function closeCalibEval()   { document.getElementById('calib-eval-modal').style.display   = 'none'; }
