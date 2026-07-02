@@ -9632,65 +9632,38 @@ function openCalibEval(sessionId) {
     '</div>' +
     '<div style="padding:8px 10px;background:rgba(74,134,232,.08);border:1px solid rgba(74,134,232,.2);border-radius:6px;font-size:11px;color:var(--blue-l);">🔒 Blind mode — scores are hidden until all participants submit.</div>';
 
-  // Build scoring form matching the QA form style
-  const mkRow = (attr, type) => {
-    const isHold = attr === 'HOLD';
-    const failCol = type==='nc'?'var(--gold)':type==='cc'?'var(--red)':'var(--orange)';
-    const failBg  = type==='nc'?'rgba(232,162,61,.2)':type==='cc'?'rgba(240,79,79,.2)':'rgba(240,120,48,.2)';
-    const failBc  = type==='nc'?'rgba(232,162,61,.4)':type==='cc'?'rgba(240,79,79,.4)':'rgba(240,120,48,.4)';
-    const fn = type==='nc' ? `calibSetNC(this,'fail','${attr}')` : `calibSetCritical(this,'fail','${type}','${attr}')`;
-    const pn = type==='nc' ? `calibSetNC(this,'pass','${attr}')` : `calibSetCritical(this,'pass','${type}','${attr}')`;
-    const nan = `calibSetNC(this,'na','${attr}')`;
-    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;">
-      <div style="font-size:13px;font-weight:600;">${attr}</div>
-      <div style="display:flex;gap:5px;">
-        <button onclick="${fn}" data-attr="${attr}" data-type="${type}" data-val="fail"
-          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-mono);transition:all .15s;">Fail</button>
-        <button onclick="${pn}" data-attr="${attr}" data-type="${type}" data-val="pass"
-          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-mono);transition:all .15s;">Pass</button>
-        ${isHold ? `<button onclick="${nan}" data-attr="${attr}" data-type="${type}" data-val="na"
-          style="padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-mono);transition:all .15s;">N/A</button>` : ''}
-      </div>
-    </div>`;
-  };
-
-  document.getElementById('calib-eval-form').innerHTML = `
-    <!-- NC Section -->
-    <div style="background:rgba(232,162,61,.05);border:1px solid rgba(232,162,61,.2);border-radius:10px;padding:14px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-        <span style="background:rgba(232,162,61,.15);color:var(--gold);font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;font-family:var(--font-mono);">NC</span>
-        <span style="font-size:13px;font-weight:700;color:var(--gold);">Non-Critical — 30 Points</span>
-      </div>
-      ${['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'].map(a => mkRow(a,'nc')).join('')}
-    </div>
-    <!-- CC Section -->
-    <div style="background:rgba(240,79,79,.05);border:1px solid rgba(240,79,79,.2);border-radius:10px;padding:14px;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-        <span style="background:rgba(240,79,79,.15);color:var(--red);font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;font-family:var(--font-mono);">CC</span>
-        <span style="font-size:13px;font-weight:700;color:var(--red);">Critical to Customer</span>
-        <span style="font-size:11px;color:var(--muted);">— any fail = score 0</span>
-      </div>
-      ${['Customer Profile','Wrong Information','Missing Information','Ticket Escalation','Transfer Process','Professionalism','Ticket Description'].map(a => mkRow(a,'cc')).join('')}
-    </div>
-    <!-- CB Section -->
-    <div style="background:rgba(240,120,48,.05);border:1px solid rgba(240,120,48,.2);border-radius:10px;padding:14px;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-        <span style="background:rgba(240,120,48,.15);color:var(--orange);font-size:10px;font-weight:800;padding:3px 8px;border-radius:5px;font-family:var(--font-mono);">CB</span>
-        <span style="font-size:13px;font-weight:700;color:var(--orange);">Critical to Business</span>
-        <span style="font-size:11px;color:var(--muted);">— any fail = score 0</span>
-      </div>
-      ${['Ticket Creation','Control the Call','Ticketing Tree'].map(a => mkRow(a,'cb')).join('')}
-    </div>
-    <div id="calib-live-score" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;margin-bottom:16px;">
-      <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green);" id="calib-score-num">—</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Live Score Preview</div>
-    </div>
-    <button onclick="submitCalibScore(window._calibActiveSessionId)" style="width:100%;background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-b);">✓ Submit My Calibration Score</button>
-  `;
-
-  // Store sessionId globally — avoids quote issues in innerHTML onclick
-  window._calibFormData = { sessionId, nc: {}, cc: {}, cb: {} };
+  // Build form using same ERROR_STRUCTURE as QA form
+  // Reset calib-specific selected errors
+  window._calibSelectedErrors = [];
+  window._calibActiveCat = null;
   window._calibActiveSessionId = sessionId;
+
+  var calibFormHTML = [
+    '<div style="display:flex;gap:6px;margin-bottom:14px;">',
+      '<button onclick="calibShowCat(\'NC\')" id="ctab-NC" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(232,162,61,.4);background:rgba(232,162,61,.13);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;"><span class=\"si-dot si-dot-gold\"></span> NC</button>',
+      '<button onclick="calibShowCat(\'CC\')" id="ctab-CC" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(240,79,79,.4);background:rgba(240,79,79,.13);color:var(--red);font-size:12px;font-weight:700;cursor:pointer;"><span class=\"si-dot si-dot-red\"></span> CC</button>',
+      '<button onclick="calibShowCat(\'CB\')" id="ctab-CB" style="flex:1;padding:8px;border-radius:8px;border:1px solid rgba(240,120,48,.4);background:rgba(240,120,48,.13);color:var(--orange);font-size:12px;font-weight:700;cursor:pointer;"><span class=\"si-dot si-dot-orange\"></span> CB</button>',
+    '</div>',
+    '<div id="calib-cat-NC" style="display:none;"></div>' +
+    '<div id="calib-cat-CC" style="display:none;"></div>' +
+    '<div id="calib-cat-CB" style="display:none;"></div>' +
+    '<div id="calib-err-summary" style="display:none;margin-top:12px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border);">' +
+      '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Selected Errors</div>' +
+      '<div id="calib-err-tags"></div>' +
+    '</div>' +
+    '<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;margin:14px 0;">' +
+      '<div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green);" id="calib-score-num">—</div>' +
+      '<div style="font-size:11px;color:var(--muted);margin-top:4px;">Live Score Preview</div>' +
+    '</div>' +
+    '<button onclick="submitCalibScore(window._calibActiveSessionId)" style="width:100%;background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-b);">&#10003; Submit My Calibration Score</button>'
+  ].join('');
+  document.getElementById('calib-eval-form').innerHTML = calibFormHTML;
+
+  // Pre-build all panels
+  ['NC','CC','CB'].forEach(function(cat) {
+    var el = document.getElementById('calib-cat-' + cat);
+    if (el) calibBuildAttrs(cat, el);
+  });
   const modal = document.getElementById('calib-eval-modal');
   modal.style.display = 'none';
   void modal.offsetHeight;
@@ -9698,82 +9671,172 @@ function openCalibEval(sessionId) {
   modal.scrollTop = 0;
 }
 
-function calibSetNC(btn, val, attr) {
-  // Style buttons
-  const row = btn.parentElement;
-  row.querySelectorAll('button').forEach(b => { b.style.background='transparent'; b.style.color='var(--muted)'; b.style.borderColor='var(--border)'; });
-  if (val==='fail') { btn.style.background='rgba(240,79,79,.2)'; btn.style.color='var(--red)'; btn.style.borderColor='rgba(240,79,79,.4)'; }
-  else if (val==='pass') { btn.style.background='rgba(22,167,102,.2)'; btn.style.color='var(--green)'; btn.style.borderColor='rgba(22,167,102,.4)'; }
-  else { btn.style.background='rgba(232,162,61,.2)'; btn.style.color='var(--gold)'; btn.style.borderColor='rgba(232,162,61,.4)'; }
-  window._calibFormData.nc[attr] = val;
-  updateCalibLiveScore();
-}
-
-function calibSetCritical(btn, val, type, attr) {
-  const row = btn.parentElement;
-  row.querySelectorAll('button').forEach(b => { b.style.background='transparent'; b.style.color='var(--muted)'; b.style.borderColor='var(--border)'; });
-  const col = type==='cc'?'var(--red)':'var(--orange)';
-  const bg  = type==='cc'?'rgba(240,79,79,.2)':'rgba(240,120,48,.2)';
-  const bc  = type==='cc'?'rgba(240,79,79,.4)':'rgba(240,120,48,.4)';
-  if (val==='fail') { btn.style.background=bg; btn.style.color=col; btn.style.borderColor=bc; }
-  else { btn.style.background='rgba(22,167,102,.2)'; btn.style.color='var(--green)'; btn.style.borderColor='rgba(22,167,102,.4)'; }
-  window._calibFormData[type][attr] = val;
-  updateCalibLiveScore();
-}
-
-function updateCalibLiveScore() {
-  const fd = window._calibFormData;
-  if (!fd) return;
-  const ncAttrs = ['Call Opening / Closure','Choice of Words','Tone of Voice','Showing Empathy','Active Listening','HOLD'];
-  let ncFails = 0, ncTotal = 30;
-  ncAttrs.forEach(a => {
-    if (fd.nc[a] === 'fail') ncFails++;
-    if (fd.nc[a] === 'na')   ncTotal -= 6;
-  });
-  const ncScore = Math.max(0, ncTotal - (ncFails * (ncTotal/6)));
-  const hasCC = Object.values(fd.cc).some(v => v === 'fail');
-  const hasCB = Object.values(fd.cb).some(v => v === 'fail');
-  const total = (hasCC || hasCB) ? ncScore : (ncScore + 70);
-  const pct = Math.min(100, (total / 100) * 100);
-  const scoreEl = document.getElementById('calib-score-num');
-  if (scoreEl) {
-    scoreEl.textContent = pct.toFixed(1) + '%';
-    scoreEl.style.color = pct >= 90 ? 'var(--green)' : pct >= 80 ? 'var(--gold)' : 'var(--red)';
+// ── Calibration form functions — mirror QA form using ERROR_STRUCTURE ──
+function calibShowCat(cat) {
+  if (window._calibActiveCat === cat) {
+    document.getElementById('calib-cat-' + cat).style.display = 'none';
+    window._calibActiveCat = null;
+    return;
   }
-  window._calibFormData._score = pct;
-  window._calibFormData._hasCC = hasCC;
-  window._calibFormData._hasCB = hasCB;
+  ['NC','CC','CB'].forEach(function(c) {
+    var el = document.getElementById('calib-cat-' + c);
+    if (el) el.style.display = 'none';
+  });
+  window._calibActiveCat = cat;
+  var panel = document.getElementById('calib-cat-' + cat);
+  if (panel) panel.style.display = 'block';
+}
+
+function calibBuildAttrs(cat, container) {
+  var catData = ERROR_STRUCTURE[cat];
+  if (!catData) return;
+  container.innerHTML = '';
+  catData.attributes.forEach(function(attr, i) {
+    var wrap = document.createElement('div');
+    wrap.style.marginBottom = '4px';
+    var header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;';
+    header.onclick = function() { calibToggleAttr(cat, i); };
+    var dot = document.createElement('div');
+    dot.style.cssText = 'width:8px;height:8px;border-radius:2px;flex-shrink:0;background:' + attr.color + ';';
+    var name = document.createElement('div');
+    name.style.cssText = 'font-size:12px;font-weight:600;flex:1;';
+    name.textContent = attr.name;
+    var cnt = document.createElement('div');
+    cnt.style.cssText = 'font-size:10px;color:var(--muted);';
+    cnt.textContent = attr.subs.length + ' items';
+    var arrow = document.createElement('div');
+    arrow.id = 'calib-arrow-' + cat + '-' + i;
+    arrow.style.cssText = 'font-size:10px;color:var(--muted);';
+    arrow.textContent = '▼';
+    header.appendChild(dot);
+    header.appendChild(name);
+    header.appendChild(cnt);
+    header.appendChild(arrow);
+    var subPanel = document.createElement('div');
+    subPanel.id = 'calib-subs-' + cat + '-' + i;
+    subPanel.style.cssText = 'display:none;padding:4px 0 4px 12px;border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;';
+    attr.subs.forEach(function(sub) {
+      subPanel.appendChild(calibBuildSubRow(sub, cat, catData.type, attr.name, false));
+    });
+    if (attr.naOption) {
+      var naRow = calibBuildSubRow(attr.naOption, cat, catData.type, attr.name, true);
+      var naCb = naRow.querySelector('input');
+      if (naCb) {
+        naCb.checked = true;
+        window._calibSelectedErrors.push({cat:cat, type:catData.type, attrName:attr.name, subError:attr.naOption, isNA:true});
+      }
+      subPanel.appendChild(naRow);
+    }
+    wrap.appendChild(header);
+    wrap.appendChild(subPanel);
+    container.appendChild(wrap);
+  });
+}
+
+function calibBuildSubRow(sub, cat, type, attrName, isNA) {
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 8px;cursor:pointer;border-bottom:1px solid var(--border);';
+  if (isNA) row.style.background = 'rgba(240,180,41,0.06)';
+  var cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.style.cssText = 'accent-color:var(--purple);width:14px;height:14px;cursor:pointer;flex-shrink:0;';
+  cb.dataset.cat = cat;
+  cb.dataset.type = type;
+  cb.dataset.attr = attrName;
+  if (isNA) cb.dataset.isna = 'true';
+  var lbl = document.createElement('label');
+  lbl.style.cssText = 'font-size:12px;color:' + (isNA?'var(--gold)':'#ccc') + ';cursor:pointer;flex:1;';
+  lbl.textContent = (isNA ? '⭕ ' : '') + sub;
+  row.addEventListener('click', function(e) {
+    if (e.target !== cb) cb.checked = !cb.checked;
+    calibOnSubChange(cb, sub);
+  });
+  row.appendChild(cb);
+  row.appendChild(lbl);
+  return row;
+}
+
+function calibToggleAttr(cat, idx) {
+  var el = document.getElementById('calib-subs-' + cat + '-' + idx);
+  var arr = document.getElementById('calib-arrow-' + cat + '-' + idx);
+  if (!el) return;
+  var open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if (arr) arr.textContent = open ? '▼' : '▲';
+}
+
+function calibOnSubChange(cb, sub) {
+  var cat = cb.dataset.cat, type = cb.dataset.type, attr = cb.dataset.attr, isNA = cb.dataset.isna === 'true';
+  if (!window._calibSelectedErrors) window._calibSelectedErrors = [];
+  if (cb.checked) {
+    if (!window._calibSelectedErrors.some(function(e){ return e.subError === sub; })) {
+      window._calibSelectedErrors.push({cat:cat, type:type, attrName:attr, subError:sub, isNA:isNA});
+    }
+  } else {
+    window._calibSelectedErrors = window._calibSelectedErrors.filter(function(e){ return e.subError !== sub; });
+  }
+  calibUpdateSummary();
+  calibLiveScore();
+}
+
+function calibUpdateSummary() {
+  var summary = document.getElementById('calib-err-summary');
+  var tags = document.getElementById('calib-err-tags');
+  if (!summary || !tags) return;
+  var errors = (window._calibSelectedErrors||[]).filter(function(e){ return !e.isNA; });
+  if (!errors.length) { summary.style.display = 'none'; return; }
+  summary.style.display = 'block';
+  tags.innerHTML = errors.map(function(e) {
+    var col = e.type==='nc'?'var(--gold)':e.type==='cc'?'var(--red)':'var(--orange)';
+    return '<span style="display:inline-flex;align-items:center;gap:6px;background:'+col+'22;color:'+col+';border:1px solid '+col+'44;border-radius:10px;padding:3px 10px;font-size:11px;margin:3px;"><b>'+e.type.toUpperCase()+'</b> · '+e.subError+'</span>';
+  }).join('');
+}
+
+function calibLiveScore() {
+  var errors = window._calibSelectedErrors || [];
+  var hasCC = errors.some(function(e){ return e.type==='cc' && !e.isNA; });
+  var hasCB = errors.some(function(e){ return e.type==='cb' && !e.isNA; });
+  var ncErrors = errors.filter(function(e){ return e.type==='nc' && !e.isNA; });
+  var holdNA = errors.some(function(e){ return e.isNA; });
+  var ncMax = holdNA ? 24 : 30;
+  var ncPtsEach = ncMax / 6;
+  var ncScore = Math.max(0, ncMax - (ncErrors.length * ncPtsEach));
+  var total = (hasCC || hasCB) ? ncScore : ncScore + 70;
+  var pct = Math.min(100, total);
+  var el = document.getElementById('calib-score-num');
+  if (el) {
+    el.textContent = pct.toFixed(1) + '%';
+    el.style.color = pct >= 90 ? 'var(--green)' : pct >= 80 ? 'var(--gold)' : 'var(--red)';
+  }
+  window._calibLiveScore = { pct, hasCC, hasCB, errors };
 }
 
 function submitCalibScore(sessionId) {
   const sid = sessionId || window._calibActiveSessionId;
-  if (!sid) { showToast('Session not found','warn'); return; }
-  const fd = window._calibFormData;
-  if (!fd) { showToast('Please open the evaluation form first','warn'); return; }
-  sessionId = sid; // normalize
-  if (Object.keys(fd.nc).length < 5) { showToast('Please evaluate all NC attributes — mark each as Fail or Pass','warn'); return; }
+  if (!sid) { showToast('Session not found — please reopen the form','warn'); return; }
+
+  // Calculate score at submit time
+  calibLiveScore();
+  const scoreData = window._calibLiveScore || { pct: 0, hasCC: false, hasCB: false, errors: [] };
+  const errors = (window._calibSelectedErrors || []).filter(e => !e.isNA);
 
   loadCalibSessions();
-  const s = _calibSessions.find(s => s.id === sessionId);
-  if (!s) return;
-  const p = s.participants.find(p => p.name === _currentUser?.name);
+  const s = _calibSessions.find(s => s.id === sid);
+  if (!s) { showToast('Session not found in storage','warn'); return; }
+  const p = s.participants.find(p => p.name === (_currentUser?.name || ''));
   if (!p) { showToast('You are not a participant in this session','warn'); return; }
   if (p.submitted) {
-    showToast('You have already submitted your calibration score for this session','warn');
+    showToast('You have already submitted your score for this session','warn');
     closeCalibEval();
     return;
   }
 
-  const errors = [];
-  Object.entries(fd.nc).forEach(([attr, val]) => { if (val === 'fail') errors.push({t:'nc', attr}); });
-  Object.entries(fd.cc).forEach(([attr, val]) => { if (val === 'fail') errors.push({t:'cc', attr}); });
-  Object.entries(fd.cb).forEach(([attr, val]) => { if (val === 'fail') errors.push({t:'cb', attr}); });
-
   p.submitted = true;
-  p.score = fd._score || 0;
-  p.hasCC = fd._hasCC;
-  p.hasCB = fd._hasCB;
-  p.errors = errors;
+  p.score = scoreData.pct;
+  p.hasCC = scoreData.hasCC;
+  p.hasCB = scoreData.hasCB;
+  p.errors = errors.map(e => ({ t: e.type, attr: e.attrName, v: e.subError }));
   p.submittedAt = new Date().toISOString();
 
   // Check if all submitted
