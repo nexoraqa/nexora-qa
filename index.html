@@ -9177,6 +9177,10 @@ function loadFromGoogleSheets() {
           try { updateHomeKPIs(); } catch(e) {}
           try { updateNavBadges(); } catch(e) {}
           try { updateCalibBadge(); } catch(e) {}
+          try {
+            // Force badge refresh after data loads
+            setTimeout(() => { try { updateCalibBadge(); } catch(e) {} }, 1000);
+          } catch(e) {}
         }, 500);
         console.log(`✅ Loaded ${added} new evals from Google Sheets`);
       }
@@ -9681,15 +9685,17 @@ function openCalibEval(sessionId) {
       <div style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--green);" id="calib-score-num">—</div>
       <div style="font-size:11px;color:var(--muted);margin-top:4px;">Live Score Preview</div>
     </div>
-    <button onclick="submitCalibScore('${sessionId}')" style="width:100%;background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Submit My Calibration Score</button>
+    <button onclick="submitCalibScore(window._calibActiveSessionId)" style="width:100%;background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font-b);">✓ Submit My Calibration Score</button>
   `;
 
-  // Track selections
+  // Store sessionId globally — avoids quote issues in innerHTML onclick
   window._calibFormData = { sessionId, nc: {}, cc: {}, cb: {} };
+  window._calibActiveSessionId = sessionId;
   const modal = document.getElementById('calib-eval-modal');
   modal.style.display = 'none';
-  void modal.offsetHeight; // force reflow
+  void modal.offsetHeight;
   modal.style.display = 'flex';
+  modal.scrollTop = 0;
 }
 
 function calibSetNC(btn, val, attr) {
@@ -9740,9 +9746,12 @@ function updateCalibLiveScore() {
 }
 
 function submitCalibScore(sessionId) {
+  const sid = sessionId || window._calibActiveSessionId;
+  if (!sid) { showToast('Session not found','warn'); return; }
   const fd = window._calibFormData;
-  if (!fd) return;
-  if (Object.keys(fd.nc).length < 5) { showToast('Please evaluate all NC attributes','warn'); return; }
+  if (!fd) { showToast('Please open the evaluation form first','warn'); return; }
+  sessionId = sid; // normalize
+  if (Object.keys(fd.nc).length < 5) { showToast('Please evaluate all NC attributes — mark each as Fail or Pass','warn'); return; }
 
   loadCalibSessions();
   const s = _calibSessions.find(s => s.id === sessionId);
@@ -9946,12 +9955,10 @@ function updateCalibBadge() {
     // Manager: any active sessions (they should review)
     pending = _calibSessions.filter(s => s.status === 'active').length;
   }
-  const lastSeen = parseInt(localStorage.getItem('nexora_calib_last_seen_' + name) || '0');
   const badge = document.getElementById('calib-nav-badge');
   if (badge) {
-    const newCount = Math.max(0, pending - lastSeen);
-    badge.textContent = newCount;
-    badge.style.display = newCount > 0 ? 'inline' : 'none';
+    badge.textContent = pending;
+    badge.style.display = pending > 0 ? 'inline' : 'none';
   }
 }
 
