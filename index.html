@@ -8646,6 +8646,8 @@ function applyRoleAccess(user) {
   // Calibration nav — Manager, QA and TL
   const navCalib = document.getElementById('nav-calibration');
   if (navCalib) navCalib.style.display = (isManager || isQA || isTL) ? 'flex' : 'none';
+  // Update calibration badge on login
+  setTimeout(function(){ try { updateCalibBadge(); } catch(e) {} }, 800);
 
   // Operation Form nav — TL only
   const navOp = document.getElementById('nav-operation');
@@ -9507,13 +9509,11 @@ function createCalibSession() {
   const checkedBoxes = document.querySelectorAll('#calib-tl-checkboxes input[type=checkbox]:checked');
   const selectedTLs = [...checkedBoxes].map(cb => cb.value).filter(Boolean);
 
-  if (!agent)              { showToast('Please select an agent','warn'); return; }
   if (!caseN)              { showToast('Please enter a case number','warn'); return; }
-  if (!selectedTLs.length) { showToast('Please select at least one Team Lead','warn'); return; }
 
-  // Block duplicate case number — show popup
+  // Block duplicate case number FIRST — show popup before anything else
+  loadCalibSessions();
   if (caseN) {
-    loadCalibSessions();
     const duplicate = _calibSessions.find(s => s.caseNumber && s.caseNumber.trim().toLowerCase() === caseN.trim().toLowerCase());
     if (duplicate) {
       const dupPopHTML = '<div id="calib-dup-popup" style="position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;">' +
@@ -9527,6 +9527,9 @@ function createCalibSession() {
       return;
     }
   }
+
+  if (!agent)              { showToast('Please select an agent','warn'); return; }
+  if (!selectedTLs.length) { showToast('Please select at least one Team Lead','warn'); return; }
 
   const session = {
     id: caseN ? 'CALIB-' + caseN : 'CALIB-' + Date.now(),
@@ -9568,7 +9571,7 @@ function renderCalibActive() {
   loadCalibSessions();
   const el = document.getElementById('calib-active-list');
   if (!el) return;
-  const active = _calibSessions.filter(s => s.status === 'active' || s.status === 'complete');
+  const active = _calibSessions.filter(s => s.status === 'active');
   const managerControls = _currentUser?.role === 'manager' && active.length > 0
     ? `<div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
         <button onclick="clearAllCalibSessions()" style="background:none;border:1px solid var(--border);color:var(--red);border-radius:var(--radius-s);padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">🗑 Clear All Sessions</button>
@@ -9828,9 +9831,10 @@ function calibUpdateSummary() {
 
 function calibLiveScore() {
   var errors = window._calibSelectedErrors || [];
-  var hasCC = errors.some(function(e){ return e.type==='cc' && !e.isNA; });
-  var hasCB = errors.some(function(e){ return e.type==='cb' && !e.isNA; });
-  var ncErrors = errors.filter(function(e){ return e.type==='nc' && !e.isNA; });
+  // errors use e.type (from calibBuildSubRow dataset.type)
+  var hasCC = errors.some(function(e){ return (e.type==='cc'||e.t==='cc') && !e.isNA; });
+  var hasCB = errors.some(function(e){ return (e.type==='cb'||e.t==='cb') && !e.isNA; });
+  var ncErrors = errors.filter(function(e){ return (e.type==='nc'||e.t==='nc') && !e.isNA; });
   var holdNA = errors.some(function(e){ return e.isNA; });
   var ncMax = holdNA ? 24 : 30;
   var ncPtsEach = ncMax / 6;
@@ -9895,7 +9899,13 @@ function submitCalibScore(sessionId) {
   </div>`;
   document.body.insertAdjacentHTML('beforeend', confirmHTML);
   renderCalibActive();
-  if (allDone) setTimeout(() => { document.getElementById('calib-confirm-popup')?.remove(); openCalibReport(sessionId); }, 2000);
+  if (allDone) {
+    setTimeout(() => {
+      document.getElementById('calib-confirm-popup')?.remove();
+      switchCalibTab('history');
+      openCalibReport(sid);
+    }, 2000);
+  }
 }
 
 function buildCalibReport(s) {
@@ -9991,7 +10001,7 @@ function openCalibReport(sessionId) {
       '</div>';
 
     return '<div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:8px;">' +
-      '<div onclick="calibToggleParticipant(\"' + expandId + '\")" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;background:var(--card);">' +
+      '<div onclick="calibToggleParticipant(\'' + expandId + '\')" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;background:var(--card);">' +
         '<div>' +
           '<div style="font-size:13px;font-weight:700;">' + p.name + ' <span style="font-size:10px;color:var(--muted);background:var(--bg);padding:1px 6px;border-radius:4px;">' + p.role.toUpperCase() + '</span></div>' +
           '<div style="font-size:11px;color:var(--muted);margin-top:3px;">Tap to see full evaluation</div>' +
