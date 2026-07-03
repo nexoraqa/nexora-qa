@@ -1253,10 +1253,16 @@ a { color:var(--purple-l); text-decoration:none; }
 
     <!-- TL Operations Tab Content -->
     <div id="hist-tab-operation" style="display:none;">
+      <!-- Bulk delete bar -->
+
+
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
           <div class="card-title" style="margin-bottom:0;">TL Operation Evaluations</div>
-          <div style="font-size:12px;color:var(--muted);" id="hist-op-count">0 evaluations</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="font-size:12px;color:var(--muted);" id="hist-op-count">0 evaluations</div>
+            <button id="btn-op-bulk-delete" onclick="opBulkDelete()" style="display:none;background:#f04f4f22;border:1px solid #f04f4f66;color:var(--red);border-radius:var(--radius-s);padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">🗑 Delete Selected</button>
+          </div>
         </div>
         <!-- TL filter for operation -->
         <div style="margin-bottom:14px;">
@@ -3613,6 +3619,23 @@ function goToReview() {
     if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
     return;
   }
+
+  // FIX 9: Block same case number with different agent
+  const caseNum = document.getElementById('c-case')?.value?.trim() || '';
+  const agentVal = document.getElementById('c-agent')?.value || '';
+  if (caseNum) {
+    const conflict = _evalHistory.find(e =>
+      e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.toLowerCase() &&
+      e.agent !== agentVal
+    );
+    if (conflict) {
+      showValidationToast(`Case ${caseNum} already used for agent: ${conflict.agent}`);
+      const caseEl = document.getElementById('field-case') || document.getElementById('c-case');
+      if (caseEl) { caseEl.scrollIntoView({ behavior:'smooth', block:'center' }); }
+      return;
+    }
+  }
+
   _eval = computeScore();
   const d = _eval;
   document.getElementById('rev-agent').textContent = d.agent;
@@ -5954,12 +5977,13 @@ function renderOperationReport() {
     return;
   }
   el.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:0;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+    <div style="display:grid;grid-template-columns:1fr auto auto auto auto auto;gap:0;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
       <div>Agent</div>
       <div style="text-align:right;padding-right:16px;">TL</div>
       <div style="text-align:right;padding-right:16px;">Project</div>
       <div style="text-align:right;padding-right:16px;">Date</div>
-      <div style="text-align:right;">Score</div>
+      <div style="text-align:right;padding-right:12px;">Score</div>
+      <div></div>
     </div>
     ${data.sort((a,b) => new Date(b.date) - new Date(a.date)).map(r => {
       const col = r.overall>=90?'var(--green)':r.overall>=80?'var(--gold)':'var(--red)';
@@ -6642,51 +6666,77 @@ function setHistMainTab(tab) {
   if (tab === 'qa') renderHistory();
 }
 
-function closeOpDelConfirm() {
-  var el = document.getElementById('op-del-confirm');
-  if (el) el.remove();
+function opToggleAll(checked) {
+  document.querySelectorAll('.op-row-cb').forEach(cb => cb.checked = checked);
+  opUpdateBulkBtn();
 }
 
-function deleteOperationEval(id) {
-  const op = (window._operationHistory||[]).find(r => r.id === id);
-  const label = op ? (op.agent + ' · ' + (op.date||'')) : id;
+function opUpdateBulkBtn() {
+  const selected = document.querySelectorAll('.op-row-cb:checked').length;
+  const total = document.querySelectorAll('.op-row-cb').length;
+  const btn = document.getElementById('btn-op-bulk-delete');
+  if (btn) {
+    btn.textContent = '🗑 Delete Selected (' + selected + ')';
+    btn.style.display = selected > 0 ? 'inline-flex' : 'none';
+  }
+  // Update select-all checkbox state
+  const master = document.getElementById('op-select-all');
+  if (master) {
+    master.checked = selected === total && total > 0;
+    master.indeterminate = selected > 0 && selected < total;
+  }
+}
+
+function opBulkDelete() {
+  const selected = [...document.querySelectorAll('.op-row-cb:checked')].map(cb => cb.dataset.id);
+  if (!selected.length) { showCalibAlert('⚠️','Nothing Selected','Please check at least one evaluation to delete.','var(--gold)'); return; }
   var div = document.createElement('div');
-  div.id = 'op-del-confirm';
+  div.id = 'op-bulk-confirm';
   div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;display:flex;align-items:center;justify-content:center;';
   div.innerHTML =
     '<div style="background:var(--card);border:1px solid rgba(240,79,79,.3);border-radius:var(--radius);padding:28px;text-align:center;max-width:320px;margin:16px;box-shadow:0 24px 60px #000a;">' +
       '<div style="font-size:36px;margin-bottom:12px;">🗑</div>' +
-      '<div style="font-family:var(--font-h);font-size:16px;font-weight:800;margin-bottom:8px;">Delete Operation Eval?</div>' +
-      '<div style="font-size:13px;color:var(--muted);margin-bottom:22px;"><b style="color:var(--text);">' + label + '</b> will be permanently removed.</div>' +
+      '<div style="font-family:var(--font-h);font-size:16px;font-weight:800;margin-bottom:8px;">Delete ' + selected.length + ' Evaluation' + (selected.length>1?'s':'') + '?</div>' +
+      '<div style="font-size:13px;color:var(--muted);margin-bottom:22px;">This cannot be undone.</div>' +
       '<div style="display:flex;gap:10px;justify-content:center;">' +
-        '<button onclick="closeOpDelConfirm()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Cancel</button>' +
-        '<button data-delid="' + id + '" onclick="confirmDeleteOpEval(this.dataset.delid)" style="flex:1;background:var(--red);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Delete</button>' +
+        '<button onclick="closeOpBulkConfirm()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Cancel</button>' +
+        '<button data-ids="' + selected.join(',') + '" onclick="confirmOpBulkDelete(this.dataset.ids)" style="flex:1;background:var(--red);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Delete</button>' +
       '</div>' +
     '</div>';
   document.body.appendChild(div);
 }
 
-function confirmDeleteOpEval(id) {
-  document.getElementById('op-del-confirm')?.remove();
-  // Remove from localStorage
-  window._operationHistory = (window._operationHistory||[]).filter(r => r.id !== id);
+function confirmOpBulkDelete(idsStr) {
+  var el = document.getElementById('op-bulk-confirm');
+  if (el) el.remove();
+  const ids = idsStr.split(',');
+  window._operationHistory = (window._operationHistory||[]).filter(r => !ids.includes(String(r.id)));
   try { localStorage.setItem('nexora_op_history', JSON.stringify(window._operationHistory)); } catch(e) {}
-  // Soft delete in Google Sheets
-  try {
-    fetch(GOOGLE_SHEET_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action:'delete_operation', id: String(id) })
-    }).catch(()=>{});
-  } catch(e) {}
+  // Soft delete each in Sheets
+  ids.forEach(id => {
+    try {
+      fetch(GOOGLE_SHEET_URL, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'delete_operation', id: String(id) })
+      }).catch(()=>{});
+    } catch(e) {}
+  });
   renderOperationHistory();
-  // Success toast
   const toast = document.createElement('div');
   toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--green);border-radius:20px;padding:12px 24px;display:flex;align-items:center;gap:10px;z-index:9999;box-shadow:0 8px 32px #000a;';
-  toast.innerHTML = '<span style="font-size:18px;">✅</span><span style="font-size:13px;font-weight:700;color:var(--green);">Operation eval deleted</span>';
+  toast.innerHTML = '<span style="font-size:18px;">✅</span><span style="font-size:13px;font-weight:700;color:var(--green);">' + ids.length + ' evaluation' + (ids.length>1?'s':'') + ' deleted</span>';
   document.body.appendChild(toast);
   setTimeout(function(){ toast.remove(); }, 2500);
 }
+
+function closeOpBulkConfirm() { var el=document.getElementById("op-bulk-confirm"); if(el)el.remove(); }
+
+function closeOpDelConfirm() {
+  var el = document.getElementById('op-del-confirm');
+  if (el) el.remove();
+}
+
+
 
 function renderOperationHistory() {
   try { window._operationHistory = JSON.parse(localStorage.getItem('nexora_op_history')||'[]'); } catch(e) {}
@@ -6721,8 +6771,14 @@ function renderOperationHistory() {
     return;
   }
 
+  // Show/hide bulk delete button
+  const bulkBtn = document.getElementById('btn-op-bulk-delete');
+  if (bulkBtn) bulkBtn.style.display = role==='manager' ? 'inline-flex' : 'none';
+
+  const cbCol = role==='manager' ? '28px ' : '';
   listEl.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr auto auto auto auto;gap:0;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+    <div style="display:grid;grid-template-columns:${cbCol}1fr auto auto auto auto;gap:0;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
+      ${role==='manager' ? '<div><input type="checkbox" id="op-select-all" onchange="opToggleAll(this.checked)" style="accent-color:var(--red);width:14px;height:14px;cursor:pointer;"></div>' : ''}
       <div>Agent</div>
       <div style="text-align:right;padding-right:16px;">TL</div>
       <div style="text-align:right;padding-right:16px;">Project</div>
@@ -6732,20 +6788,18 @@ function renderOperationHistory() {
     ${items.sort((a,b) => new Date(b.date) - new Date(a.date)).map(r => {
       const col = r.overall>=90?'var(--green)':r.overall>=80?'var(--gold)':'var(--red)';
       const status = r.overall>=90?iconCheck()+' Pass':r.overall>=80?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Fail';
-      return `<div style="display:grid;grid-template-columns:1fr auto auto auto auto auto;gap:0;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;">
+      return `<div style="display:grid;grid-template-columns:${cbCol}1fr auto auto auto auto;gap:0;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;">
+        ${role==='manager' ? `<div><input type="checkbox" class="op-row-cb" data-id="${r.id}" onchange="opUpdateBulkBtn()" style="accent-color:var(--red);width:14px;height:14px;cursor:pointer;"></div>` : ''}
         <div>
           <div style="font-size:13px;font-weight:600;">${r.agent}</div>
           <div style="font-size:10px;color:var(--muted);margin-top:2px;">${r.lang||''} · ${r.country||''}</div>
         </div>
         <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.tl||'—'}</div>
         <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.proj||'—'}</div>
-        <div style="text-align:right;padding-right:16px;font-size:11px;color:var(--muted);">${r.date||'—'}</div>
-        <div style="text-align:right;padding-right:12px;">
+        <div style="text-align:right;padding-right:16px;font-size:11px;color:var(--muted);">${fmtDate(r.date)||'—'}</div>
+        <div style="text-align:right;">
           <div style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:${col};">${Number(r.overall).toFixed(1)}%</div>
           <div style="font-size:10px;color:${col};margin-top:2px;">${status}</div>
-        </div>
-        <div style="text-align:right;">
-          ${role==='manager' ? `<button onclick="deleteOperationEval('${r.id}')" style="background:none;border:1px solid var(--border);color:var(--red);border-radius:var(--radius-s);padding:4px 8px;font-size:11px;cursor:pointer;" title="Delete">🗑</button>` : ''}
         </div>
       </div>`;
     }).join('')}`;
@@ -6820,6 +6874,9 @@ function renderCoaching() {
 
   const list = document.getElementById('coaching-list');
   if (!list) return;
+
+  // Sort newest to oldest
+  items = items.sort((a,b) => new Date(b.date||b.createdAt||0) - new Date(a.date||a.createdAt||0));
 
   if (!items.length) {
     list.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--muted);">
@@ -8706,8 +8763,15 @@ function applyRoleAccess(user) {
   // Calibration nav — Manager, QA and TL
   const navCalib = document.getElementById('nav-calibration');
   if (navCalib) navCalib.style.display = (isManager || isQA || isTL) ? 'flex' : 'none';
-  // Update calibration badge on login
-  setTimeout(function(){ try { updateCalibBadge(); } catch(e) {} }, 800);
+  // Update badges immediately on login
+  setTimeout(function(){
+    try { updateCalibBadge(); } catch(e) {}
+    try { updateCoachingBadge(); } catch(e) {}
+  }, 300);
+  setTimeout(function(){
+    try { updateCalibBadge(); } catch(e) {}
+    try { updateCoachingBadge(); } catch(e) {}
+  }, 1500);
 
   // Operation Form nav — TL only
   const navOp = document.getElementById('nav-operation');
@@ -9974,14 +10038,7 @@ function submitCalibScore(sessionId) {
     return;
   }
 
-  // Warn if no categories opened at all — scroll to NC tab
-  const hasAnyInput = (window._calibSelectedErrors||[]).length > 0 || window._calibActiveCat;
-  if (!hasAnyInput) {
-    const tabRow = document.querySelector('#calib-eval-form div');
-    if (tabRow) { tabRow.style.border = '2px solid var(--red)'; tabRow.style.borderRadius = '8px'; tabRow.scrollIntoView({ behavior:'smooth', block:'center' }); }
-    showCalibAlert('⚠️', 'Form Not Completed', 'Please open at least one category (NC, CC or CB) and review the attributes before submitting.', 'var(--gold)');
-    return;
-  }
+  // 100% score is valid — no errors needed
 
   p.submitted = true;
   p.score = scoreData.pct;
