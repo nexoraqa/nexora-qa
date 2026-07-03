@@ -4423,8 +4423,15 @@ const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzBgm42c30Sbk7
 // ── Date/Time display helpers ──────────────────────────────
 function fmtDate(raw) {
   if (!raw) return '—';
-  // Already clean format like "27 June 2026"
+  // Already clean format like "27 June 2026" or "27 Jun 2026"
   if (/^\d{1,2} [A-Z][a-z]+ \d{4}$/.test(raw)) return raw;
+  // Excel serial date from Sheets (1899-12-30) — extract time only
+  if (typeof raw === 'string' && raw.includes('1899-12-30')) {
+    try {
+      const d = new Date(raw);
+      return d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+    } catch(e) { return '—'; }
+  }
   try {
     const d = new Date(raw);
     if (isNaN(d.getTime())) return raw;
@@ -4911,6 +4918,15 @@ function confirmDelete() {
   try { renderRadar(); } catch(e) {}
   try { buildIntelligence(); } catch(e) {}
   try { renderDashboard(); } catch(e) {}
+  // Update today's eval count immediately
+  try {
+    const todayStr = new Date().toLocaleDateString('en-GB');
+    const todayCount = _evalHistory.filter(e => {
+      try { return new Date(e.date).toLocaleDateString('en-GB') === todayStr || String(e.date||'').includes(todayStr); } catch(x) { return false; }
+    }).length;
+    const el = document.getElementById('today-evals');
+    if (el) el.textContent = todayCount;
+  } catch(e) {}
   try { if(document.getElementById('page-monitor').classList.contains('active')) renderMonitor(); } catch(e) {}
 }
 
@@ -6780,34 +6796,48 @@ function renderOperationHistory() {
   const bulkBtn = document.getElementById('btn-op-bulk-delete');
   if (bulkBtn) bulkBtn.style.display = role==='manager' ? 'inline-flex' : 'none';
 
-  const cbCol = role==='manager' ? '28px ' : '';
-  listEl.innerHTML = `
-    <div style="display:grid;grid-template-columns:${cbCol}1fr auto auto auto auto;gap:0;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:0 0 8px;border-bottom:1px solid var(--border);margin-bottom:4px;">
-      ${role==='manager' ? '<div><input type="checkbox" id="op-select-all" onchange="opToggleAll(this.checked)" style="accent-color:var(--red);width:14px;height:14px;cursor:pointer;"></div>' : ''}
-      <div>Agent</div>
-      <div style="text-align:right;padding-right:16px;">TL</div>
-      <div style="text-align:right;padding-right:16px;">Project</div>
-      <div style="text-align:right;padding-right:16px;">Date</div>
-      <div style="text-align:right;">Score</div>
-    </div>
-    ${items.sort((a,b) => new Date(b.date) - new Date(a.date)).map(r => {
-      const col = r.overall>=90?'var(--green)':r.overall>=80?'var(--gold)':'var(--red)';
-      const status = r.overall>=90?iconCheck()+' Pass':r.overall>=80?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Fail';
-      return `<div style="display:grid;grid-template-columns:${cbCol}1fr auto auto auto auto;gap:0;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;">
-        ${role==='manager' ? `<div><input type="checkbox" class="op-row-cb" data-id="${r.id}" onchange="opUpdateBulkBtn()" style="accent-color:var(--red);width:14px;height:14px;cursor:pointer;"></div>` : ''}
-        <div>
-          <div style="font-size:13px;font-weight:600;">${r.agent}</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${r.lang||''} · ${r.country||''}</div>
-        </div>
-        <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.tl||'—'}</div>
-        <div style="text-align:right;padding-right:16px;font-size:12px;color:var(--muted);">${r.proj||'—'}</div>
-        <div style="text-align:right;padding-right:16px;font-size:11px;color:var(--muted);">${fmtDate(r.date)||'—'}</div>
-        <div style="text-align:right;">
-          <div style="font-family:var(--font-mono);font-size:14px;font-weight:800;color:${col};">${Number(r.overall).toFixed(1)}%</div>
-          <div style="font-size:10px;color:${col};margin-top:2px;">${status}</div>
-        </div>
-      </div>`;
-    }).join('')}`;
+  // Build as table matching QA eval history style
+  const sorted = items.sort((a,b) => new Date(b.date) - new Date(a.date));
+  const cbCheck = role==='manager' ? '<th style="width:28px;"><input type="checkbox" id="op-select-all" onchange="opToggleAll(this.checked)" style="accent-color:var(--red);width:14px;height:14px;cursor:pointer;"></th>' : '';
+  listEl.innerHTML = `<table style="width:100%;border-collapse:collapse;">
+    <thead><tr style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);">
+      ${cbCheck}
+      <th style="padding:8px 0;text-align:left;">#</th>
+      <th style="padding:8px 0;text-align:left;">Agent</th>
+      <th style="padding:8px 4px;text-align:left;">TL</th>
+      <th style="padding:8px 4px;text-align:left;">Project</th>
+      <th style="padding:8px 4px;text-align:right;">Overall</th>
+      <th style="padding:8px 4px;text-align:right;">NC</th>
+      <th style="padding:8px 4px;text-align:center;">CC</th>
+      <th style="padding:8px 4px;text-align:center;">CB</th>
+      <th style="padding:8px 4px;text-align:left;">Status</th>
+      <th style="padding:8px 0;text-align:right;">Date</th>
+    </tr></thead>
+    <tbody>${sorted.map((r, i) => {
+      const col = Number(r.overall)>=90?'var(--green)':Number(r.overall)>=80?'var(--gold)':'var(--red)';
+      const status = Number(r.overall)>=90?'<span class="tag tag-top">'+iconCheck()+' Pass</span>':Number(r.overall)>=80?'<span class="tag tag-risk"><span class="si-dot si-dot-gold"></span> At Risk</span>':'<span class="tag tag-critical">'+iconCross()+' Critical</span>';
+      const ncScore = r.nc_score ? Number(r.nc_score).toFixed(1)+'/30' : '—';
+      const ccOk = r.cc === 'Yes' || r.cc === true;
+      const cbOk = r.cb === 'Yes' || r.cb === true;
+      const cbInput = role==='manager' ? `<td><input type="checkbox" class="op-row-cb" data-id="${r.id}" onchange="opUpdateBulkBtn()" style="accent-color:var(--red);width:14px;height:14px;cursor:pointer;"></td>` : '';
+      return `<tr style="border-bottom:1px solid var(--border);">
+        ${cbInput}
+        <td style="padding:10px 0;color:var(--muted);font-weight:700;font-size:12px;">${sorted.length - i}</td>
+        <td style="padding:10px 4px 10px 0;">
+          <div style="font-size:13px;font-weight:600;">${r.agent||'—'}</div>
+          <div style="font-size:10px;color:var(--muted);">${r.lang||''} ${r.country?'· '+r.country:''}</div>
+        </td>
+        <td style="padding:10px 4px;color:var(--muted);font-size:12px;">${r.tl||'—'}</td>
+        <td style="padding:10px 4px;color:var(--muted);font-size:12px;">${r.proj||'—'}</td>
+        <td style="padding:10px 4px;text-align:right;"><span style="color:${col};font-weight:800;font-size:15px;">${Number(r.overall).toFixed(1)}%</span></td>
+        <td style="padding:10px 4px;text-align:right;color:var(--gold);">${ncScore}</td>
+        <td style="padding:10px 4px;text-align:center;color:${ccOk?'var(--green)':'var(--red)'};">${ccOk?iconCheck():iconCross()}</td>
+        <td style="padding:10px 4px;text-align:center;color:${cbOk?'var(--green)':'var(--red)'};">${cbOk?iconCheck():iconCross()}</td>
+        <td style="padding:10px 4px;">${status}</td>
+        <td style="padding:10px 0;text-align:right;color:var(--muted);font-size:11px;">${fmtDate(r.date)||'—'}</td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>`;
 }
 
 
