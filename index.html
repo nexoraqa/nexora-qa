@@ -3665,8 +3665,6 @@ function submitEval() {
   if (!d) return;
   // Save to history
   saveToHistory(d, _errors);
-  // Update today summary immediately
-  try { if (_currentUser) showTodaySummary(_currentUser); } catch(e) {}
   // Immediately sync so Manager and TL see it right away
   setTimeout(function(){ try { loadFromGoogleSheets(); } catch(e) {} }, 1500);
   // Success screen
@@ -4913,7 +4911,6 @@ function confirmDelete() {
   try { renderRadar(); } catch(e) {}
   try { buildIntelligence(); } catch(e) {}
   try { renderDashboard(); } catch(e) {}
-  try { if (_currentUser) showTodaySummary(_currentUser); } catch(e) {}
   try { if(document.getElementById('page-monitor').classList.contains('active')) renderMonitor(); } catch(e) {}
 }
 
@@ -9322,7 +9319,6 @@ function loadFromGoogleSheets() {
         try { if(document.getElementById('page-monitor')?.classList.contains('active')) renderMonitor(); } catch(e) {}
         try { if(document.getElementById('page-profiles')?.classList.contains('active')) renderProfiles(); } catch(e) {}
         try { if(document.getElementById('page-history')?.classList.contains('active')) renderHistory(); } catch(e) {}
-        try { if (_currentUser) showTodaySummary(_currentUser); } catch(e) {}
         // Second pass after short delay to ensure all DOM is ready
         setTimeout(() => {
           try { buildIntelligence(); } catch(e) {}
