@@ -1640,7 +1640,8 @@ a { color:var(--purple-l); text-decoration:none; }
 
         <div style="margin-bottom:14px;">
           <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Agent</div>
-          <select id="calib-agent" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;">
+          <input type="text" id="calib-agent-search" placeholder="Type to search agent..." oninput="filterCalibAgents(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;margin-bottom:6px;box-sizing:border-box;">
+          <select id="calib-agent" size="4" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:6px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;box-sizing:border-box;">
             <option value="">Select agent...</option>
           </select>
         </div>
@@ -9800,9 +9801,10 @@ function populateCalibForm() {
   // Qatar agents from eval history
   const agentSel = document.getElementById('calib-agent');
   if (agentSel) {
-    const agents = [...new Set(_evalHistory.filter(e => !e.country || e.country === 'Qatar').map(e => e.agent))].sort();
-    const allAgents = agents.length > 0 ? agents : [...new Set(_evalHistory.map(e => e.agent))].sort();
-    agentSel.innerHTML = '<option value="">Select agent...</option>' + allAgents.map(a => `<option value="${a}">${a}</option>`).join('');
+    const hardcoded = (typeof AGENTS !== 'undefined' ? AGENTS : []).map(a => a.n).sort();
+    const fromHistory = [...new Set(_evalHistory.map(e => e.agent))].sort();
+    window._calibAllAgents = [...new Set([...hardcoded, ...fromHistory])].filter(Boolean).sort();
+    agentSel.innerHTML = '<option value="">Select agent...</option>' + window._calibAllAgents.map(a => `<option value="${a}">${a}</option>`).join('');
   }
 
   // TL checkboxes
@@ -9818,6 +9820,16 @@ function populateCalibForm() {
   }
 
   // Case number input — focus it
+}
+
+function filterCalibAgents(query) {
+  const sel = document.getElementById('calib-agent');
+  if (!sel) return;
+  const all = window._calibAllAgents || [];
+  const q = query.trim().toLowerCase();
+  const filtered = q ? all.filter(a => a.toLowerCase().includes(q)) : all;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">Select agent...</option>' + filtered.map(a => `<option value="${a}"${a===current?' selected':''}>${a}</option>`).join('');
 }
 
 function createCalibSession() {
