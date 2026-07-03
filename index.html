@@ -3664,6 +3664,8 @@ function submitEval() {
   if (!d) return;
   // Save to history
   saveToHistory(d, _errors);
+  // Immediately sync so Manager and TL see it right away
+  setTimeout(function(){ try { loadFromGoogleSheets(); } catch(e) {} }, 1500);
   // Success screen
   const scoreEl = document.getElementById('success-score');
   scoreEl.textContent = d.overall.toFixed(1)+'%';
@@ -9358,8 +9360,8 @@ function loadFromGoogleSheets() {
 // Load from Google Sheets 1 second after startup
 setTimeout(loadFromGoogleSheets, 1000);
 
-// Auto-refresh every 30 seconds for all users
-setInterval(loadFromGoogleSheets, 30000);
+// Auto-refresh every 5 seconds for all users — instant updates
+setInterval(loadFromGoogleSheets, 5000);
 
 // Manual sync function — triggered by Sync button in topbar
 function manualSync() {
