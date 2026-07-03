@@ -9317,7 +9317,10 @@ function loadFromGoogleSheets() {
         try { updateHistoryBadge(); } catch(e) {}
         try { updateNavBadges(); } catch(e) {}
         try { if(document.getElementById('page-monitor')?.classList.contains('active')) renderMonitor(); } catch(e) {}
-        try { if(document.getElementById('page-profiles')?.classList.contains('active')) renderProfiles(); } catch(e) {}
+        // Only reset profiles if user is at country level — don't interrupt deeper navigation
+        try {
+          if(document.getElementById('page-profiles')?.classList.contains('active') && !_profCountry) renderProfiles();
+        } catch(e) {}
         try { if(document.getElementById('page-history')?.classList.contains('active')) renderHistory(); } catch(e) {}
         // Second pass after short delay to ensure all DOM is ready
         setTimeout(() => {
