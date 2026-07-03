@@ -1105,7 +1105,7 @@ a { color:var(--purple-l); text-decoration:none; }
           onmouseover="this.style.background='#e8a23d25'" onmouseout="this.style.background='var(--purple-dim)'">
           <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span> New Evaluation
         </button>
-        <button id="btn-export-history" onclick="exportEvalHistory(_histQAFilter)"
+        <button id="btn-export-history" onclick="exportAllHistory()"
           style="display:inline-flex;align-items:center;gap:7px;background:var(--green-dim);border:1px solid #18b87050;color:var(--green);border-radius:var(--radius-s);padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);"
           onmouseover="this.style.background='#18b87025'" onmouseout="this.style.background='var(--green-dim)'">
           <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/></svg></span> Export CSV
@@ -4666,15 +4666,72 @@ function importEvalCSV(input) {
   reader.readAsText(file);
 }
 
+function exportAllHistory() {
+  // Export both QA evals and TL operations in one CSV
+  const role = _currentUser?.role || '';
+  const name = _currentUser?.name || '';
+
+  // Get QA evals based on role
+  let qaData;
+  if (role === 'tl') qaData = _evalHistory.filter(e => e.tl === (window._tlTeam||name));
+  else if (role === 'qa') qaData = _evalHistory.filter(e => e.qa === name);
+  else qaData = _evalHistory;
+
+  // Get TL ops
+  var opData = window._operationHistory || [];
+  if (role === 'tl') opData = opData.filter(r => r.tl === name);
+
+  if (qaData.length === 0 && opData.length === 0) {
+    alert('No evaluations to export.');
+    return;
+  }
+
+  // Build combined CSV
+  var lines = ['TYPE,Date,Time,Agent,TL,Project,QA/Assessor,Overall,NC Score,CC,CB,Case Number'];
+
+  qaData.forEach(function(e) {
+    const cc = (e.errors||[]).some(x => x.t==='cc' && !x.isNA) ? 'Fail' : 'Pass';
+    const cb = (e.errors||[]).some(x => x.t==='cb' && !x.isNA) ? 'Fail' : 'Pass';
+    lines.push([
+      'QA Evaluation',
+      e.date||'', e.time||'', e.agent||'', e.tl||'', e.proj||'',
+      e.qa||'', Number(e.overall||0).toFixed(1)+'%',
+      (e.ncScore||e.ncPct||0)+'/30', cc, cb, e.caseNumber||''
+    ].join(','));
+  });
+
+  opData.forEach(function(r) {
+    lines.push([
+      'TL Operation',
+      r.date||'', r.time||'', r.agent||'', r.tl||'', r.proj||'',
+      r.assessor||r.tl||'', Number(r.overall||0).toFixed(1)+'%',
+      r.nc_score ? Number(r.nc_score).toFixed(1)+'/30' : '-',
+      r.cc||'-', r.cb||'-', r.caseNumber||''
+    ].join(','));
+  });
+
+  var csv = lines.join(String.fromCharCode(10));
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'NexoraQA_Export_' + new Date().toLocaleDateString('en-GB').replace(/\//g,'-') + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function exportEvalHistory(filterQA) {
+  const role = _currentUser?.role || '';
+  const name = _currentUser?.name || '';
   let data;
-  if (window._tlTeam) {
-    data = _evalHistory.filter(e => e.tl === window._tlTeam);
-  } else if (IS_MANAGER) {
+  if (role === 'tl') {
+    data = _evalHistory.filter(e => e.tl === (window._tlTeam||name));
+  } else if (role === 'manager') {
     data = filterQA && filterQA !== 'all' ? _evalHistory.filter(e => e.qa === filterQA) : _evalHistory;
+  } else if (role === 'qa') {
+    data = _evalHistory.filter(e => e.qa === name);
   } else {
-    const myName = window._sessionQA || CURRENT_QA;
-    data = _evalHistory.filter(e => e.qa === myName);
+    data = _evalHistory;
   }
 
   if (data.length === 0) {
@@ -9403,11 +9460,17 @@ function loadFromGoogleSheets() {
         persistHistory();
         try { filtered = [...getLiveAgents()]; } catch(e) {}
         try { updateHomeKPIs(); } catch(e) {}
-        try { renderDashboard(); } catch(e) {}
-        try { renderRadar(); } catch(e) {}
-        try { buildIntelligence(); } catch(e) {}
         try { updateHistoryBadge(); } catch(e) {}
         try { updateNavBadges(); } catch(e) {}
+        // Only re-render pages if no active filters to avoid resetting user's selections
+        const hasActiveFilter = (document.getElementById('f-proj')?.value||'all') !== 'all' ||
+          (document.getElementById('f-tl')?.value||'all') !== 'all' ||
+          (document.getElementById('f-country')?.value||'all') !== 'all';
+        if (!hasActiveFilter) {
+          try { renderDashboard(); } catch(e) {}
+          try { renderRadar(); } catch(e) {}
+          try { buildIntelligence(); } catch(e) {}
+        }
         try { if(document.getElementById('page-monitor')?.classList.contains('active')) renderMonitor(); } catch(e) {}
         // Only reset profiles if user is at country level — don't interrupt deeper navigation
         try {
