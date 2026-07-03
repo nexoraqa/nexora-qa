@@ -699,7 +699,7 @@ a { color:var(--purple-l); text-decoration:none; }
     <div class="card" style="margin-top:4px;background:linear-gradient(135deg,#0f1f17,#1a2e1f);border:1px solid var(--purple);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <div class="card-title" style="margin-bottom:0;"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span> Pattern Intelligence Summary</div>
-        <div onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1])" style="font-size:12px;color:var(--purple-l);cursor:pointer;font-weight:600;">View Full Report →</div>
+        <div id="home-view-full-report" onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1])" style="font-size:12px;color:var(--purple-l);cursor:pointer;font-weight:600;">View Full Report →</div>
       </div>
 
       <!-- Alert counts row -->
@@ -734,7 +734,7 @@ a { color:var(--purple-l); text-decoration:none; }
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div onclick="nav('calc',document.querySelectorAll('.nav-item')[2])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'"><span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:var(--gold)18;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></span><div><div style="font-size:13px;font-weight:600;">Score Calculator</div><div style="font-size:11px;color:var(--muted)">Evaluate an agent call</div></div></div>
         <div onclick="nav('upload',document.querySelectorAll('.nav-item')[3])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'"><span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#4a86e818;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V8M7 13l5-5 5 5"/><path d="M4 19h16"/></svg></span><div><div style="font-size:13px;font-weight:600;">Upload Data</div><div style="font-size:11px;color:var(--muted)">Import Excel files</div></div></div>
-        <div onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border)'"><span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:var(--purple)18;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span><div><div style="font-size:13px;font-weight:600;">Analytics Dashboard</div><div style="font-size:11px;color:var(--muted)">View insights</div></div></div>
+        <div id="home-analytics-btn" onclick="nav('dashboard',document.querySelectorAll('.nav-item')[1])" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:12px;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border)'"><span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:var(--purple)18;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg></span><div><div style="font-size:13px;font-weight:600;">Analytics Dashboard</div><div style="font-size:11px;color:var(--muted)">View insights</div></div></div>
       </div>
     </div>
 
@@ -5103,11 +5103,6 @@ function clearHistory() {
 const _pageScroll = {};
 
 function nav(id, el) {
-  // Check user has permission for this page
-  if (_currentUser) {
-    const allowed = USERS[_currentUser.key]?.pages || [];
-    if (!allowed.includes(id)) return;
-  }
   // Save current page scroll position before leaving
   const mainEl = document.querySelector('.main');
   const currentActive = document.querySelector('.page.active');
@@ -8780,6 +8775,12 @@ function applyRoleAccess(user) {
   // Operation Form nav — TL only
   const navOp = document.getElementById('nav-operation');
   if (navOp) navOp.style.display = isTL ? 'flex' : 'none';
+
+  // Hide dashboard buttons for agent
+  const homeViewFull = document.getElementById('home-view-full-report');
+  const homeAnalytics = document.getElementById('home-analytics-btn');
+  if (homeViewFull) homeViewFull.style.display = isAgent ? 'none' : '';
+  if (homeAnalytics) homeAnalytics.style.display = isAgent ? 'none' : '';
 
   // Report cards — monthly/project/pattern are cross-team (manager/QA only)
   ['report-card-monthly'].forEach(id => {
