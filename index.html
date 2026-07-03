@@ -6594,6 +6594,8 @@ function autoGenerateCoaching(evalObj) {
   _coachingData.push(item);
   saveCoaching();
   updateCoachingBadge();
+  // Sync new coaching item to Google Sheets
+  try { syncCoachingItem(item); } catch(e) {}
 }
 
 function getCoachingPendingCount() {
@@ -6716,7 +6718,7 @@ function confirmOpBulkDelete(idsStr) {
   ids.forEach(id => {
     try {
       fetch(GOOGLE_SHEET_URL, {
-        method:'POST', headers:{'Content-Type':'application/json'},
+        method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ action:'delete_operation', id: String(id) })
       }).catch(()=>{});
     } catch(e) {}
