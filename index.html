@@ -5082,7 +5082,7 @@ function renderHistory() {
       <td style="color:${e.cbPct===100?'var(--green)':'var(--red)'};">${e.cbPct===100?iconCheck():iconCross()}</td>
       <td>${e.errors.length > 0 ? errTags : '<span style="color:var(--green);font-size:11px;">None</span>'}</td>
       <td>${status}</td>
-      <td style="color:var(--muted);font-size:11px;">${e.time}</td>
+      <td style="color:var(--muted);font-size:11px;">${fmtTime(e.time)}</td>
       <td style="white-space:nowrap;">
         <button onclick="exportSingleEval(${e.uid})"
           style="background:var(--green-dim);border:1px solid #18b87044;color:var(--green);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;margin-right:4px;"
@@ -6752,6 +6752,35 @@ function confirmOpBulkDelete(idsStr) {
 
 function closeOpBulkConfirm() { var el=document.getElementById("op-bulk-confirm"); if(el)el.remove(); }
 
+function exportOpEval(id) {
+  var ops = window._operationHistory || [];
+  var r = null;
+  for (var i=0; i<ops.length; i++) { if (String(ops[i].id) === String(id)) { r = ops[i]; break; } }
+  if (!r) { alert('Record not found'); return; }
+  var lines = [
+    'Field,Value',
+    'Date,' + (r.date||''),
+    'Time,' + (r.time||''),
+    'Agent,' + (r.agent||''),
+    'TL,' + (r.tl||''),
+    'Project,' + (r.proj||''),
+    'Country,' + (r.country||''),
+    'Language,' + (r.lang||''),
+    'Overall Score,' + Number(r.overall).toFixed(1) + '%',
+    'NC Score,' + (r.nc_score ? Number(r.nc_score).toFixed(1)+'/30' : '-'),
+    'CC,' + (r.cc||'-'),
+    'CB,' + (r.cb||'-'),
+  ];
+  var csv = lines.join(String.fromCharCode(10));
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'op_eval_' + (r.agent||'unknown') + '_' + (r.date||'') + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function closeOpDelConfirm() {
   var el = document.getElementById('op-del-confirm');
   if (el) el.remove();
@@ -6812,6 +6841,7 @@ function renderOperationHistory() {
       <th style="padding:8px 4px;text-align:center;">CB</th>
       <th style="padding:8px 4px;text-align:left;">Status</th>
       <th style="padding:8px 0;text-align:right;">Date</th>
+      <th style="padding:8px 0;"></th>
     </tr></thead>
     <tbody>${sorted.map((r, i) => {
       const col = Number(r.overall)>=90?'var(--green)':Number(r.overall)>=80?'var(--gold)':'var(--red)';
@@ -6835,6 +6865,11 @@ function renderOperationHistory() {
         <td style="padding:10px 4px;text-align:center;color:${cbOk?'var(--green)':'var(--red)'};">${cbOk?iconCheck():iconCross()}</td>
         <td style="padding:10px 4px;">${status}</td>
         <td style="padding:10px 0;text-align:right;color:var(--muted);font-size:11px;">${fmtDate(r.date)||'—'}</td>
+        <td style="padding:10px 0;text-align:right;">
+          <button onclick="exportOpEval('${r.id}')" style="background:var(--green-dim);border:1px solid #18b87044;color:var(--green);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;" title="Export">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-flex;vertical-align:-2px;"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/></svg>
+          </button>
+        </td>
       </tr>`;
     }).join('')}</tbody>
   </table>`;
@@ -7600,7 +7635,7 @@ function submitOperation() {
     body: JSON.stringify(payload),
   }).catch(err => console.warn('Operation save failed:', err));
 
-  var opRecord = { id, date, time, agent, tl:tlName, proj, country:AGENT_META[agent]?.country||'', lang, caseNumber:caseNum, assessor:_currentUser?.name||tlName, overall:d.overall };
+  var opRecord = { id, date, time, agent, tl:tlName, proj, country:AGENT_META[agent]?.country||'', lang, caseNumber:caseNum, assessor:_currentUser?.name||tlName, overall:d.overall, nc_score:d.ncScore||0, cc:d.cc===0?'Yes':'No', cb:d.cb===0?'Yes':'No' };
   if (!window._operationHistory) window._operationHistory = [];
   window._operationHistory.unshift(opRecord);
   try { localStorage.setItem('nexora_op_history', JSON.stringify(window._operationHistory.slice(0,200))); } catch(e) {}
@@ -9267,7 +9302,11 @@ function loadFromGoogleSheets() {
         let added = 0;
         evalsData.forEach(row => {
         if (!row.id || !row.agent) return;
-        if (String(row.deleted||'').toUpperCase().trim() === 'YES') return; // skip soft-deleted
+        if (String(row.deleted||'').toUpperCase().trim() === 'YES') {
+          // Remove from local if it was soft-deleted in sheet
+          _evalHistory = _evalHistory.filter(e => String(e.uid) !== String(row.id));
+          return;
+        }
         if (existingIds.has(String(row.id))) return; // skip duplicates
         // Convert sheet row back to eval object
         const eval_obj = {
