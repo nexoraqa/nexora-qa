@@ -5103,6 +5103,11 @@ function clearHistory() {
 const _pageScroll = {};
 
 function nav(id, el) {
+  // Check user has permission for this page
+  if (_currentUser) {
+    const allowed = USERS[_currentUser.key]?.pages || [];
+    if (!allowed.includes(id)) return;
+  }
   // Save current page scroll position before leaving
   const mainEl = document.querySelector('.main');
   const currentActive = document.querySelector('.page.active');
@@ -10076,7 +10081,7 @@ function submitCalibScore(sessionId) {
           caseNumber: s.caseNumber||'',
           agent: s.agent,
           createdBy: s.createdBy,
-          completedAt: s.completedAt||'',
+          completedAt: s.completedAt ? new Date(s.completedAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '',
           qaName: r.qa?.name||'',
           qaScore: r.qa?.score?.toFixed(1)||'',
           qaCC: (r.qa?.failedCC||[]).join(', ')||'PASS',
@@ -10226,7 +10231,7 @@ function openCalibReport(sessionId) {
     const attrRow = (attr, qaFailed, tlFailed) => {
       const differs = qaFailed !== tlFailed;
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 10px;border-radius:5px;margin-bottom:3px;background:${differs?'rgba(240,79,79,.06)':'var(--bg)'};">
-        <span style="font-size:11px;">${differs?'⚠ ':''}${attr}</span>
+        <span style="font-size:11px;">${differs?'<span style="color:var(--gold);">⚠</span> ':''}${attr}</span>
         <div style="display:flex;gap:8px;">
           <span style="font-size:10px;color:var(--muted);">QA: <b style="color:${qaFailed?'var(--red)':'var(--green)'};">${qaFailed?'FAIL':'PASS'}</b></span>
           <span style="font-size:10px;color:var(--muted);">TL: <b style="color:${tlFailed?'var(--red)':'var(--green)'};">${tlFailed?'FAIL':'PASS'}</b></span>
