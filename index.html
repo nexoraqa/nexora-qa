@@ -2085,9 +2085,7 @@ a { color:var(--purple-l); text-decoration:none; }
   <!-- ═══════════════ TL HOME PAGE ═══════════════ -->
   <div class="page" id="page-tl-home">
 
-    <button class="back-btn" onclick="nav('home')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Home
-    </button>
+
 
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
@@ -4322,7 +4320,7 @@ const PAGE_TITLES = {
 
 // Current logged-in QA — matches sidebar footer name
 const CURRENT_QA = 'Younes Sid';
-const IS_MANAGER = true; // Younes has full manager access
+const IS_MANAGER = true; // Will be overridden dynamically on login
 
 // QA filter for history page
 let _histQAFilter = 'all';
@@ -4998,13 +4996,20 @@ function evalMatchesHistDate(e) {
 
 function renderHistory() {
   let data;
-  if (window._tlTeam) {
-    // TL role: only see evals for their own team
-    data = _evalHistory.filter(e => e.tl === window._tlTeam);
-  } else if (IS_MANAGER) {
+  const role = _currentUser?.role || '';
+  const name = _currentUser?.name || '';
+  if (role === 'tl' || window._tlTeam) {
+    // TL: only their team's evals
+    const team = window._tlTeam || _currentUser?.tl || '';
+    data = _evalHistory.filter(e => e.tl === team);
+  } else if (role === 'manager') {
+    // Manager: all evals, with QA filter option
     data = _histQAFilter === 'all' ? _evalHistory : _evalHistory.filter(e => e.qa === _histQAFilter);
+  } else if (role === 'qa') {
+    // QA: only their own evaluations
+    data = _evalHistory.filter(e => e.qa === name);
   } else {
-    data = _evalHistory.filter(e => e.qa === CURRENT_QA);
+    data = _evalHistory;
   }
 
   // Apply date/period filter
