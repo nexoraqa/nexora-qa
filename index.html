@@ -1214,6 +1214,7 @@ a { color:var(--purple-l); text-decoration:none; }
               <th>CB</th>
               <th>Errors</th>
               <th>Status</th>
+              <th>Date</th>
               <th>Time</th>
               <th></th>
             </tr>
@@ -1260,7 +1261,12 @@ a { color:var(--purple-l); text-decoration:none; }
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
           <div class="card-title" style="margin-bottom:0;">TL Operation Evaluations</div>
           <div style="display:flex;align-items:center;gap:8px;">
+            <div style="display:flex;align-items:center;gap:10px;">
             <div style="font-size:12px;color:var(--muted);" id="hist-op-count">0 evaluations</div>
+            <button onclick="exportOpHistory()" style="background:var(--green-dim);border:1px solid #18b87044;color:var(--green);border-radius:var(--radius-s);padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/></svg> Export
+            </button>
+          </div>
             <button id="btn-op-bulk-delete" onclick="opBulkDelete()" style="display:none;background:#f04f4f22;border:1px solid #f04f4f66;color:var(--red);border-radius:var(--radius-s);padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);">🗑 Delete Selected</button>
           </div>
         </div>
@@ -5082,6 +5088,7 @@ function renderHistory() {
       <td style="color:${e.cbPct===100?'var(--green)':'var(--red)'};">${e.cbPct===100?iconCheck():iconCross()}</td>
       <td>${e.errors.length > 0 ? errTags : '<span style="color:var(--green);font-size:11px;">None</span>'}</td>
       <td>${status}</td>
+      <td style="color:var(--muted);font-size:11px;">${fmtDate(e.date)}</td>
       <td style="color:var(--muted);font-size:11px;">${fmtTime(e.time)}</td>
       <td style="white-space:nowrap;">
         <button onclick="exportSingleEval(${e.uid})"
@@ -6751,6 +6758,29 @@ function confirmOpBulkDelete(idsStr) {
 }
 
 function closeOpBulkConfirm() { var el=document.getElementById("op-bulk-confirm"); if(el)el.remove(); }
+
+function exportOpHistory() {
+  var ops = window._operationHistory || [];
+  if (!ops.length) { alert('No TL operation evaluations to export.'); return; }
+  var lines = ['ID,Date,Time,Agent,TL,Project,Country,Language,Overall Score,NC Score,CC,CB,Case Number'];
+  ops.forEach(function(r) {
+    lines.push([
+      r.id, r.date||'', r.time||'', r.agent||'', r.tl||'', r.proj||'',
+      r.country||'', r.lang||'',
+      Number(r.overall).toFixed(1)+'%',
+      r.nc_score ? Number(r.nc_score).toFixed(1)+'/30' : '-',
+      r.cc||'-', r.cb||'-', r.caseNumber||''
+    ].join(','));
+  });
+  var csv = lines.join(String.fromCharCode(10));
+  var blob = new Blob([csv], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'TL_Operations_' + new Date().toLocaleDateString('en-GB').replace(/\//g,'-') + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 function exportOpEval(id) {
   var ops = window._operationHistory || [];
@@ -9390,7 +9420,13 @@ function loadFromGoogleSheets() {
         try {
           if(document.getElementById('page-profiles')?.classList.contains('active') && !_profCountry) renderProfiles();
         } catch(e) {}
-        try { if(document.getElementById('page-history')?.classList.contains('active')) renderHistory(); } catch(e) {}
+        // Only re-render history if no checkboxes are currently selected (avoid deselecting)
+        try {
+          if(document.getElementById('page-history')?.classList.contains('active')) {
+            const checked = document.querySelectorAll('.hist-row-check:checked').length;
+            if (checked === 0) renderHistory();
+          }
+        } catch(e) {}
         // Second pass after short delay to ensure all DOM is ready
         setTimeout(() => {
           try { buildIntelligence(); } catch(e) {}
