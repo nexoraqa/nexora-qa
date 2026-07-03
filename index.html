@@ -2157,9 +2157,7 @@ a { color:var(--purple-l); text-decoration:none; }
   <!-- ═══════════════ AGENT PAGE ═══════════════ -->
   <div class="page" id="page-agent">
 
-    <button class="back-btn" onclick="nav('home')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg> Home
-    </button>
+
 
     <!-- Welcome header -->
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
@@ -8767,6 +8765,9 @@ function applyRoleAccess(user) {
   // Calibration nav — Manager, QA and TL
   const navCalib = document.getElementById('nav-calibration');
   if (navCalib) navCalib.style.display = (isManager || isQA || isTL) ? 'flex' : 'none';
+  // Sync from Google Sheets on login
+  setTimeout(function(){ try { loadFromGoogleSheets(); } catch(e) {} }, 500);
+
   // Update badges immediately on login
   setTimeout(function(){
     try { updateCalibBadge(); } catch(e) {}
@@ -9222,6 +9223,13 @@ function loadFromGoogleSheets() {
       const evalsData = res.evals || res.data || [];
 
       if (evalsData.length) {
+        // For manager: always use sheet as source of truth
+        const isManager = _currentUser?.role === 'manager';
+        if (isManager) {
+          // Clear and reload all from sheet
+          _evalHistory = [];
+          localStorage.removeItem('nexora_eval_history');
+        }
         const existingIds = new Set(_evalHistory.map(e => String(e.uid)));
         let added = 0;
         evalsData.forEach(row => {
@@ -9350,8 +9358,8 @@ function loadFromGoogleSheets() {
 // Load from Google Sheets 1 second after startup
 setTimeout(loadFromGoogleSheets, 1000);
 
-// Auto-refresh every 5 minutes
-setInterval(loadFromGoogleSheets, 5 * 60 * 1000);
+// Auto-refresh every 30 seconds for all users
+setInterval(loadFromGoogleSheets, 30000);
 
 // Manual sync function — triggered by Sync button in topbar
 function manualSync() {
