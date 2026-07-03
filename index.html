@@ -9321,13 +9321,6 @@ function loadFromGoogleSheets() {
       const evalsData = res.evals || res.data || [];
 
       if (evalsData.length) {
-        // For manager: always use sheet as source of truth
-        const isManager = _currentUser?.role === 'manager';
-        if (isManager) {
-          // Clear and reload all from sheet
-          _evalHistory = [];
-          localStorage.removeItem('nexora_eval_history');
-        }
         const existingIds = new Set(_evalHistory.map(e => String(e.uid)));
         let added = 0;
         evalsData.forEach(row => {
@@ -9470,8 +9463,8 @@ function loadFromGoogleSheets() {
 // Load from Google Sheets 1 second after startup
 setTimeout(loadFromGoogleSheets, 1000);
 
-// Auto-refresh every 5 seconds for all users — instant updates
-setInterval(loadFromGoogleSheets, 5000);
+// Auto-refresh every 30 seconds
+setInterval(loadFromGoogleSheets, 30000);
 
 // Manual sync function — triggered by Sync button in topbar
 function manualSync() {
