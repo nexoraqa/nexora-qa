@@ -1640,10 +1640,11 @@ a { color:var(--purple-l); text-decoration:none; }
 
         <div style="margin-bottom:14px;">
           <div style="font-size:12px;font-weight:600;margin-bottom:6px;">Agent</div>
-          <input type="text" id="calib-agent-search" placeholder="Type to search agent..." oninput="filterCalibAgents(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;margin-bottom:6px;box-sizing:border-box;">
-          <select id="calib-agent" size="4" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:6px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;box-sizing:border-box;">
-            <option value="">Select agent...</option>
-          </select>
+          <div style="position:relative;">
+            <input type="text" id="calib-agent-search" placeholder="Tap to select agent..." oninput="filterCalibAgents(this.value)" onfocus="filterCalibAgents(this.value)" autocomplete="off" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);outline:none;box-sizing:border-box;">
+            <input type="hidden" id="calib-agent" value="">
+            <div id="calib-agent-dropdown" style="display:none;position:absolute;top:calc(100% + 2px);left:0;right:0;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-s);max-height:200px;overflow-y:auto;z-index:9999;box-shadow:0 8px 32px #000c;margin-top:0;"></div>
+          </div>
         </div>
 
         <div style="margin-bottom:14px;">
@@ -9823,14 +9824,48 @@ function populateCalibForm() {
 }
 
 function filterCalibAgents(query) {
-  const sel = document.getElementById('calib-agent');
-  if (!sel) return;
-  const all = window._calibAllAgents || [];
-  const q = query.trim().toLowerCase();
-  const filtered = q ? all.filter(a => a.toLowerCase().includes(q)) : all;
-  const current = sel.value;
-  sel.innerHTML = '<option value="">Select agent...</option>' + filtered.map(a => `<option value="${a}"${a===current?' selected':''}>${a}</option>`).join('');
+  const dd = document.getElementById('calib-agent-dropdown');
+  const hidden = document.getElementById('calib-agent');
+  if (!dd) return;
+  // Build agents list
+  if (!window._calibAllAgents || window._calibAllAgents.length === 0) {
+    const hardcoded = (typeof AGENTS !== 'undefined' ? AGENTS : []).map(a => a.n).sort();
+    const fromHistory = [...new Set((_evalHistory||[]).map(e => e.agent))].sort();
+    window._calibAllAgents = [...new Set([...hardcoded, ...fromHistory])].filter(Boolean).sort();
+  }
+  const q = (query||'').trim().toLowerCase();
+  const filtered = q ? window._calibAllAgents.filter(a => a.toLowerCase().includes(q)).slice(0, 50) : window._calibAllAgents.slice(0, 50);
+  if (!filtered.length) { dd.style.display = 'none'; return; }
+  dd.innerHTML = '';
+  filtered.forEach(function(a) {
+    var div = document.createElement('div');
+    div.textContent = a;
+    div.style.cssText = 'padding:10px 14px;font-size:13px;cursor:pointer;border-bottom:1px solid var(--border);';
+    div.onmouseover = function(){ this.style.background='var(--bg)'; };
+    div.onmouseout = function(){ this.style.background=''; };
+    div.onclick = function(){ selectCalibAgent(a); };
+    dd.appendChild(div);
+  });
+  dd.style.display = 'block';
 }
+
+function selectCalibAgent(name) {
+  const input = document.getElementById('calib-agent-search');
+  const hidden = document.getElementById('calib-agent');
+  const dd = document.getElementById('calib-agent-dropdown');
+  if (input) input.value = name;
+  if (hidden) hidden.value = name;
+  if (dd) dd.style.display = 'none';
+  clearFieldError('calib-agent');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest || !e.target.closest('#calib-agent-dropdown') && e.target.id !== 'calib-agent-search') {
+    var dd = document.getElementById('calib-agent-dropdown');
+    if (dd) dd.style.display = 'none';
+  }
+});
 
 function createCalibSession() {
   const agent = document.getElementById('calib-agent')?.value;
