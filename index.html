@@ -3271,12 +3271,12 @@ const ERROR_STRUCTURE = {
   NC: {
     color: 'var(--gold)', type: 'nc',
     attributes: [
-      { name: 'Call Opening/Closure', color: '#0070C0', subs: ['Opening Script','Opening within 3 Sec','Greet the caller','Reply to the customer greeting','Correct language','O/C tone of voice','Closure Script','Didn\'t end the call after 3 Sec of closure'] },
+      { name: 'Call Opening/Closure', color: '#0070C0', subs: ['Opening Script','Opening within 3 Sec','Greet the caller','Reply to the customer greeting','Correct language','O/C tone of voice','Closure Script','Didn\'t end the call after 3 Sec of closure','Assistance question'] },
       { name: 'Choice of Words / Avoid Slang / Technical Terms', color: '#00B0F0', subs: ['Choice of words','Slang','Technical Terms','Using prefix','Using customer name','Ask for customer name'] },
       { name: 'Tone of Voice', color: '#00B050', subs: ['Not Clear','Sleepy/cheerless/Inactive','Aggressive/irritated/argumentative','Sarcastic','Chewing/eating','Sounding hesitant/non-confident','Speaking too fast/rushing the conversation','Sounding distracted','Using verbal nods'] },
       { name: 'Showing Empathy / handling objection', color: '#92D050', subs: ['Not Showing Empathy','Not handling objection'] },
       { name: 'Active Listening', color: '#FFC000', subs: ['Interrupting the Customer','Concentrating on the call','Repeating an answered questions','Dead air','Talking/laughing to others','Mute'] },
-      { name: 'HOLD', color: '#FFFF00', isHold: true, subs: ['Customer Permission','Mentioning Hold Time','Customer Approval','Mentioning Hold reason','Thanking a customer for holding','Not exceeding hold duration','Draw the caller/user attention after hold','Assistance question'], naOption: 'Not Applicable' },
+      { name: 'HOLD', color: '#FFFF00', isHold: true, subs: ['Customer Permission','Mentioning Hold Time','Customer Approval','Mentioning Hold reason','Thanking a customer for holding','Not exceeding hold duration','Draw the caller/user attention after hold'], naOption: 'Not Applicable' },
     ]
   },
   CC: {
@@ -3285,8 +3285,8 @@ const ERROR_STRUCTURE = {
       { name: 'Customer Profile', color: '#FF0000', subs: ['Verifying customer profile','Wrong/Missing QID','Wrong/Missing Name','Wrong/Missing gender','Wrong/Missing Language','Wrong/Missing Mobile number','Wrong/Missing Email','Wrong/Missing Email Comment','Confirming the principal mobile number'] },
       { name: 'Wrong Information', color: '#C00000', subs: ['Wrong information from KB','Wrong information from System'] },
       { name: 'Missing Information', color: '#808080', subs: ['Incomplete information','Information out of the KB'] },
-      { name: 'Ticket Escalation and Status', color: '#808080', subs: ['Ticket Creation','Ticket priority','Backend selection','Case History','Customer Permission','Customer Approval','Mentioning Hold reason','Inform the TL / Supervisor'] },
-      { name: 'Transfer Process', color: '#808080', subs: ['Thanking a customer for holding','Not exceeding hold duration','Transfer/Educate the customer','Didn\'t mention the other Dept number','Didn\'t wait for the other dept answer'] },
+      { name: 'Ticket Escalation and Status', color: '#808080', subs: ['Ticket Creation','Ticket priority','Backend selection','Case History'] },
+      { name: 'Transfer Process', color: '#808080', subs: ['Thanking a customer for holding','Not exceeding hold duration','Transfer/Educate the customer','Didn\'t mention the other Dept number','Didn\'t wait for the other dept answer','Customer Permission','Customer Approval','Mentioning Hold reason','Inform the TL / Supervisor'] },
       { name: 'Professionalism / Attitude', color: '#808080', subs: ['Unprofessional','Impolite','Releasing/Disconnecting the call','Denying the caller/user request','Wrong/Missing Nationality'] },
       { name: 'Ticket Description', color: '#808080', subs: ['Ticket Status','Incomplete ticket description','Incomplete minimum requirement','Ticket Language','Updating tickets and adding notes','Interaction'] },
     ]
@@ -3295,8 +3295,8 @@ const ERROR_STRUCTURE = {
     color: 'var(--orange)', type: 'cb',
     attributes: [
       { name: 'Ticket Creation and Categorization', color: '#808080', subs: ['Call Type','On the right customer profile','No ticket','Control the Call','Follow up'] },
-      { name: 'Control the Call / Comprehension', color: '#808080', subs: ['Relevant questions','Effective questions','Understanding the case','Service drivers'] },
-      { name: 'Ticketing Tree', color: '#808080', subs: ['Call type selection','Ticket source selection','Duplicate ticket','Ticket Tree'] },
+      { name: 'Control the Call / Comprehension', color: '#808080', subs: ['Relevant questions','Effective questions','Understanding the case'] },
+      { name: 'Ticketing Tree', color: '#808080', subs: ['Call type selection','Ticket source selection','Duplicate ticket','Ticket Tree','Service drivers'] },
     ]
   }
 };
@@ -7378,12 +7378,12 @@ const OP_ERROR_STRUCTURE = {
   NC: {
     color: 'var(--gold)', type: 'nc',
     attributes: [
-      { name: 'Call Opening/Closure', color: '#0070C0', subs: ['Opening Script','Opening within 3 Sec','Greet the caller','Reply to the customer greeting','Correct language','O/C tone of voice','Closure Script','Didn\'t end the call after 3 Sec of closure'] },
+      { name: 'Call Opening/Closure', color: '#0070C0', subs: ['Opening Script','Opening within 3 Sec','Greet the caller','Reply to the customer greeting','Correct language','O/C tone of voice','Closure Script','Didn\'t end the call after 3 Sec of closure','Assistance question'] },
       { name: 'Choice of Words / Avoid Slang / Technical Terms', color: '#00B0F0', subs: ['Choice of words','Slang','Technical Terms','Using prefix','Using customer name','Ask for customer name'] },
       { name: 'Tone of Voice', color: '#00B050', subs: ['Not Clear','Sleepy/cheerless/Inactive','Aggressive/irritated/argumentative','Sarcastic','Chewing/eating','Sounding hesitant/non-confident','Speaking too fast/rushing the conversation','Sounding distracted','Using verbal nods'] },
       { name: 'Showing Empathy / handling objection', color: '#92D050', subs: ['Not Showing Empathy','Not handling objection'] },
       { name: 'Active Listening', color: '#FFC000', subs: ['Interrupting the Customer','Concentrating on the call','Repeating an answered questions','Dead air','Talking/laughing to others','Mute'] },
-      { name: 'HOLD', color: '#FFFF00', isHold: true, subs: ['Customer Permission','Mentioning Hold Time','Customer Approval','Mentioning Hold reason','Thanking a customer for holding','Not exceeding hold duration','Draw the caller/user attention after hold','Assistance question'], naOption: 'Not Applicable' },
+      { name: 'HOLD', color: '#FFFF00', isHold: true, subs: ['Customer Permission','Mentioning Hold Time','Customer Approval','Mentioning Hold reason','Thanking a customer for holding','Not exceeding hold duration','Draw the caller/user attention after hold'], naOption: 'Not Applicable' },
     ]
   },
   CC: {
@@ -7392,8 +7392,8 @@ const OP_ERROR_STRUCTURE = {
       { name: 'Customer Profile', color: '#FF0000', subs: ['Verifying customer profile','Wrong/Missing QID','Wrong/Missing Name','Wrong/Missing gender','Wrong/Missing Language','Wrong/Missing Mobile number','Wrong/Missing Email','Wrong/Missing Email Comment','Confirming the principal mobile number'] },
       { name: 'Wrong Information', color: '#C00000', subs: ['Wrong information from KB','Wrong information from System'] },
       { name: 'Missing Information', color: '#808080', subs: ['Incomplete information','Information out of the KB'] },
-      { name: 'Ticket Escalation and Status', color: '#808080', subs: ['Ticket Creation','Ticket priority','Backend selection','Case History','Customer Permission','Customer Approval','Mentioning Hold reason','Inform the TL / Supervisor'] },
-      { name: 'Transfer Process', color: '#808080', subs: ['Thanking a customer for holding','Not exceeding hold duration','Transfer/Educate the customer','Didn\'t mention the other Dept number','Didn\'t wait for the other dept answer'] },
+      { name: 'Ticket Escalation and Status', color: '#808080', subs: ['Ticket Creation','Ticket priority','Backend selection','Case History'] },
+      { name: 'Transfer Process', color: '#808080', subs: ['Thanking a customer for holding','Not exceeding hold duration','Transfer/Educate the customer','Didn\'t mention the other Dept number','Didn\'t wait for the other dept answer','Customer Permission','Customer Approval','Mentioning Hold reason','Inform the TL / Supervisor'] },
       { name: 'Professionalism / Attitude', color: '#808080', subs: ['Unprofessional','Impolite','Releasing/Disconnecting the call','Denying the caller/user request','Wrong/Missing Nationality'] },
       { name: 'Ticket Description', color: '#808080', subs: ['Ticket Status','Incomplete ticket description','Incomplete minimum requirement','Ticket Language','Updating tickets and adding notes','Interaction'] },
     ]
@@ -7402,8 +7402,8 @@ const OP_ERROR_STRUCTURE = {
     color: 'var(--orange)', type: 'cb',
     attributes: [
       { name: 'Ticket Creation and Categorization', color: '#808080', subs: ['Call Type','On the right customer profile','No ticket','Control the Call','Follow up'] },
-      { name: 'Control the Call / Comprehension', color: '#808080', subs: ['Relevant questions','Effective questions','Understanding the case','Service drivers'] },
-      { name: 'Ticketing Tree', color: '#808080', subs: ['Call type selection','Ticket source selection','Duplicate ticket','Ticket Tree'] },
+      { name: 'Control the Call / Comprehension', color: '#808080', subs: ['Relevant questions','Effective questions','Understanding the case'] },
+      { name: 'Ticketing Tree', color: '#808080', subs: ['Call type selection','Ticket source selection','Duplicate ticket','Ticket Tree','Service drivers'] },
     ]
   }
 };
