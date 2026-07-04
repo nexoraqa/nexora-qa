@@ -1070,8 +1070,7 @@ a { color:var(--purple-l); text-decoration:none; }
           <div style="font-size:13px;color:var(--muted);margin-top:8px;" id="success-agent">—</div>
         </div>
 
-        <!-- Peer score — shows TL score if TL evaluated same case -->
-        <div id="qa-peer-score" style="display:none;max-width:360px;margin:0 auto 24px;background:var(--purple)18;border:1px solid var(--purple)44;border-radius:var(--radius);padding:16px;"></div>
+        <div id="qa-peer-score" style="display:none;max-width:360px;margin:0 auto 20px;background:var(--card);border:1px solid var(--purple);border-radius:var(--radius);padding:16px;"></div>
 
         <div style="max-width:360px;margin:0 auto;display:flex;flex-direction:column;gap:10px;">
           <button class="btn btn-primary" onclick="resetCalc()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span> Submit New Evaluation</button>
@@ -2037,8 +2036,7 @@ a { color:var(--purple-l); text-decoration:none; }
           <div class="score-big" id="op-success-score" style="color:var(--green);">—</div>
           <div style="font-size:13px;color:var(--muted);margin-top:8px;" id="op-success-agent">—</div>
         </div>
-        <!-- Peer score — shows QA score if QA evaluated same case -->
-        <div id="op-peer-score" style="display:none;max-width:360px;margin:0 auto 24px;background:var(--purple)18;border:1px solid var(--purple)44;border-radius:var(--radius);padding:16px;"></div>
+        <div id="op-peer-score" style="display:none;max-width:360px;margin:0 auto 20px;background:var(--card);border:1px solid var(--purple);border-radius:var(--radius);padding:16px;"></div>
 
         <button class="btn btn-primary" onclick="opResetForm()">
           <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span> Submit New Operation Eval
@@ -3634,39 +3632,24 @@ function goToReview() {
     return;
   }
 
-  // Case number validation
+  // Case number validation using registry
   const caseNum = document.getElementById('c-case')?.value?.trim() || '';
   const agentVal = document.getElementById('c-agent')?.value || '';
   const projVal = document.getElementById('c-proj')?.value || '';
   if (caseNum) {
-    // Check eval history for this case number
-    const existingEval = _evalHistory.find(e =>
-      e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.toLowerCase()
-    );
-    if (existingEval) {
-      if (existingEval.agent !== agentVal) {
-        showValidationToast(`Case ${caseNum} belongs to agent: ${existingEval.agent}`);
+    const reg = window._caseRegistry || {};
+    const entry = reg[caseNum.trim().toLowerCase()];
+    if (entry) {
+      if (entry.agent !== agentVal) {
+        showValidationToast('Case ' + caseNum + ' belongs to agent: ' + entry.agent);
         return;
       }
-      if (existingEval.proj !== projVal) {
-        showValidationToast(`Case ${caseNum} belongs to project: ${existingEval.proj}`);
+      if (entry.proj !== projVal) {
+        showValidationToast('Case ' + caseNum + ' belongs to project: ' + entry.proj);
         return;
       }
-      // Same agent + same project — block duplicate QA eval
-      showValidationToast(`Case ${caseNum} already evaluated by QA`);
-      return;
-    }
-    // Check TL operation history for this case number
-    const existingOp = (window._operationHistory||[]).find(r =>
-      r.caseNumber && r.caseNumber.trim().toLowerCase() === caseNum.toLowerCase()
-    );
-    if (existingOp) {
-      if (existingOp.agent !== agentVal) {
-        showValidationToast(`Case ${caseNum} belongs to agent: ${existingOp.agent}`);
-        return;
-      }
-      if (existingOp.proj !== projVal) {
-        showValidationToast(`Case ${caseNum} belongs to project: ${existingOp.proj}`);
+      if (entry.qaScore !== null) {
+        showValidationToast('Case ' + caseNum + ' already evaluated by QA');
         return;
       }
     }
@@ -3710,26 +3693,22 @@ function submitEval() {
   const scoreEl = document.getElementById('success-score');
   scoreEl.textContent = d.overall.toFixed(1)+'%';
   scoreEl.style.color = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
-
-  // Show TL peer score if TL already evaluated same case
-  const peerEl = document.getElementById('qa-peer-score');
-  if (peerEl && d.caseNumber) {
-    const tlRecord = (window._operationHistory||[]).find(r =>
-      r.caseNumber && r.caseNumber.trim().toLowerCase() === d.caseNumber.trim().toLowerCase()
-    );
-    if (tlRecord) {
-      const col = Number(tlRecord.overall)>=90?'var(--green)':Number(tlRecord.overall)>=80?'var(--gold)':'var(--red)';
-      peerEl.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--purple-l);margin-bottom:8px;">🔗 TL ALSO EVALUATED THIS CASE</div>' +
-        '<div style="display:flex;gap:12px;flex-wrap:wrap;">' +
-        '<div style="font-size:12px;"><span style="color:var(--muted);">TL:</span> <b>' + (tlRecord.tl||'—') + '</b></div>' +
-        '<div style="font-size:12px;"><span style="color:var(--muted);">Score:</span> <b style="color:' + col + ';">' + Number(tlRecord.overall).toFixed(1) + '%</b></div>' +
-        '<div style="font-size:12px;"><span style="color:var(--muted);">Date:</span> <b>' + (fmtDate(tlRecord.date)||'—') + '</b></div>' +
+  // Show peer TL score if exists
+  const qaPeerEl = document.getElementById('qa-peer-score');
+  if (qaPeerEl && caseNum) {
+    const reg = window._caseRegistry || {};
+    const entry = reg[caseNum.toLowerCase()];
+    if (entry && entry.tlScore !== null) {
+      const col = entry.tlScore>=90?'var(--green)':entry.tlScore>=80?'var(--gold)':'var(--red)';
+      qaPeerEl.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--purple-l);margin-bottom:8px;">🔗 TL SCORE FOR THIS CASE</div>' +
+        '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">' +
+        '<div style="font-size:13px;"><span style="color:var(--muted);">TL:</span> <b>' + (entry.tlEval?.tl||'—') + '</b></div>' +
+        '<div style="font-size:20px;font-weight:800;color:' + col + ';">' + entry.tlScore.toFixed(1) + '%</div>' +
         '</div>';
-      peerEl.style.display = 'block';
-    } else {
-      peerEl.style.display = 'none';
-    }
+      qaPeerEl.style.display = 'block';
+    } else { qaPeerEl.style.display = 'none'; }
   }
+
   document.getElementById('success-agent').textContent  = d.agent+' · '+d.proj;
   document.getElementById('success-detail').textContent = `${d.agent}'s evaluation (${d.overall.toFixed(1)}%) recorded on ${d.today}`;
   // Hide old coaching box
@@ -7637,6 +7616,16 @@ function opComputeScore() {
 }
 
 function opLiveCalc() {
+  // Final guard using registry
+  if (caseNum) {
+    var reg2 = window._caseRegistry || {};
+    var entry2 = reg2[caseNum.toLowerCase()];
+    if (entry2) {
+      if (entry2.agent !== agent) { showValidationToast('Case ' + caseNum + ' belongs to agent: ' + entry2.agent); opShowStep('form'); return; }
+      if (entry2.proj !== proj) { showValidationToast('Case ' + caseNum + ' belongs to project: ' + entry2.proj); opShowStep('form'); return; }
+      if (entry2.tlScore !== null) { showValidationToast('Case ' + caseNum + ' already evaluated by TL'); opShowStep('form'); return; }
+    }
+  }
   var d = opComputeScore();
   var col = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
   var scoreEl = document.getElementById('op-score-preview');
@@ -7668,27 +7657,17 @@ function opLiveCalc() {
 function opGoToReview() {
   var agent = document.getElementById('op-agent')?.value;
   var proj  = document.getElementById('op-proj')?.value;
-  var caseNumCheck = (document.getElementById('op-case')?.value||'').trim();
+  var caseCheck = (document.getElementById('op-case')?.value||'').trim();
   if (!agent) { alert('Please select an agent.'); return; }
   if (!proj)  { alert('Please select a project.'); return; }
-
-  // Case number validation — run here so message shows on form page not review page
-  if (caseNumCheck) {
-    var existingOp = (window._operationHistory||[]).find(function(r) {
-      return r.caseNumber && r.caseNumber.trim().toLowerCase() === caseNumCheck.toLowerCase();
-    });
-    if (existingOp) {
-      if (existingOp.agent !== agent) { showValidationToast('Case ' + caseNumCheck + ' belongs to agent: ' + existingOp.agent); return; }
-      if (existingOp.proj !== proj) { showValidationToast('Case ' + caseNumCheck + ' belongs to project: ' + existingOp.proj); return; }
-      // Same agent + same project = duplicate TL eval — always block
-      showValidationToast('Case ' + caseNumCheck + ' already evaluated by TL for this agent'); return;
-    }
-    var existingEval = _evalHistory.find(function(e) {
-      return e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNumCheck.toLowerCase();
-    });
-    if (existingEval) {
-      if (existingEval.agent !== agent) { showValidationToast('Case ' + caseNumCheck + ' belongs to agent: ' + existingEval.agent); return; }
-      if (existingEval.proj !== proj) { showValidationToast('Case ' + caseNumCheck + ' belongs to project: ' + existingEval.proj); return; }
+  // Case number validation using registry
+  if (caseCheck) {
+    var reg = window._caseRegistry || {};
+    var entry = reg[caseCheck.toLowerCase()];
+    if (entry) {
+      if (entry.agent !== agent) { showValidationToast('Case ' + caseCheck + ' belongs to agent: ' + entry.agent); return; }
+      if (entry.proj !== proj) { showValidationToast('Case ' + caseCheck + ' belongs to project: ' + entry.proj); return; }
+      if (entry.tlScore !== null) { showValidationToast('Case ' + caseCheck + ' already evaluated by TL'); return; }
     }
   }
   var d = opComputeScore();
@@ -7787,25 +7766,6 @@ function submitOperation() {
   var tlName = _currentUser?.tl || _currentUser?.name || '';
   if (!agent || !proj) { alert('Please select agent and project.'); return; }
 
-  // Final safety guard — block duplicate case number
-  if (caseNum) {
-    var dupOp = (window._operationHistory||[]).find(function(r) {
-      return r.caseNumber && r.caseNumber.trim().toLowerCase() === caseNum.toLowerCase();
-    });
-    if (dupOp) {
-      if (dupOp.agent !== agent) { showValidationToast('Case ' + caseNum + ' belongs to agent: ' + dupOp.agent); opShowStep('form'); return; }
-      if (dupOp.proj !== proj) { showValidationToast('Case ' + caseNum + ' belongs to project: ' + dupOp.proj); opShowStep('form'); return; }
-      showValidationToast('Case ' + caseNum + ' already evaluated by TL'); opShowStep('form'); return;
-    }
-    var dupEval = _evalHistory.find(function(e) {
-      return e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.toLowerCase();
-    });
-    if (dupEval) {
-      if (dupEval.agent !== agent) { showValidationToast('Case ' + caseNum + ' belongs to agent: ' + dupEval.agent); opShowStep('form'); return; }
-      if (dupEval.proj !== proj) { showValidationToast('Case ' + caseNum + ' belongs to project: ' + dupEval.proj); opShowStep('form'); return; }
-    }
-  }
-
   var d = opComputeScore();
   var now  = new Date();
   var date = now.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
@@ -7867,26 +7827,21 @@ function submitOperation() {
   try { if(document.getElementById('rep-tab-operation')?.style.display!=='none') renderOperationReport(); } catch(e) {}
   try { if(document.getElementById('hist-tab-operation')?.style.display!=='none') renderOperationHistory(); } catch(e) {}
 
-  // Show QA peer score if QA already evaluated same case
+  // Show peer QA score if exists
   var opPeerEl = document.getElementById('op-peer-score');
   if (opPeerEl && caseNum) {
-    var qaRecord = _evalHistory.find(function(e) {
-      return e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.trim().toLowerCase();
-    });
-    if (qaRecord) {
-      var peerCol = Number(qaRecord.overall)>=90?'var(--green)':Number(qaRecord.overall)>=80?'var(--gold)':'var(--red)';
-      opPeerEl.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--purple-l);margin-bottom:8px;">🔗 QA ALSO EVALUATED THIS CASE</div>' +
-        '<div style="display:flex;gap:12px;flex-wrap:wrap;">' +
-        '<div style="font-size:12px;"><span style="color:var(--muted);">QA:</span> <b>' + (qaRecord.qa||'—') + '</b></div>' +
-        '<div style="font-size:12px;"><span style="color:var(--muted);">Score:</span> <b style="color:' + peerCol + ';">' + Number(qaRecord.overall).toFixed(1) + '%</b></div>' +
-        '<div style="font-size:12px;"><span style="color:var(--muted);">Date:</span> <b>' + (fmtDate(qaRecord.date)||'—') + '</b></div>' +
+    var reg3 = window._caseRegistry || {};
+    var entry3 = reg3[caseNum.toLowerCase()];
+    if (entry3 && entry3.qaScore !== null) {
+      var pCol = entry3.qaScore>=90?'var(--green)':entry3.qaScore>=80?'var(--gold)':'var(--red)';
+      opPeerEl.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--purple-l);margin-bottom:8px;">🔗 QA SCORE FOR THIS CASE</div>' +
+        '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">' +
+        '<div style="font-size:13px;"><span style="color:var(--muted);">QA:</span> <b>' + (entry3.qaEval?.qa||'—') + '</b></div>' +
+        '<div style="font-size:20px;font-weight:800;color:' + pCol + ';">' + entry3.qaScore.toFixed(1) + '%</div>' +
         '</div>';
       opPeerEl.style.display = 'block';
-    } else {
-      opPeerEl.style.display = 'none';
-    }
+    } else { opPeerEl.style.display = 'none'; }
   }
-
   opShowStep('success');
 }
 
@@ -9667,10 +9622,47 @@ function loadFromGoogleSheets() {
             assessor:r.assessor,
             overall: parseFloat(r.overall) || 0,
           }));
+          // Also save cc/cb/nc_score from sheet
+          window._operationHistory = window._operationHistory.map((r, i) => {
+            var raw = res.operation[i];
+            return Object.assign(r, {
+              caseNumber: raw.caseNumber||raw.case_number||'',
+              nc_score: parseFloat(raw.nc_score)||0,
+              cc: raw.cc||'',
+              cb: raw.cb||''
+            });
+          });
         } catch(e) {}
       }
+
+      // Build case number registry from both evals and operations
+      try { buildCaseRegistry(); } catch(e) {}
+
     })
     .catch(err => console.warn('Google Sheets load failed:', err));
+}
+
+// Case number registry — built from sheet data after every sync
+window._caseRegistry = {};
+function buildCaseRegistry() {
+  var reg = {};
+  // Add from QA eval history
+  (_evalHistory||[]).forEach(function(e) {
+    if (!e.caseNumber) return;
+    var key = e.caseNumber.trim().toLowerCase();
+    if (!reg[key]) reg[key] = { agent: e.agent, proj: e.proj, qaScore: null, tlScore: null };
+    reg[key].qaScore = Number(e.overall);
+    reg[key].qaEval = e;
+  });
+  // Add from TL operation history
+  (window._operationHistory||[]).forEach(function(r) {
+    if (!r.caseNumber) return;
+    var key = r.caseNumber.trim().toLowerCase();
+    if (!reg[key]) reg[key] = { agent: r.agent, proj: r.proj, qaScore: null, tlScore: null };
+    reg[key].tlScore = Number(r.overall);
+    reg[key].tlEval = r;
+  });
+  window._caseRegistry = reg;
 }
 // Load from Google Sheets 1 second after startup
 setTimeout(loadFromGoogleSheets, 1000);
