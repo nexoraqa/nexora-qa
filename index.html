@@ -1212,6 +1212,7 @@ a { color:var(--purple-l); text-decoration:none; }
               <th>NC</th>
               <th>CC</th>
               <th>CB</th>
+              <th>Case</th>
               <th>Errors</th>
               <th>Status</th>
               <th>Date</th>
@@ -3628,18 +3629,15 @@ function goToReview() {
     return;
   }
 
-  // FIX 9: Block same case number with different agent
+  // Block duplicate case number in QA evaluations
   const caseNum = document.getElementById('c-case')?.value?.trim() || '';
   const agentVal = document.getElementById('c-agent')?.value || '';
   if (caseNum) {
-    const conflict = _evalHistory.find(e =>
-      e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.toLowerCase() &&
-      e.agent !== agentVal
+    const duplicate = _evalHistory.find(e =>
+      e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.toLowerCase()
     );
-    if (conflict) {
-      showValidationToast(`Case ${caseNum} already used for agent: ${conflict.agent}`);
-      const caseEl = document.getElementById('field-case') || document.getElementById('c-case');
-      if (caseEl) { caseEl.scrollIntoView({ behavior:'smooth', block:'center' }); }
+    if (duplicate) {
+      showValidationToast('Case ' + caseNum + ' already has a QA evaluation');
       return;
     }
   }
@@ -5154,6 +5152,7 @@ function renderHistory() {
       <td style="color:var(--gold);">${e.ncScore.toFixed(1)}/30</td>
       <td style="color:${e.ccPct===100?'var(--green)':'var(--red)'};">${e.ccPct===100?iconCheck():iconCross()}</td>
       <td style="color:${e.cbPct===100?'var(--green)':'var(--red)'};">${e.cbPct===100?iconCheck():iconCross()}</td>
+      <td style="color:var(--muted);font-size:11px;">${e.caseNumber||'—'}</td>
       <td>${e.errors.length > 0 ? errTags : '<span style="color:var(--green);font-size:11px;">None</span>'}</td>
       <td>${status}</td>
       <td style="color:var(--muted);font-size:11px;">${fmtDate(e.date)}</td>
@@ -6933,6 +6932,7 @@ function renderOperationHistory() {
       <th style="padding:8px 0;text-align:left;">Agent</th>
       <th style="padding:8px 4px;text-align:left;">TL</th>
       <th style="padding:8px 4px;text-align:left;">Project</th>
+      <th style="padding:8px 4px;text-align:left;">Case</th>
       <th style="padding:8px 4px;text-align:right;">Overall</th>
       <th style="padding:8px 4px;text-align:right;">NC</th>
       <th style="padding:8px 4px;text-align:center;">CC</th>
@@ -6960,6 +6960,7 @@ function renderOperationHistory() {
         </td>
         <td style="padding:10px 4px;color:var(--muted);font-size:12px;">${r.tl||'—'}</td>
         <td style="padding:10px 4px;color:var(--muted);font-size:12px;">${r.proj||'—'}</td>
+        <td style="padding:10px 4px;color:var(--muted);font-size:11px;">${r.caseNumber||'—'}</td>
         <td style="padding:10px 4px;text-align:right;"><span style="color:${col};font-weight:800;font-size:15px;">${Number(r.overall).toFixed(1)}%</span></td>
         <td style="padding:10px 4px;text-align:right;color:var(--gold);">${ncScore}</td>
         <td style="padding:10px 4px;text-align:center;color:${ccOk?'var(--green)':'var(--red)'};">${ccOk?iconCheck():iconCross()}</td>
@@ -7620,8 +7621,16 @@ function opLiveCalc() {
 function opGoToReview() {
   var agent = document.getElementById('op-agent')?.value;
   var proj  = document.getElementById('op-proj')?.value;
+  var caseCheck = (document.getElementById('op-case')?.value||'').trim();
   if (!agent) { alert('Please select an agent.'); return; }
   if (!proj)  { alert('Please select a project.'); return; }
+  // Block duplicate case number in TL operations
+  if (caseCheck) {
+    var dup = (window._operationHistory||[]).find(function(r) {
+      return r.caseNumber && r.caseNumber.trim().toLowerCase() === caseCheck.toLowerCase();
+    });
+    if (dup) { showValidationToast('Case ' + caseCheck + ' already has a TL evaluation'); return; }
+  }
   var d = opComputeScore();
   _opEval = d;
   var col = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
