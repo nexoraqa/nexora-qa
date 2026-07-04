@@ -10233,13 +10233,15 @@ function calibLiveScore() {
   var hasCC = errors.some(function(e){ return (e.type==='cc'||e.t==='cc') && !e.isNA; });
   var hasCB = errors.some(function(e){ return (e.type==='cb'||e.t==='cb') && !e.isNA; });
   var ncErrors = errors.filter(function(e){ return (e.type==='nc'||e.t==='nc') && !e.isNA; });
-  var ncFails = ncErrors.length;
+  // Count unique NC attributes failed (not sub-errors) — same as QA computeScore
+  var failedNcAttrs = ncErrors.map(function(e){ return e.attrName||e.attr||e.v||''; });
+  var uniqueNcAttrs = failedNcAttrs.filter(function(a,i){ return a && failedNcAttrs.indexOf(a)===i; });
+  var ncFails = uniqueNcAttrs.length;
   var holdNA = errors.some(function(e){ return e.isNA; });
-  var holdFail = errors.some(function(e){ return (e.type==='nc'||e.t==='nc') && !e.isNA && (e.subError||e.v||'').indexOf('HOLD') >= 0; });
 
   // NC scoring: always out of 30
-  // HOLD N/A → divide by 5 (6pts each for 5 attributes)
-  // HOLD Pass/Fail → divide by 6 (5pts each for 6 attributes)
+  // HOLD N/A → 5 attributes × 6pts each
+  // HOLD present → 6 attributes × 5pts each
   var ptsEach = holdNA ? 6 : 5;
   var ncScore = Math.max(0, 30 - (ncFails * ptsEach));
 
