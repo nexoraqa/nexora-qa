@@ -9413,33 +9413,33 @@ function loadFromGoogleSheets() {
         };
         // Build errors array from Yes/No/N/A columns
         const ncMap = {
-          'NC Call Opening/Closure':    'Call Opening/Closure',
-          'NC Choice of Words':         'Choice of Words / Avoid Slang / Technical Terms',
-          'NC Tone of Voice':           'Tone of Voice',
-          'NC Showing Empathy':         'Showing Empathy / handling objection',
-          'NC Active Listening':        'Active Listening',
-          'NC HOLD':                    'HOLD',
+          'nc_call_opening':    'Call Opening/Closure',
+          'nc_choice_of_words': 'Choice of Words / Avoid Slang / Technical Terms',
+          'nc_tone_of_voice':   'Tone of Voice',
+          'nc_showing_empathy': 'Showing Empathy / handling objection',
+          'nc_active_listening':'Active Listening',
+          'nc_hold':            'HOLD',
         };
         Object.entries(ncMap).forEach(([col, attr]) => {
           if (row[col] === 'No') { eval_obj.errors.push({t:'nc', v:attr, attr:attr, isNA:false}); eval_obj.ncCount++; }
           if (row[col] === 'N/A') { eval_obj.errors.push({t:'nc', v:attr, attr:attr, isNA:true}); }
         });
         const ccMap = {
-          'CC Customer Profile':   'Customer Profile',
-          'CC Wrong Information':  'Wrong Information',
-          'CC Missing Information':'Missing Information',
-          'CC Ticket Escalation':  'Ticket Escalation and Status',
-          'CC Transfer Process':   'Transfer Process',
-          'CC Professionalism':    'Professionalism / Attitude',
-          'CC Ticket Description': 'Ticket Description',
+          'cc_customer_profile':   'Customer Profile',
+          'cc_wrong_information':  'Wrong Information',
+          'cc_missing_information':'Missing Information',
+          'cc_ticket_escalation':  'Ticket Escalation and Status',
+          'cc_transfer_process':   'Transfer Process',
+          'cc_professionalism':    'Professionalism / Attitude',
+          'cc_ticket_description': 'Ticket Description',
         };
         Object.entries(ccMap).forEach(([col, attr]) => {
           if (row[col] === 'No') eval_obj.errors.push({t:'cc', v:attr, attr:attr, isNA:false});
         });
         const cbMap = {
-          'CB Ticket Creation':  'Ticket Creation and Categorization',
-          'CB Control the Call': 'Control the Call / Comprehension',
-          'CB Ticketing Tree':   'Ticketing Tree',
+          'cb_ticket_creation':  'Ticket Creation and Categorization',
+          'cb_control_the_call': 'Control the Call / Comprehension',
+          'cb_ticketing_tree':   'Ticketing Tree',
         };
         Object.entries(cbMap).forEach(([col, attr]) => {
           if (row[col] === 'No') eval_obj.errors.push({t:'cb', v:attr, attr:attr, isNA:false});
