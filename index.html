@@ -10161,7 +10161,20 @@ function calibBuildAttrs(cat, container) {
       subPanel.appendChild(calibBuildSubRow(sub, cat, catData.type, attr.name, false));
     });
     if (attr.naOption) {
-      subPanel.appendChild(calibBuildSubRow(attr.naOption, cat, catData.type, attr.name, true));
+      var naRow = calibBuildSubRow(attr.naOption, cat, catData.type, attr.name, true);
+      // HOLD N/A is default checked — same as QA form
+      var holdAlreadySelected = attr.subs.some(function(s) {
+        return (window._calibSelectedErrors||[]).some(function(e){ return e.subError === s; });
+      });
+      var naCb = naRow.querySelector('input[type=checkbox]');
+      if (!holdAlreadySelected && !(window._calibSelectedErrors||[]).some(function(e){ return e.subError === attr.naOption; })) {
+        naCb.checked = true;
+        if (!window._calibSelectedErrors) window._calibSelectedErrors = [];
+        window._calibSelectedErrors.push({cat:cat, type:catData.type, attrName:attr.name, subError:attr.naOption, isNA:true});
+        calibUpdateSummary();
+        calibLiveScore();
+      }
+      subPanel.appendChild(naRow);
     }
     wrap.appendChild(header); wrap.appendChild(subPanel); frag.appendChild(wrap);
   });
