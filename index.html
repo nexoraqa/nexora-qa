@@ -7668,8 +7668,28 @@ function opLiveCalc() {
 function opGoToReview() {
   var agent = document.getElementById('op-agent')?.value;
   var proj  = document.getElementById('op-proj')?.value;
+  var caseNumCheck = (document.getElementById('op-case')?.value||'').trim();
   if (!agent) { alert('Please select an agent.'); return; }
   if (!proj)  { alert('Please select a project.'); return; }
+
+  // Case number validation — run here so message shows on form page not review page
+  if (caseNumCheck) {
+    var existingOp = (window._operationHistory||[]).find(function(r) {
+      return r.caseNumber && r.caseNumber.trim().toLowerCase() === caseNumCheck.toLowerCase();
+    });
+    if (existingOp) {
+      if (existingOp.agent !== agent) { showValidationToast('Case ' + caseNumCheck + ' belongs to agent: ' + existingOp.agent); return; }
+      if (existingOp.proj !== proj) { showValidationToast('Case ' + caseNumCheck + ' belongs to project: ' + existingOp.proj); return; }
+      showValidationToast('Case ' + caseNumCheck + ' already evaluated by TL'); return;
+    }
+    var existingEval = _evalHistory.find(function(e) {
+      return e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNumCheck.toLowerCase();
+    });
+    if (existingEval) {
+      if (existingEval.agent !== agent) { showValidationToast('Case ' + caseNumCheck + ' belongs to agent: ' + existingEval.agent); return; }
+      if (existingEval.proj !== proj) { showValidationToast('Case ' + caseNumCheck + ' belongs to project: ' + existingEval.proj); return; }
+    }
+  }
   var d = opComputeScore();
   _opEval = d;
   var col = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
@@ -7766,34 +7786,7 @@ function submitOperation() {
   var tlName = _currentUser?.tl || _currentUser?.name || '';
   if (!agent || !proj) { alert('Please select agent and project.'); return; }
 
-  // Case number validation
-  if (caseNum) {
-    // Check TL operation history — block duplicate TL eval
-    const existingOp = (window._operationHistory||[]).find(r =>
-      r.caseNumber && r.caseNumber.trim().toLowerCase() === caseNum.toLowerCase()
-    );
-    if (existingOp) {
-      if (existingOp.agent !== agent) {
-        showOpToast('Case ' + caseNum + ' belongs to agent: ' + existingOp.agent, 'warn'); return;
-      }
-      if (existingOp.proj !== proj) {
-        showOpToast('Case ' + caseNum + ' belongs to project: ' + existingOp.proj, 'warn'); return;
-      }
-      showOpToast('Case ' + caseNum + ' already evaluated by TL', 'warn'); return;
-    }
-    // Check QA eval history — different agent or project blocked
-    const existingEval = _evalHistory.find(e =>
-      e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.toLowerCase()
-    );
-    if (existingEval) {
-      if (existingEval.agent !== agent) {
-        showOpToast('Case ' + caseNum + ' belongs to agent: ' + existingEval.agent, 'warn'); return;
-      }
-      if (existingEval.proj !== proj) {
-        showOpToast('Case ' + caseNum + ' belongs to project: ' + existingEval.proj, 'warn'); return;
-      }
-    }
-  }
+
 
   var d = opComputeScore();
   var now  = new Date();
