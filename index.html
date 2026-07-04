@@ -7680,7 +7680,8 @@ function opGoToReview() {
     if (existingOp) {
       if (existingOp.agent !== agent) { showValidationToast('Case ' + caseNumCheck + ' belongs to agent: ' + existingOp.agent); return; }
       if (existingOp.proj !== proj) { showValidationToast('Case ' + caseNumCheck + ' belongs to project: ' + existingOp.proj); return; }
-      showValidationToast('Case ' + caseNumCheck + ' already evaluated by TL'); return;
+      // Same agent + same project = duplicate TL eval — always block
+      showValidationToast('Case ' + caseNumCheck + ' already evaluated by TL for this agent'); return;
     }
     var existingEval = _evalHistory.find(function(e) {
       return e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNumCheck.toLowerCase();
