@@ -1904,7 +1904,8 @@ a { color:var(--purple-l); text-decoration:none; }
             <div class="card-title">Agent Information</div>
             <div class="field">
               <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
-              <input type="text" id="op-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
+              <input type="text" id="op-case" placeholder="e.g. CASE-2026-04521" oninput="opCheckCaseNumber(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
+              <div id="op-case-info" style="display:none;margin-top:8px;background:var(--purple)18;border:1px solid var(--purple)44;border-radius:var(--radius-s);padding:10px 14px;"></div>
             </div>
             <div class="field">
               <label>Agent Name <span style="color:var(--red);">*</span></label>
@@ -7703,6 +7704,33 @@ function opResetForm() {
   if (summary) summary.style.display = 'none';
   opLiveCalc();
   opShowStep('form');
+}
+
+function opCheckCaseNumber(val) {
+  var infoEl = document.getElementById('op-case-info');
+  if (!infoEl) return;
+  var caseNum = (val||'').trim().toLowerCase();
+  if (!caseNum) { infoEl.style.display = 'none'; return; }
+
+  // Check QA eval history
+  var qaEval = _evalHistory.find(function(e) {
+    return e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum;
+  });
+
+  if (qaEval) {
+    var col = Number(qaEval.overall) >= 90 ? 'var(--green)' : Number(qaEval.overall) >= 80 ? 'var(--gold)' : 'var(--red)';
+    infoEl.innerHTML =
+      '<div style="font-size:11px;font-weight:700;color:var(--purple-l);margin-bottom:6px;">📋 QA EVALUATION FOUND</div>' +
+      '<div style="display:flex;gap:12px;flex-wrap:wrap;">' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">Agent:</span> <b>' + (qaEval.agent||'—') + '</b></div>' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">QA:</span> <b>' + (qaEval.qa||'—') + '</b></div>' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">Score:</span> <b style="color:' + col + ';">' + Number(qaEval.overall).toFixed(1) + '%</b></div>' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">Date:</span> <b>' + (fmtDate(qaEval.date)||'—') + '</b></div>' +
+      '</div>';
+    infoEl.style.display = 'block';
+  } else {
+    infoEl.style.display = 'none';
+  }
 }
 
 function submitOperation() {
