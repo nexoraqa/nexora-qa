@@ -7787,7 +7787,24 @@ function submitOperation() {
   var tlName = _currentUser?.tl || _currentUser?.name || '';
   if (!agent || !proj) { alert('Please select agent and project.'); return; }
 
-
+  // Final safety guard — block duplicate case number
+  if (caseNum) {
+    var dupOp = (window._operationHistory||[]).find(function(r) {
+      return r.caseNumber && r.caseNumber.trim().toLowerCase() === caseNum.toLowerCase();
+    });
+    if (dupOp) {
+      if (dupOp.agent !== agent) { showValidationToast('Case ' + caseNum + ' belongs to agent: ' + dupOp.agent); opShowStep('form'); return; }
+      if (dupOp.proj !== proj) { showValidationToast('Case ' + caseNum + ' belongs to project: ' + dupOp.proj); opShowStep('form'); return; }
+      showValidationToast('Case ' + caseNum + ' already evaluated by TL'); opShowStep('form'); return;
+    }
+    var dupEval = _evalHistory.find(function(e) {
+      return e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.toLowerCase();
+    });
+    if (dupEval) {
+      if (dupEval.agent !== agent) { showValidationToast('Case ' + caseNum + ' belongs to agent: ' + dupEval.agent); opShowStep('form'); return; }
+      if (dupEval.proj !== proj) { showValidationToast('Case ' + caseNum + ' belongs to project: ' + dupEval.proj); opShowStep('form'); return; }
+    }
+  }
 
   var d = opComputeScore();
   var now  = new Date();
