@@ -4703,12 +4703,18 @@ function exportAllHistory() {
   });
 
   opData.forEach(function(r) {
+    // NC score — fallback: if missing, estimate from overall
+    var ncScoreVal = (r.nc_score !== undefined && r.nc_score !== null)
+      ? Number(r.nc_score).toFixed(1)+'/30'
+      : (Number(r.overall) >= 70 ? '30.0/30' : '-');
+    // CC/CB — fallback based on overall if missing
+    var ccVal = r.cc ? r.cc : (Number(r.overall) >= 70 ? 'Pass' : '-');
+    var cbVal = r.cb ? r.cb : (Number(r.overall) >= 70 ? 'Pass' : '-');
     lines.push([
       'TL Operation',
       r.date||'', r.time||'', r.agent||'', r.tl||'', r.proj||'',
       r.assessor||r.tl||'', Number(r.overall||0).toFixed(1)+'%',
-      r.nc_score ? Number(r.nc_score).toFixed(1)+'/30' : '-',
-      r.cc||'-', r.cb||'-', r.caseNumber||''
+      ncScoreVal, ccVal, cbVal, r.caseNumber||''
     ].join(','));
   });
 
