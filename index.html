@@ -1070,6 +1070,9 @@ a { color:var(--purple-l); text-decoration:none; }
           <div style="font-size:13px;color:var(--muted);margin-top:8px;" id="success-agent">—</div>
         </div>
 
+        <!-- Peer score — shows TL score if TL evaluated same case -->
+        <div id="qa-peer-score" style="display:none;max-width:360px;margin:0 auto 24px;background:var(--purple)18;border:1px solid var(--purple)44;border-radius:var(--radius);padding:16px;"></div>
+
         <div style="max-width:360px;margin:0 auto;display:flex;flex-direction:column;gap:10px;">
           <button class="btn btn-primary" onclick="resetCalc()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span> Submit New Evaluation</button>
           <button class="btn btn-secondary" onclick="window.print()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="1"/><path d="M6 17v4h12v-4"/></svg></span> Print / Save PDF</button>
@@ -1904,8 +1907,7 @@ a { color:var(--purple-l); text-decoration:none; }
             <div class="card-title">Agent Information</div>
             <div class="field">
               <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
-              <input type="text" id="op-case" placeholder="e.g. CASE-2026-04521" oninput="opCheckCaseNumber(this.value)" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
-              <div id="op-case-info" style="display:none;margin-top:8px;background:var(--purple)18;border:1px solid var(--purple)44;border-radius:var(--radius-s);padding:10px 14px;"></div>
+              <input type="text" id="op-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
             </div>
             <div class="field">
               <label>Agent Name <span style="color:var(--red);">*</span></label>
@@ -2035,6 +2037,9 @@ a { color:var(--purple-l); text-decoration:none; }
           <div class="score-big" id="op-success-score" style="color:var(--green);">—</div>
           <div style="font-size:13px;color:var(--muted);margin-top:8px;" id="op-success-agent">—</div>
         </div>
+        <!-- Peer score — shows QA score if QA evaluated same case -->
+        <div id="op-peer-score" style="display:none;max-width:360px;margin:0 auto 24px;background:var(--purple)18;border:1px solid var(--purple)44;border-radius:var(--radius);padding:16px;"></div>
+
         <button class="btn btn-primary" onclick="opResetForm()">
           <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span> Submit New Operation Eval
         </button>
@@ -3705,6 +3710,26 @@ function submitEval() {
   const scoreEl = document.getElementById('success-score');
   scoreEl.textContent = d.overall.toFixed(1)+'%';
   scoreEl.style.color = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
+
+  // Show TL peer score if TL already evaluated same case
+  const peerEl = document.getElementById('qa-peer-score');
+  if (peerEl && d.caseNumber) {
+    const tlRecord = (window._operationHistory||[]).find(r =>
+      r.caseNumber && r.caseNumber.trim().toLowerCase() === d.caseNumber.trim().toLowerCase()
+    );
+    if (tlRecord) {
+      const col = Number(tlRecord.overall)>=90?'var(--green)':Number(tlRecord.overall)>=80?'var(--gold)':'var(--red)';
+      peerEl.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--purple-l);margin-bottom:8px;">🔗 TL ALSO EVALUATED THIS CASE</div>' +
+        '<div style="display:flex;gap:12px;flex-wrap:wrap;">' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">TL:</span> <b>' + (tlRecord.tl||'—') + '</b></div>' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">Score:</span> <b style="color:' + col + ';">' + Number(tlRecord.overall).toFixed(1) + '%</b></div>' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">Date:</span> <b>' + (fmtDate(tlRecord.date)||'—') + '</b></div>' +
+        '</div>';
+      peerEl.style.display = 'block';
+    } else {
+      peerEl.style.display = 'none';
+    }
+  }
   document.getElementById('success-agent').textContent  = d.agent+' · '+d.proj;
   document.getElementById('success-detail').textContent = `${d.agent}'s evaluation (${d.overall.toFixed(1)}%) recorded on ${d.today}`;
   // Hide old coaching box
@@ -7830,6 +7855,26 @@ function submitOperation() {
 
   try { if(document.getElementById('rep-tab-operation')?.style.display!=='none') renderOperationReport(); } catch(e) {}
   try { if(document.getElementById('hist-tab-operation')?.style.display!=='none') renderOperationHistory(); } catch(e) {}
+
+  // Show QA peer score if QA already evaluated same case
+  var opPeerEl = document.getElementById('op-peer-score');
+  if (opPeerEl && caseNum) {
+    var qaRecord = _evalHistory.find(function(e) {
+      return e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.trim().toLowerCase();
+    });
+    if (qaRecord) {
+      var peerCol = Number(qaRecord.overall)>=90?'var(--green)':Number(qaRecord.overall)>=80?'var(--gold)':'var(--red)';
+      opPeerEl.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--purple-l);margin-bottom:8px;">🔗 QA ALSO EVALUATED THIS CASE</div>' +
+        '<div style="display:flex;gap:12px;flex-wrap:wrap;">' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">QA:</span> <b>' + (qaRecord.qa||'—') + '</b></div>' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">Score:</span> <b style="color:' + peerCol + ';">' + Number(qaRecord.overall).toFixed(1) + '%</b></div>' +
+        '<div style="font-size:12px;"><span style="color:var(--muted);">Date:</span> <b>' + (fmtDate(qaRecord.date)||'—') + '</b></div>' +
+        '</div>';
+      opPeerEl.style.display = 'block';
+    } else {
+      opPeerEl.style.display = 'none';
+    }
+  }
 
   opShowStep('success');
 }
