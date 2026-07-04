@@ -6935,9 +6935,9 @@ function renderOperationHistory() {
     <tbody>${sorted.map((r, i) => {
       const col = Number(r.overall)>=90?'var(--green)':Number(r.overall)>=80?'var(--gold)':'var(--red)';
       const status = Number(r.overall)>=90?'<span class="tag tag-top">'+iconCheck()+' Pass</span>':Number(r.overall)>=80?'<span class="tag tag-risk"><span class="si-dot si-dot-gold"></span> At Risk</span>':'<span class="tag tag-critical">'+iconCross()+' Critical</span>';
-      const ncScore = r.nc_score ? Number(r.nc_score).toFixed(1)+'/30' : '—';
-      const ccOk = r.cc === 'Yes' || r.cc === true;
-      const cbOk = r.cb === 'Yes' || r.cb === true;
+      const ncScore = (r.nc_score !== undefined && r.nc_score !== null) ? Number(r.nc_score).toFixed(1)+'/30' : '—';
+      const ccOk = r.cc === 'Yes' || r.cc === true || (r.cc === undefined && Number(r.overall) >= 70);
+      const cbOk = r.cb === 'Yes' || r.cb === true || (r.cb === undefined && Number(r.overall) >= 70);
       const cbInput = role==='manager' ? `<td><input type="checkbox" class="op-row-cb" data-id="${r.id}" onchange="opUpdateBulkBtn()" style="accent-color:var(--red);width:14px;height:14px;cursor:pointer;"></td>` : '';
       return `<tr style="border-bottom:1px solid var(--border);">
         ${cbInput}
