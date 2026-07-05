@@ -3635,10 +3635,10 @@ function goToReview() {
     return;
   }
 
-  // Block duplicate case number in QA evaluations
+  // Block duplicate case number in QA evaluations (skip if editing)
   const caseNum = document.getElementById('c-case')?.value?.trim() || '';
   const agentVal = document.getElementById('c-agent')?.value || '';
-  if (caseNum) {
+  if (caseNum && !window._editUid) {
     const duplicate = _evalHistory.find(e =>
       e.caseNumber && e.caseNumber.trim().toLowerCase() === caseNum.toLowerCase()
     );
