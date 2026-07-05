@@ -923,7 +923,7 @@ a { color:var(--purple-l); text-decoration:none; }
   <div class="page" id="page-calc">
 
     <!-- Cancel edit button — only shows in edit mode -->
-    <div id="edit-cancel-bar" style="display:none;background:var(--blue-dim);border:1px solid #4a86e844;border-radius:var(--radius-s);padding:12px 16px;margin-bottom:14px;display:none;align-items:center;justify-content:space-between;">
+    <div id="edit-cancel-bar" style="display:none;background:var(--blue-dim);border:1px solid #4a86e844;border-radius:var(--radius-s);padding:12px 16px;margin-bottom:14px;align-items:center;justify-content:space-between;">
       <div style="font-size:13px;font-weight:600;color:var(--blue-l);">✏️ Editing existing evaluation</div>
       <button onclick="cancelEdit()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius-s);padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">✕ Cancel</button>
     </div>
@@ -3772,11 +3772,11 @@ function editEval(uid) {
   const e = _evalHistory.find(ev => String(ev.uid) === String(uid));
   if (!e) { alert('Evaluation not found'); return; }
 
-  // Store edit UID
-  window._editUid = uid;
-
-  // Reset form first
+  // Reset form first (must be before setting _editUid since resetCalc was hiding bar)
   resetCalc();
+
+  // Store edit UID after reset
+  window._editUid = uid;
 
   // Pre-fill form fields
   setTimeout(function() {
@@ -3819,7 +3819,7 @@ function editEval(uid) {
 }
 
 function resetCalc() {
-  window._editUid = null; // Clear edit mode
+  // Note: _editUid is NOT cleared here — cleared only after submit or cancel
   var bar = document.getElementById('edit-cancel-bar');
   if (bar) bar.style.display = 'none';
   _selectedErrors = [];
