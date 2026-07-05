@@ -5250,7 +5250,7 @@ function renderHistory() {
         <button onclick="exportSingleEval(${e.uid})"
           style="background:var(--green-dim);border:1px solid #18b87044;color:var(--green);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;margin-right:4px;"
           onmouseover="this.style.background='#18b87025'" onmouseout="this.style.background='var(--green-dim)'"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/></svg></span></button>
-        ${(role==='qa' && e.qa === name) ? `<button onclick="editEval(${e.uid})"
+        ${role==='qa' ? `<button onclick="editEval(${e.uid})"
           style="background:var(--blue-dim);border:1px solid #4a86e844;color:var(--blue-l);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;margin-right:4px;"
           title="Edit this evaluation">✏️</button>` : ''}
         ${window._canDelete ? `<button onclick="openDeleteModal(${e.uid})"
