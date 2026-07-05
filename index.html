@@ -4776,13 +4776,12 @@ function exportAllHistory() {
   });
 
   opData.forEach(function(r) {
-    // NC score — fallback: if missing, estimate from overall
+    // NC score — show actual value or — if missing
     var ncScoreVal = (r.nc_score !== undefined && r.nc_score !== null)
-      ? Number(r.nc_score).toFixed(1)+'/30'
-      : (Number(r.overall) >= 70 ? '30.0/30' : '-');
-    // CC/CB — fallback based on overall if missing
-    var ccVal = r.cc ? r.cc : (Number(r.overall) >= 70 ? 'Pass' : '-');
-    var cbVal = r.cb ? r.cb : (Number(r.overall) >= 70 ? 'Pass' : '-');
+      ? Number(r.nc_score).toFixed(1)+'/30' : '—';
+    // CC/CB — show actual value or — if missing (old records)
+    var ccVal = r.cc ? r.cc : '—';
+    var cbVal = r.cb ? r.cb : '—';
     lines.push([
       'TL Operation',
       r.date||'', r.time||'', r.agent||'', r.tl||'', r.proj||'',
