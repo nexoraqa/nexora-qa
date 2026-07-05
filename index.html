@@ -3599,7 +3599,7 @@ function setFieldError(fieldId, show) {
   if (err) err.style.display = show ? 'block' : 'none';
 }
 
-function goToReview() {
+async function goToReview() {
   // Validate all mandatory fields
   const checks = [
     { id:'c-proj',  field:'field-proj',  label:'Project' },
@@ -3639,6 +3639,20 @@ function goToReview() {
     if (duplicate) {
       showValidationToast('Case ' + caseNum + ' already has a QA evaluation');
       return;
+    }
+    // Live check against Google Sheets — catches a case number submitted
+    // seconds ago by someone else, before this device has synced it in
+    try {
+      const checkRes  = await fetch(GOOGLE_SHEET_URL + '?action=check_case&sheet=Evals&caseNumber=' + encodeURIComponent(caseNum));
+      const checkData = await checkRes.json();
+      if (checkData.exists) {
+        showValidationToast('Case ' + caseNum + ' already has a QA evaluation');
+        return;
+      }
+    } catch (err) {
+      // If the live check itself fails (e.g. no internet), don't block the user —
+      // fall back to the local check above, which already ran
+      console.warn('Live case check failed, continuing with local check only:', err);
     }
   }
 
@@ -7618,7 +7632,7 @@ function opLiveCalc() {
   }
 }
 
-function opGoToReview() {
+async function opGoToReview() {
   var agent = document.getElementById('op-agent')?.value;
   var proj  = document.getElementById('op-proj')?.value;
   var caseCheck = (document.getElementById('op-case')?.value||'').trim();
@@ -7630,6 +7644,20 @@ function opGoToReview() {
       return r.caseNumber && r.caseNumber.trim().toLowerCase() === caseCheck.toLowerCase();
     });
     if (dup) { showValidationToast('Case ' + caseCheck + ' already has a TL evaluation'); return; }
+    // Live check against Google Sheets — catches a case number submitted
+    // seconds ago by another TL, before this device has synced it in
+    try {
+      const checkRes  = await fetch(GOOGLE_SHEET_URL + '?action=check_case&sheet=Operation&caseNumber=' + encodeURIComponent(caseCheck));
+      const checkData = await checkRes.json();
+      if (checkData.exists) {
+        showValidationToast('Case ' + caseCheck + ' already has a TL evaluation');
+        return;
+      }
+    } catch (err) {
+      // If the live check itself fails (e.g. no internet), don't block the user —
+      // fall back to the local check above, which already ran
+      console.warn('Live case check failed, continuing with local check only:', err);
+    }
   }
   var d = opComputeScore();
   _opEval = d;
@@ -9422,6 +9450,7 @@ function loadFromGoogleSheets() {
           qa:      row.assessor,
           lang:    row.language || '',
           country: row.country  || '',
+          caseNumber: row.caseNumber || '',
           overall: parseFloat(row.overall) || 0,
           cc:      row['CC Customer Profile']==='No'||row['CC Wrong Information']==='No'||
                    row['CC Missing Information']==='No'||row['CC Ticket Escalation']==='No'||
@@ -9539,6 +9568,7 @@ function loadFromGoogleSheets() {
             country: r.country,
             lang:    r.language,
             assessor:r.assessor,
+            caseNumber: r.caseNumber || '',
             overall: parseFloat(r.overall) || 0,
           }));
         } catch(e) {}
