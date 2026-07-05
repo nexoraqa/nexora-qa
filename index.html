@@ -3625,6 +3625,31 @@ function showValidationToast(msg) {
   window._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 3000);
 }
 
+function showBadgePopup(index) {
+  const b = (window._agentBadges || [])[index];
+  if (!b) return;
+  let popup = document.getElementById('badge-popup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'badge-popup';
+    popup.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#00000066;';
+    popup.innerHTML = '<div id="badge-popup-card" style="background:var(--card);border-radius:16px;padding:24px;max-width:300px;width:90%;box-shadow:0 8px 32px #0008;text-align:center;"></div>';
+    popup.addEventListener('click', function(ev){ if (ev.target === popup) closeBadgePopup(); });
+    document.body.appendChild(popup);
+  }
+  document.getElementById('badge-popup-card').innerHTML =
+    '<div style="font-size:36px;margin-bottom:8px;">' + b.icon + '</div>' +
+    '<div style="font-size:15px;font-weight:800;color:' + b.color + ';margin-bottom:6px;">' + b.label + '</div>' +
+    '<div style="font-size:13px;color:var(--text-2);margin-bottom:14px;">' + b.desc + '</div>' +
+    '<div style="font-size:11px;color:var(--muted);background:var(--border);border-radius:8px;padding:8px 12px;">' + b.detail + '</div>' +
+    '<button onclick="closeBadgePopup()" style="margin-top:16px;background:' + b.color + '22;border:1px solid ' + b.color + '44;color:' + b.color + ';border-radius:8px;padding:6px 20px;font-size:12px;font-weight:700;cursor:pointer;">Got it</button>';
+  popup.style.display = 'flex';
+}
+function closeBadgePopup() {
+  const popup = document.getElementById('badge-popup');
+  if (popup) popup.style.display = 'none';
+}
+
 function clearFieldError(fieldId) {
   const field = document.getElementById(fieldId);
   if (!field) return;
@@ -9399,27 +9424,46 @@ function renderAgentDashboard(user) {
     const badges = [];
 
     // Perfect Score badge
-    if (agentEvals.some(e => Number(e.overall) === 100)) badges.push({icon:'⭐', label:'Perfect Score', color:'var(--gold)'});
+    const perfectEval = agentEvals.find(e => Number(e.overall) === 100);
+    if (perfectEval) badges.push({
+      icon:'⭐', label:'Perfect Score', color:'var(--gold)',
+      desc: 'You scored 100% on an evaluation.',
+      detail: 'Case ' + (perfectEval.caseNumber||'—') + ' · 100% · ' + (perfectEval.date||'') + (perfectEval.qa ? ' · by ' + perfectEval.qa : '')
+    });
 
     // No CC errors in last 5 evals
     const last5 = agentEvals.slice(0,5);
-    if (last5.length >= 3 && last5.every(e => !(e.errors||[]).some(x=>x.t==='cc'&&!x.isNA))) badges.push({icon:'🛡', label:'CC Clean Streak', color:'var(--green)'});
+    if (last5.length >= 3 && last5.every(e => !(e.errors||[]).some(x=>x.t==='cc'&&!x.isNA))) badges.push({
+      icon:'🛡', label:'CC Clean Streak', color:'var(--green)',
+      desc: 'No critical customer errors in your last ' + last5.length + ' evaluations.',
+      detail: 'Last eval: Case ' + (last5[0].caseNumber||'—') + ' · ' + Number(last5[0].overall).toFixed(1) + '% · ' + (last5[0].date||'')
+    });
 
     // Improved — last score better than first
     if (agentEvals.length >= 2) {
       const latest = Number(agentEvals[0].overall);
       const oldest = Number(agentEvals[agentEvals.length-1].overall);
-      if (latest > oldest) badges.push({icon:'📈', label:'Improving', color:'var(--blue-l)'});
+      if (latest > oldest) badges.push({
+        icon:'📈', label:'Improving', color:'var(--blue-l)',
+        desc: 'Your latest score is higher than your first evaluation.',
+        detail: 'First: ' + oldest.toFixed(1) + '% → Latest: ' + latest.toFixed(1) + '% · Case ' + (agentEvals[0].caseNumber||'—')
+      });
     }
 
     // Passing streak
     let streak = 0;
     for (let e of agentEvals) { if (Number(e.overall) >= 90) streak++; else break; }
-    if (streak >= 3) badges.push({icon:'🔥', label: streak + ' Pass Streak', color:'var(--orange)'});
+    if (streak >= 3) badges.push({
+      icon:'🔥', label: streak + ' Pass Streak', color:'var(--orange)',
+      desc: 'You passed ' + streak + ' evaluations in a row above 90%.',
+      detail: 'Latest: Case ' + (agentEvals[0].caseNumber||'—') + ' · ' + Number(agentEvals[0].overall).toFixed(1) + '% · ' + (agentEvals[0].date||'')
+    });
 
     if (badges.length > 0) {
-      badgesEl.innerHTML = badges.map(b =>
-        '<div style="display:flex;align-items:center;gap:5px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:' + b.color + ';">' + b.icon + ' ' + b.label + '</div>'
+      // Store badges globally so popup can read them
+      window._agentBadges = badges;
+      badgesEl.innerHTML = badges.map((b, i) =>
+        '<div onclick="showBadgePopup(' + i + ')" style="cursor:pointer;display:flex;align-items:center;gap:5px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:' + b.color + ';">' + b.icon + ' ' + b.label + '</div>'
       ).join('');
     } else {
       badgesEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">Submit more evals to earn badges</div>';
