@@ -5817,7 +5817,7 @@ function renderNCTab() {
               '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">NC Sub-Errors</div>' +
               ncSubAttrs.map(s => '<div style="display:inline-block;padding:5px 10px;background:rgba(232,162,61,.1);border:1px solid rgba(232,162,61,.3);border-radius:6px;margin:0 5px 5px 0;font-size:11px;font-weight:600;color:var(--gold);">↳ ' + s + '</div>').join('') :
               '<div style="color:var(--muted);font-size:12px;">No sub-error detail available</div>';
-            return '<tr onclick="toggleNCRow(this,&quot;'+expandId+'&quot;);" style="cursor:pointer;">' + +
+            return '<tr onclick="toggleNCRow(this,\'' + expandId + '\')" style="cursor:pointer;border-bottom:1px solid var(--border);">' + +
               '<td><span class="nc-arrow" style="color:var(--muted);font-size:10px;">▶</span></td>' +
               '<td style="font-weight:700;">' + a.name + '</td>' +
               '<td style="color:var(--muted);">' + (a.tl||'—') + '</td>' +
