@@ -1718,6 +1718,7 @@ a { color:var(--purple-l); text-decoration:none; }
     <div style="display:flex;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;">
       <button onclick="setReportTab('leaderboard')" id="rtab-leaderboard" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid var(--purple);background:none;color:var(--purple);font-family:var(--font-b);margin-bottom:-1px;">🏆 Leaderboard</button>
       <button onclick="setReportTab('mom')" id="rtab-mom" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;">📅 Month-over-Month</button>
+      <button onclick="setReportTab('trend')" id="rtab-trend" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;">📈 Trend</button>
       <button onclick="setReportTab('operation')" id="rtab-operation" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;">📋 TL Operations</button>
       <button onclick="setReportTab('smart')" id="rtab-smart" style="padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;color:var(--muted);font-family:var(--font-b);margin-bottom:-1px;">✨ Smart Reports</button>
     </div>
@@ -1790,6 +1791,34 @@ a { color:var(--purple-l); text-decoration:none; }
         <div id="mom-content"></div>
       </div>
     </div><!-- /rep-tab-mom -->
+
+    <!-- Tab: Trend Chart -->
+    <div id="rep-tab-trend" style="display:none;">
+      <div class="card" style="margin-top:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+          <div class="card-title" style="margin-bottom:0;">📈 Score Trend Over Time</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <select class="fsel" id="trend-view" onchange="renderTrendChart()">
+              <option value="overall">Overall Average</option>
+              <option value="agent">By Agent</option>
+              <option value="tl">By TL</option>
+              <option value="project">By Project</option>
+            </select>
+            <select class="fsel" id="trend-agent" onchange="renderTrendChart()" style="display:none;"><option value="">Select Agent</option></select>
+            <select class="fsel" id="trend-tl" onchange="renderTrendChart()" style="display:none;"><option value="all">All TLs</option></select>
+            <select class="fsel" id="trend-proj" onchange="renderTrendChart()" style="display:none;"><option value="all">All Projects</option></select>
+            <select class="fsel" id="trend-period" onchange="renderTrendChart()">
+              <option value="week">Weekly</option>
+              <option value="month">Monthly</option>
+            </select>
+          </div>
+        </div>
+        <div style="position:relative;height:300px;">
+          <canvas id="trendChart"></canvas>
+        </div>
+        <div id="trend-empty" style="display:none;text-align:center;padding:60px;color:var(--muted);font-size:13px;">No evaluation data yet — submit some evaluations first</div>
+      </div>
+    </div><!-- /rep-tab-trend -->
 
     <!-- Tab: TL Operations -->
     <div id="rep-tab-operation" style="display:none;">
@@ -6124,7 +6153,7 @@ function renderLeaderboard() {
 }
 
 function setReportTab(tab) {
-  const tabs = ['leaderboard','mom','operation','smart'];
+  const tabs = ['leaderboard','mom','operation','smart','trend'];
   tabs.forEach(t => {
     const btn = document.getElementById('rtab-'+t);
     const content = document.getElementById('rep-tab-'+t);
@@ -6137,6 +6166,124 @@ function setReportTab(tab) {
   if (tab === 'mom') try { renderMoM(); } catch(e) {}
   if (tab === 'leaderboard') try { renderLeaderboard(); } catch(e) {}
   if (tab === 'operation') renderOperationReport();
+  if (tab === 'trend') try { renderTrendChart(); } catch(e) {}
+}
+
+var _trendChartInstance = null;
+
+function renderTrendChart() {
+  const view   = document.getElementById('trend-view')?.value || 'overall';
+  const period = document.getElementById('trend-period')?.value || 'week';
+  const canvas = document.getElementById('trendChart');
+  const empty  = document.getElementById('trend-empty');
+  if (!canvas) return;
+
+  // Show/hide filter dropdowns
+  document.getElementById('trend-agent').style.display  = view==='agent'   ? 'block' : 'none';
+  document.getElementById('trend-tl').style.display     = view==='tl'      ? 'block' : 'none';
+  document.getElementById('trend-proj').style.display   = view==='project' ? 'block' : 'none';
+
+  // Populate agent/tl/project dropdowns
+  const agents  = [...new Set(_evalHistory.map(e=>e.agent))].sort();
+  const tls     = [...new Set(_evalHistory.map(e=>e.tl))].filter(Boolean).sort();
+  const projs   = [...new Set(_evalHistory.map(e=>e.proj))].filter(Boolean).sort();
+  const agSel   = document.getElementById('trend-agent');
+  const tlSel   = document.getElementById('trend-tl');
+  const prSel   = document.getElementById('trend-proj');
+  if (agSel && agSel.options.length <= 1) agents.forEach(a=>{ const o=document.createElement('option');o.value=a;o.textContent=a;agSel.appendChild(o); });
+  if (tlSel && tlSel.options.length <= 1) tls.forEach(t=>{ const o=document.createElement('option');o.value=t;o.textContent=t;tlSel.appendChild(o); });
+  if (prSel && prSel.options.length <= 1) projs.forEach(p=>{ const o=document.createElement('option');o.value=p;o.textContent=p;prSel.appendChild(o); });
+
+  if (!_evalHistory.length) {
+    canvas.style.display='none'; if(empty) empty.style.display='block'; return;
+  }
+  canvas.style.display='block'; if(empty) empty.style.display='none';
+
+  // Group evals by period
+  function getPeriodKey(dateStr) {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d)) return null;
+      if (period === 'month') return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+      // Week: use ISO week
+      const day = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      const dayNum = day.getUTCDay() || 7;
+      day.setUTCDate(day.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(day.getUTCFullYear(),0,1));
+      const weekNo = Math.ceil((((day-yearStart)/86400000)+1)/7);
+      return day.getUTCFullYear()+'-W'+String(weekNo).padStart(2,'0');
+    } catch(e) { return null; }
+  }
+
+  // Filter evals
+  let evals = _evalHistory;
+  if (view==='agent' && agSel?.value) evals = evals.filter(e=>e.agent===agSel.value);
+  if (view==='tl' && tlSel?.value && tlSel.value!=='all') evals = evals.filter(e=>e.tl===tlSel.value);
+  if (view==='project' && prSel?.value && prSel.value!=='all') evals = evals.filter(e=>e.proj===prSel.value);
+
+  // Build period buckets
+  const buckets = {};
+  evals.forEach(e => {
+    const key = getPeriodKey(e.date);
+    if (!key) return;
+    if (!buckets[key]) buckets[key] = [];
+    buckets[key].push(Number(e.overall)||0);
+  });
+
+  const keys = Object.keys(buckets).sort();
+  if (!keys.length) {
+    canvas.style.display='none'; if(empty) empty.style.display='block'; return;
+  }
+
+  const labels = keys.map(k => period==='month' ? k : k.replace('-W',' W'));
+  const data   = keys.map(k => {
+    const arr = buckets[k];
+    return Math.round((arr.reduce((a,b)=>a+b,0)/arr.length)*10)/10;
+  });
+
+  // Color based on trend
+  const isImproving = data.length > 1 && data[data.length-1] >= data[0];
+  const lineColor = isImproving ? '#18b870' : '#f04f4f';
+
+  if (_trendChartInstance) { _trendChartInstance.destroy(); _trendChartInstance = null; }
+
+  _trendChartInstance = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Avg Score %',
+        data,
+        borderColor: lineColor,
+        backgroundColor: lineColor+'22',
+        borderWidth: 2.5,
+        pointBackgroundColor: lineColor,
+        pointRadius: 5,
+        fill: true,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.parsed.y.toFixed(1) + '%  (' + buckets[keys[ctx.dataIndex]].length + ' evals)'
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 0, max: 100,
+          ticks: { color:'#888', callback: v=>v+'%' },
+          grid: { color:'rgba(255,255,255,.05)' }
+        },
+        x: { ticks: { color:'#888' }, grid: { display:false } }
+      }
+    }
+  });
 }
 
 function renderOperationReport() {
