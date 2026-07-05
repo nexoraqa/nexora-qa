@@ -9603,22 +9603,35 @@ function loadFromGoogleSheets() {
       // Store operation evals for Manager view
       if (res.operation && res.operation.length) {
         try {
-          window._operationHistory = res.operation.map(r => ({
-            id:        r.id,
-            date:      r.date,
-            time:      r.time,
-            agent:     r.agent,
-            tl:        r.tl,
-            proj:      r.project,
-            country:   r.country,
-            lang:      r.language,
-            assessor:  r.assessor,
-            overall:   parseFloat(r.overall) || 0,
-            nc_score:  r.nc_score !== undefined ? parseFloat(r.nc_score) : null,
-            cc:        r.cc || '',
-            cb:        r.cb || '',
-            caseNumber:r.caseNumber || r.case_number || '',
-          }));
+          window._operationHistory = res.operation.map(r => {
+            // Calculate NC score from individual attribute columns
+            var ncAttrs = ['nc_call_opening','nc_choice_of_words','nc_tone_of_voice','nc_showing_empathy','nc_active_listening','nc_hold'];
+            var ncFails = ncAttrs.filter(function(a){ return r[a] === 'No'; }).length;
+            var naSelected = r['nc_hold'] === 'N/A';
+            var ptsEach = naSelected ? 6 : 5;
+            var ncScore = Math.max(0, 30 - ncFails * ptsEach);
+            // Calculate CC/CB pass/fail from individual columns
+            var ccAttrs = ['cc_customer_profile','cc_wrong_information','cc_missing_information','cc_ticket_escalation','cc_transfer_process','cc_professionalism','cc_ticket_description'];
+            var cbAttrs = ['cb_ticket_creation','cb_control_the_call','cb_ticketing_tree'];
+            var ccFail = ccAttrs.some(function(a){ return r[a] === 'No'; });
+            var cbFail = cbAttrs.some(function(a){ return r[a] === 'No'; });
+            return {
+              id:        r.id,
+              date:      r.date,
+              time:      r.time,
+              agent:     r.agent,
+              tl:        r.tl,
+              proj:      r.project,
+              country:   r.country,
+              lang:      r.language,
+              assessor:  r.assessor,
+              overall:   parseFloat(r.overall) || 0,
+              nc_score:  ncScore,
+              cc:        ccFail ? 'No' : 'Yes',
+              cb:        cbFail ? 'No' : 'Yes',
+              caseNumber:r.caseNumber || r.case_number || '',
+            };
+          });
         } catch(e) {}
       }
     })
