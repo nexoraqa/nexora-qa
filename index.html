@@ -1014,7 +1014,7 @@ a { color:var(--purple-l); text-decoration:none; }
               <div id="prev-elist"></div>
             </div>
             <div style="margin-top:20px;">
-              <button id="qa-review-btn" class="btn btn-primary" onclick="goToReview()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span> REVIEW SCORE</button>
+              <button class="btn btn-primary" onclick="goToReview()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span> REVIEW SCORE</button>
             </div>
           </div>
         </div>
@@ -1068,12 +1068,6 @@ a { color:var(--purple-l); text-decoration:none; }
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Submitted Score</div>
           <div class="score-big" id="success-score" style="font-size:52px;color:var(--green);">—</div>
           <div style="font-size:13px;color:var(--muted);margin-top:8px;" id="success-agent">—</div>
-        </div>
-
-        <div id="success-compare" style="display:none;background:#e8a23d15;border:1px solid var(--gold);border-radius:var(--radius);padding:20px;max-width:360px;margin:0 auto 32px;">
-          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">TL Already Evaluated This Case</div>
-          <div class="score-big" id="success-compare-score" style="font-size:36px;color:var(--gold);">—</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:6px;" id="success-compare-detail">—</div>
         </div>
 
         <div style="max-width:360px;margin:0 auto;display:flex;flex-direction:column;gap:10px;">
@@ -1988,7 +1982,7 @@ a { color:var(--purple-l); text-decoration:none; }
               <div id="op-prev-elist"></div>
             </div>
             <div style="margin-top:20px;">
-              <button id="op-review-btn" class="btn btn-primary" onclick="opGoToReview()">
+              <button class="btn btn-primary" onclick="opGoToReview()">
                 <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span> REVIEW SCORE
               </button>
             </div>
@@ -2040,12 +2034,6 @@ a { color:var(--purple-l); text-decoration:none; }
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Submitted Score</div>
           <div class="score-big" id="op-success-score" style="color:var(--green);">—</div>
           <div style="font-size:13px;color:var(--muted);margin-top:8px;" id="op-success-agent">—</div>
-        </div>
-
-        <div id="op-success-compare" style="display:none;background:#e8a23d15;border:1px solid var(--gold);border-radius:var(--radius);padding:20px;max-width:360px;margin:0 auto 32px;">
-          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">QA Already Evaluated This Case</div>
-          <div class="score-big" id="op-success-compare-score" style="font-size:36px;color:var(--gold);">—</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:6px;" id="op-success-compare-detail">—</div>
         </div>
         <button class="btn btn-primary" onclick="opResetForm()">
           <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span> Submit New Operation Eval
@@ -3611,7 +3599,7 @@ function setFieldError(fieldId, show) {
   if (err) err.style.display = show ? 'block' : 'none';
 }
 
-async function goToReview() {
+function goToReview() {
   // Validate all mandatory fields
   const checks = [
     { id:'c-proj',  field:'field-proj',  label:'Project' },
@@ -3652,37 +3640,6 @@ async function goToReview() {
       showValidationToast('Case ' + caseNum + ' already has a QA evaluation');
       return;
     }
-    // Live check against Google Sheets — catches a case number submitted
-    // seconds ago by someone else, before this device has synced it in
-    const qaReviewBtn = document.getElementById('qa-review-btn');
-    const qaReviewBtnHTML = qaReviewBtn ? qaReviewBtn.innerHTML : '';
-    if (qaReviewBtn) { qaReviewBtn.disabled = true; qaReviewBtn.innerHTML = 'Checking case number…'; }
-    try {
-      const checkRes  = await fetch(GOOGLE_SHEET_URL + '?action=check_case&sheet=Evals&caseNumber=' + encodeURIComponent(caseNum));
-      const checkData = await checkRes.json();
-      if (checkData.exists) {
-        if (checkData.sameForm) {
-          showValidationToast('Case ' + caseNum + ' already has a QA evaluation');
-          return;
-        }
-        // Found in TL Operation sheet — must be the same agent/project/language
-        const curProj = document.getElementById('c-proj')?.value || '';
-        const curLang = document.getElementById('c-lang')?.value || '';
-        const mismatch = String(checkData.agent).trim().toLowerCase()   !== agentVal.trim().toLowerCase() ||
-                          String(checkData.project).trim().toLowerCase() !== curProj.trim().toLowerCase() ||
-                          String(checkData.language).trim().toLowerCase()!== curLang.trim().toLowerCase();
-        if (mismatch) {
-          showValidationToast('Case ' + caseNum + ' is already recorded for a different agent/project/language');
-          return;
-        }
-      }
-    } catch (err) {
-      // If the live check itself fails (e.g. no internet), don't block the user —
-      // fall back to the local check above, which already ran
-      console.warn('Live case check failed, continuing with local check only:', err);
-    } finally {
-      if (qaReviewBtn) { qaReviewBtn.disabled = false; qaReviewBtn.innerHTML = qaReviewBtnHTML; }
-    }
   }
 
   _eval = computeScore();
@@ -3715,6 +3672,20 @@ function goBack()    { showStep('form'); }
 function submitEval() {
   const d = _eval;
   if (!d) return;
+  // Check if editing existing eval
+  if (window._editUid) {
+    // Remove old record from history
+    _evalHistory = _evalHistory.filter(e => String(e.uid) !== String(window._editUid));
+    // Soft delete old record in sheet
+    try {
+      fetch(GOOGLE_SHEET_URL, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ action:'delete', id: String(window._editUid) })
+      });
+    } catch(err) {}
+    window._editUid = null;
+  }
   // Save to history
   saveToHistory(d, _errors);
   // Immediately sync so Manager and TL see it right away
@@ -3728,20 +3699,6 @@ function submitEval() {
   // Hide old coaching box
   const coachBox = document.getElementById('success-coaching');
   if (coachBox) coachBox.style.display = 'none';
-  // Show TL's score for this case, if a TL already evaluated it (Operation sheet)
-  const compareBox = document.getElementById('success-compare');
-  if (compareBox) {
-    const tlMatch = (window._operationHistory||[]).find(r =>
-      r.caseNumber && d.caseNumber && r.caseNumber.trim().toLowerCase() === d.caseNumber.trim().toLowerCase()
-    );
-    if (tlMatch) {
-      document.getElementById('success-compare-score').textContent = parseFloat(tlMatch.overall).toFixed(1)+'%';
-      document.getElementById('success-compare-detail').textContent = (tlMatch.tl||'TL') + ' scored this case';
-      compareBox.style.display = 'block';
-    } else {
-      compareBox.style.display = 'none';
-    }
-  }
   showStep('success');
   // Show coaching popup if errors found
   const hasCC = d.cc > 0;
@@ -3789,7 +3746,59 @@ function buildCoachHTML(agent, tl, qa, today) {
     </div>`;
 }
 
+// Track edit mode
+window._editUid = null;
+
+function editEval(uid) {
+  // Find the eval to edit
+  const e = _evalHistory.find(ev => String(ev.uid) === String(uid));
+  if (!e) { alert('Evaluation not found'); return; }
+
+  // Store edit UID
+  window._editUid = uid;
+
+  // Reset form first
+  resetCalc();
+
+  // Pre-fill form fields
+  setTimeout(function() {
+    // Set project first (triggers agent list)
+    const proj = document.getElementById('c-proj');
+    if (proj) { proj.value = e.proj||''; proj.dispatchEvent(new Event('change')); }
+
+    // Set TL
+    const tl = document.getElementById('c-tl');
+    if (tl) { tl.value = e.tl||''; tl.dispatchEvent(new Event('change')); }
+
+    // Set agent after short delay (TL change triggers agent list rebuild)
+    setTimeout(function() {
+      const agent = document.getElementById('c-agent');
+      if (agent) agent.value = e.agent||'';
+
+      // Set QA
+      const qa = document.getElementById('c-qa');
+      if (qa) qa.value = e.qa||'';
+
+      // Set language
+      const lang = document.getElementById('c-lang');
+      if (lang) lang.value = e.lang||'';
+
+      // Set case number
+      const caseEl = document.getElementById('c-case');
+      if (caseEl) caseEl.value = e.caseNumber||'';
+
+      // Show edit indicator
+      const title = document.getElementById('calc-title') || document.querySelector('#page-calc .card-title');
+      if (title) title.textContent = '✏️ Editing Evaluation #' + uid;
+
+      // Navigate to form
+      nav('calc', document.getElementById('nav-calc') || document.querySelector('.nav-item[onclick*=calc]'));
+    }, 200);
+  }, 100);
+}
+
 function resetCalc() {
+  window._editUid = null; // Clear edit mode
   _selectedErrors = [];
   _errors = [];
   _eval = null;
@@ -5218,6 +5227,9 @@ function renderHistory() {
         <button onclick="exportSingleEval(${e.uid})"
           style="background:var(--green-dim);border:1px solid #18b87044;color:var(--green);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;margin-right:4px;"
           onmouseover="this.style.background='#18b87025'" onmouseout="this.style.background='var(--green-dim)'"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/></svg></span></button>
+        ${window._canEdit && e.qa === (_currentUser?.name||'') ? `<button onclick="editEval(${e.uid})"
+          style="background:var(--blue-dim);border:1px solid #4a86e844;color:var(--blue-l);border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;margin-right:4px;"
+          title="Edit this evaluation">✏️</button>` : ''}
         ${window._canDelete ? `<button onclick="openDeleteModal(${e.uid})"
           style="background:var(--red-dim);border:1px solid #f04f4f44;color:var(--red);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;"
           onmouseover="this.style.background='#f04f4f30';this.style.borderColor='var(--red)'"
@@ -7675,7 +7687,7 @@ function opLiveCalc() {
   }
 }
 
-async function opGoToReview() {
+function opGoToReview() {
   var agent = document.getElementById('op-agent')?.value;
   var proj  = document.getElementById('op-proj')?.value;
   var caseCheck = (document.getElementById('op-case')?.value||'').trim();
@@ -7687,36 +7699,6 @@ async function opGoToReview() {
       return r.caseNumber && r.caseNumber.trim().toLowerCase() === caseCheck.toLowerCase();
     });
     if (dup) { showValidationToast('Case ' + caseCheck + ' already has a TL evaluation'); return; }
-    // Live check against Google Sheets — catches a case number submitted
-    // seconds ago by another TL, before this device has synced it in
-    const opReviewBtn = document.getElementById('op-review-btn');
-    const opReviewBtnHTML = opReviewBtn ? opReviewBtn.innerHTML : '';
-    if (opReviewBtn) { opReviewBtn.disabled = true; opReviewBtn.innerHTML = 'Checking case number…'; }
-    try {
-      const checkRes  = await fetch(GOOGLE_SHEET_URL + '?action=check_case&sheet=Operation&caseNumber=' + encodeURIComponent(caseCheck));
-      const checkData = await checkRes.json();
-      if (checkData.exists) {
-        if (checkData.sameForm) {
-          showValidationToast('Case ' + caseCheck + ' already has a TL evaluation');
-          return;
-        }
-        // Found in QA Evals sheet — must be the same agent/project/language
-        var curLang = document.getElementById('op-lang')?.value || '';
-        var mismatch = String(checkData.agent).trim().toLowerCase()    !== agent.trim().toLowerCase() ||
-                       String(checkData.project).trim().toLowerCase()  !== proj.trim().toLowerCase() ||
-                       String(checkData.language).trim().toLowerCase() !== curLang.trim().toLowerCase();
-        if (mismatch) {
-          showValidationToast('Case ' + caseCheck + ' is already recorded for a different agent/project/language');
-          return;
-        }
-      }
-    } catch (err) {
-      // If the live check itself fails (e.g. no internet), don't block the user —
-      // fall back to the local check above, which already ran
-      console.warn('Live case check failed, continuing with local check only:', err);
-    } finally {
-      if (opReviewBtn) { opReviewBtn.disabled = false; opReviewBtn.innerHTML = opReviewBtnHTML; }
-    }
   }
   var d = opComputeScore();
   _opEval = d;
@@ -7844,21 +7826,6 @@ function submitOperation() {
   if (detailEl) detailEl.textContent = agent + '\'s operation eval (' + d.overall.toFixed(1) + '%) recorded on ' + date;
   var agentEl = document.getElementById('op-success-agent');
   if (agentEl) agentEl.textContent = agent + ' · ' + proj;
-
-  // Show QA's score for this case, if QA already evaluated it (Evals sheet)
-  var opCompareBox = document.getElementById('op-success-compare');
-  if (opCompareBox) {
-    var qaMatch = (_evalHistory||[]).find(function(ev) {
-      return ev.caseNumber && caseNum && ev.caseNumber.trim().toLowerCase() === caseNum.trim().toLowerCase();
-    });
-    if (qaMatch) {
-      document.getElementById('op-success-compare-score').textContent = parseFloat(qaMatch.overall).toFixed(1)+'%';
-      document.getElementById('op-success-compare-detail').textContent = (qaMatch.qa||'QA') + ' scored this case';
-      opCompareBox.style.display = 'block';
-    } else {
-      opCompareBox.style.display = 'none';
-    }
-  }
 
   try { if(document.getElementById('rep-tab-operation')?.style.display!=='none') renderOperationReport(); } catch(e) {}
   try { if(document.getElementById('hist-tab-operation')?.style.display!=='none') renderOperationHistory(); } catch(e) {}
@@ -9093,6 +9060,7 @@ function applyRoleAccess(user) {
   // Row-level delete button — hide for QA (needs manager approval)
   // We store role so renderHistory can conditionally show/hide the delete <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13"/></svg></span> button per row
   window._canDelete = isManager;
+  window._canEdit = (role === 'qa');
 
   // Override CURRENT_QA and IS_MANAGER for history filtering
   window._sessionQA      = user.name;
@@ -9524,7 +9492,6 @@ function loadFromGoogleSheets() {
           qa:      row.assessor,
           lang:    row.language || '',
           country: row.country  || '',
-          caseNumber: row.caseNumber || '',
           overall: parseFloat(row.overall) || 0,
           cc:      row['CC Customer Profile']==='No'||row['CC Wrong Information']==='No'||
                    row['CC Missing Information']==='No'||row['CC Ticket Escalation']==='No'||
@@ -9642,7 +9609,6 @@ function loadFromGoogleSheets() {
             country: r.country,
             lang:    r.language,
             assessor:r.assessor,
-            caseNumber: r.caseNumber || '',
             overall: parseFloat(r.overall) || 0,
           }));
         } catch(e) {}
