@@ -9644,8 +9644,8 @@ function loadFromGoogleSheets() {
 // Load from Google Sheets 1 second after startup
 setTimeout(loadFromGoogleSheets, 1000);
 
-// Auto-refresh every 30 seconds
-setInterval(loadFromGoogleSheets, 30000);
+// Auto-refresh every 5 seconds for real-time updates
+setInterval(loadFromGoogleSheets, 5000);
 
 // Manual sync function — triggered by Sync button in topbar
 function manualSync() {
