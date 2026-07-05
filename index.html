@@ -3661,8 +3661,20 @@ async function goToReview() {
       const checkRes  = await fetch(GOOGLE_SHEET_URL + '?action=check_case&sheet=Evals&caseNumber=' + encodeURIComponent(caseNum));
       const checkData = await checkRes.json();
       if (checkData.exists) {
-        showValidationToast('Case ' + caseNum + ' already has a QA evaluation');
-        return;
+        if (checkData.sameForm) {
+          showValidationToast('Case ' + caseNum + ' already has a QA evaluation');
+          return;
+        }
+        // Found in TL Operation sheet — must be the same agent/project/language
+        const curProj = document.getElementById('c-proj')?.value || '';
+        const curLang = document.getElementById('c-lang')?.value || '';
+        const mismatch = String(checkData.agent).trim().toLowerCase()   !== agentVal.trim().toLowerCase() ||
+                          String(checkData.project).trim().toLowerCase() !== curProj.trim().toLowerCase() ||
+                          String(checkData.language).trim().toLowerCase()!== curLang.trim().toLowerCase();
+        if (mismatch) {
+          showValidationToast('Case ' + caseNum + ' is already recorded for a different agent/project/language');
+          return;
+        }
       }
     } catch (err) {
       // If the live check itself fails (e.g. no internet), don't block the user —
@@ -7684,8 +7696,19 @@ async function opGoToReview() {
       const checkRes  = await fetch(GOOGLE_SHEET_URL + '?action=check_case&sheet=Operation&caseNumber=' + encodeURIComponent(caseCheck));
       const checkData = await checkRes.json();
       if (checkData.exists) {
-        showValidationToast('Case ' + caseCheck + ' already has a TL evaluation');
-        return;
+        if (checkData.sameForm) {
+          showValidationToast('Case ' + caseCheck + ' already has a TL evaluation');
+          return;
+        }
+        // Found in QA Evals sheet — must be the same agent/project/language
+        var curLang = document.getElementById('op-lang')?.value || '';
+        var mismatch = String(checkData.agent).trim().toLowerCase()    !== agent.trim().toLowerCase() ||
+                       String(checkData.project).trim().toLowerCase()  !== proj.trim().toLowerCase() ||
+                       String(checkData.language).trim().toLowerCase() !== curLang.trim().toLowerCase();
+        if (mismatch) {
+          showValidationToast('Case ' + caseCheck + ' is already recorded for a different agent/project/language');
+          return;
+        }
       }
     } catch (err) {
       // If the live check itself fails (e.g. no internet), don't block the user —
