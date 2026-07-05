@@ -9753,8 +9753,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(res => {
           if (res.coaching && res.coaching.length) {
             mergeCoachingFromSheets(res.coaching);
-            updateCoachingBadge();
           }
+          try { updateCoachingBadge(); } catch(e) {}
         }).catch(() => {});
     } catch(e) {}
   }, 30000);
