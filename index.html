@@ -4742,62 +4742,44 @@ function importEvalCSV(input) {
 }
 
 function exportAllHistory() {
-  // Export both QA evals and TL operations in one CSV
+  if (typeof XLSX === 'undefined') { alert('Excel library not loaded.'); return; }
   const role = _currentUser?.role || '';
   const name = _currentUser?.name || '';
 
-  // Get QA evals based on role
-  let qaData;
-  if (role === 'tl') qaData = _evalHistory.filter(e => e.tl === (window._tlTeam||name));
-  else if (role === 'qa') qaData = _evalHistory.filter(e => e.qa === name);
-  else qaData = _evalHistory;
-
-  // Get TL ops
-  var opData = window._operationHistory || [];
+  // QA and Manager get all data — TL gets own team only
+  let qaData = role === 'tl' ? _evalHistory.filter(e => e.tl === (window._tlTeam||name)) : _evalHistory;
+  let opData = window._operationHistory || [];
   if (role === 'tl') opData = opData.filter(r => r.tl === name);
 
-  if (qaData.length === 0 && opData.length === 0) {
-    alert('No evaluations to export.');
-    return;
-  }
+  if (qaData.length === 0 && opData.length === 0) { alert('No evaluations to export.'); return; }
 
-  // Build combined CSV
-  var lines = ['TYPE,Date,Time,Agent,TL,Project,QA/Assessor,Overall,NC Score,CC,CB,Case Number'];
-
+  // Sheet 1 — QA Evaluations
+  var qaRows = [['Date','Time','Agent','TL','Project','QA Assessor','Overall','NC Score','CC','CB','Case Number','Status']];
   qaData.forEach(function(e) {
-    const cc = (e.errors||[]).some(x => x.t==='cc' && !x.isNA) ? 'Fail' : 'Pass';
-    const cb = (e.errors||[]).some(x => x.t==='cb' && !x.isNA) ? 'Fail' : 'Pass';
-    lines.push([
-      'QA Evaluation',
-      e.date||'', e.time||'', e.agent||'', e.tl||'', e.proj||'',
-      e.qa||'', Number(e.overall||0).toFixed(1)+'%',
-      (e.ncScore||e.ncPct||0)+'/30', cc, cb, e.caseNumber||''
-    ].join(','));
+    var cc = (e.errors||[]).some(function(x){ return x.t==='cc' && !x.isNA; }) ? 'Fail' : 'Pass';
+    var cb = (e.errors||[]).some(function(x){ return x.t==='cb' && !x.isNA; }) ? 'Fail' : 'Pass';
+    var status = Number(e.overall||0) >= 90 ? 'Pass' : Number(e.overall||0) >= 80 ? 'At Risk' : 'Critical';
+    qaRows.push([e.date||'', e.time||'', e.agent||'', e.tl||'', e.proj||'', e.qa||'',
+      Number(e.overall||0).toFixed(1)+'%', (e.ncScore||0)+'/30', cc, cb, e.caseNumber||'', status]);
   });
 
+  // Sheet 2 — TL Operations
+  var opRows = [['Date','Time','Agent','TL','Project','Assessor','Overall','NC Score','CC','CB','Case Number','Status']];
   opData.forEach(function(r) {
-    // NC score — show actual value or — if missing
-    var ncScoreVal = (r.nc_score !== undefined && r.nc_score !== null)
-      ? Number(r.nc_score).toFixed(1)+'/30' : 'N/A';
+    var ncVal = (r.nc_score !== undefined && r.nc_score !== null) ? Number(r.nc_score).toFixed(1)+'/30' : 'N/A';
     var ccVal = r.cc === 'Yes' ? 'Pass' : r.cc === 'No' ? 'Fail' : 'N/A';
     var cbVal = r.cb === 'Yes' ? 'Pass' : r.cb === 'No' ? 'Fail' : 'N/A';
-    lines.push([
-      'TL Operation',
-      r.date||'', r.time||'', r.agent||'', r.tl||'', r.proj||'',
-      r.assessor||r.tl||'', Number(r.overall||0).toFixed(1)+'%',
-      ncScoreVal, ccVal, cbVal, r.caseNumber||''
-    ].join(','));
+    var status = Number(r.overall||0) >= 90 ? 'Pass' : Number(r.overall||0) >= 80 ? 'At Risk' : 'Critical';
+    opRows.push([r.date||'', r.time||'', r.agent||'', r.tl||'', r.proj||'', r.assessor||r.tl||'',
+      Number(r.overall||0).toFixed(1)+'%', ncVal, ccVal, cbVal, r.caseNumber||'', status]);
   });
 
-  var csv = lines.join(String.fromCharCode(10));
-  var blob = new Blob([csv], {type:'text/csv'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = 'NexoraQA_Export_' + new Date().toLocaleDateString('en-GB').replace(/\//g,'-') + '.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(qaRows), 'QA Evaluations');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(opRows), 'TL Operations');
+  XLSX.writeFile(wb, 'NexoraQA_Export_' + new Date().toLocaleDateString('en-GB').replace(/\//g,'-') + '.xlsx');
 }
+
 
 function exportEvalHistory(filterQA) {
   const role = _currentUser?.role || '';
