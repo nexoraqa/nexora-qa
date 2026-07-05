@@ -922,6 +922,12 @@ a { color:var(--purple-l); text-decoration:none; }
        ══════════════════════════════════════ -->
   <div class="page" id="page-calc">
 
+    <!-- Cancel edit button — only shows in edit mode -->
+    <div id="edit-cancel-bar" style="display:none;background:var(--blue-dim);border:1px solid #4a86e844;border-radius:var(--radius-s);padding:12px 16px;margin-bottom:14px;display:none;align-items:center;justify-content:space-between;">
+      <div style="font-size:13px;font-weight:600;color:var(--blue-l);">✏️ Editing existing evaluation</div>
+      <button onclick="cancelEdit()" style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:var(--radius-s);padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">✕ Cancel</button>
+    </div>
+
     <!-- ── STEP 1: FILL FORM ── -->
     <div id="step-form">
       <div class="two-col">
@@ -3749,6 +3755,18 @@ function buildCoachHTML(agent, tl, qa, today) {
 // Track edit mode
 window._editUid = null;
 
+function cancelEdit() {
+  window._editUid = null;
+  // Hide cancel bar
+  var bar = document.getElementById('edit-cancel-bar');
+  if (bar) bar.style.display = 'none';
+  // Reset form title
+  var title = document.querySelector('#page-calc .card-title');
+  if (title && title.textContent.includes('Editing')) title.textContent = 'Agent Information';
+  // Go back to history
+  nav('history', document.getElementById('nav-history') || document.querySelector('.nav-item[onclick*=history]'));
+}
+
 function editEval(uid) {
   // Find the eval to edit
   const e = _evalHistory.find(ev => String(ev.uid) === String(uid));
@@ -3791,6 +3809,9 @@ function editEval(uid) {
       const title = document.getElementById('calc-title') || document.querySelector('#page-calc .card-title');
       if (title) title.textContent = '✏️ Editing Evaluation #' + uid;
 
+      // Show cancel bar
+      var cancelBar = document.getElementById('edit-cancel-bar');
+      if (cancelBar) cancelBar.style.display = 'flex';
       // Navigate to form
       nav('calc', document.getElementById('nav-calc') || document.querySelector('.nav-item[onclick*=calc]'));
     }, 200);
@@ -3799,6 +3820,8 @@ function editEval(uid) {
 
 function resetCalc() {
   window._editUid = null; // Clear edit mode
+  var bar = document.getElementById('edit-cancel-bar');
+  if (bar) bar.style.display = 'none';
   _selectedErrors = [];
   _errors = [];
   _eval = null;
