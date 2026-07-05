@@ -3768,54 +3768,37 @@ function cancelEdit() {
 }
 
 function editEval(uid) {
-  // Find the eval to edit
   const e = _evalHistory.find(ev => String(ev.uid) === String(uid));
   if (!e) { alert('Evaluation not found'); return; }
 
-  // Reset form first (must be before setting _editUid since resetCalc was hiding bar)
-  resetCalc();
-
-  // Store edit UID after reset
+  // Store edit UID
   window._editUid = uid;
 
-  // Pre-fill form fields
+  // Navigate to calc page first
+  nav('calc');
+
+  // Fill fields after navigation settles
   setTimeout(function() {
-    // Set project first (triggers agent list)
-    const proj = document.getElementById('c-proj');
-    if (proj) { proj.value = e.proj||''; proj.dispatchEvent(new Event('change')); }
+    try {
+      document.getElementById('c-proj').value = e.proj||'';
+      document.getElementById('c-proj').dispatchEvent(new Event('change'));
+    } catch(x) {}
+    try {
+      document.getElementById('c-tl').value = e.tl||'';
+      document.getElementById('c-tl').dispatchEvent(new Event('change'));
+    } catch(x) {}
 
-    // Set TL
-    const tl = document.getElementById('c-tl');
-    if (tl) { tl.value = e.tl||''; tl.dispatchEvent(new Event('change')); }
-
-    // Set agent after short delay (TL change triggers agent list rebuild)
     setTimeout(function() {
-      const agent = document.getElementById('c-agent');
-      if (agent) agent.value = e.agent||'';
-
-      // Set QA
-      const qa = document.getElementById('c-qa');
-      if (qa) qa.value = e.qa||'';
-
-      // Set language
-      const lang = document.getElementById('c-lang');
-      if (lang) lang.value = e.lang||'';
-
-      // Set case number
-      const caseEl = document.getElementById('c-case');
-      if (caseEl) caseEl.value = e.caseNumber||'';
-
-      // Show edit indicator
-      const title = document.getElementById('calc-title') || document.querySelector('#page-calc .card-title');
-      if (title) title.textContent = '✏️ Editing Evaluation #' + uid;
+      try { document.getElementById('c-agent').value = e.agent||''; } catch(x) {}
+      try { document.getElementById('c-qa').value = e.qa||''; } catch(x) {}
+      try { document.getElementById('c-lang').value = e.lang||''; } catch(x) {}
+      try { document.getElementById('c-case').value = e.caseNumber||''; } catch(x) {}
 
       // Show cancel bar
-      var cancelBar = document.getElementById('edit-cancel-bar');
-      if (cancelBar) cancelBar.style.display = 'flex';
-      // Navigate to form
-      nav('calc', document.getElementById('nav-calc') || document.querySelector('.nav-item[onclick*=calc]'));
-    }, 200);
-  }, 100);
+      var bar = document.getElementById('edit-cancel-bar');
+      if (bar) bar.style.display = 'flex';
+    }, 400);
+  }, 300);
 }
 
 function resetCalc() {
@@ -5409,7 +5392,7 @@ function nav(id, el) {
     }
     renderProfiles();
   }
-  if(id === 'calc') resetCalc();
+  if(id === 'calc' && !window._editUid) resetCalc();
   document.getElementById('sidebar').classList.remove('open');
 }
 
