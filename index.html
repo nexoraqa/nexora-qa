@@ -3645,6 +3645,29 @@ function showBadgePopup(index) {
     '<button onclick="closeBadgePopup()" style="margin-top:16px;background:' + b.color + '22;border:1px solid ' + b.color + '44;color:' + b.color + ';border-radius:8px;padding:6px 20px;font-size:12px;font-weight:700;cursor:pointer;">Got it</button>';
   popup.style.display = 'flex';
 }
+function showStreakPopup() {
+  const b = window._streakBadge;
+  if (!b) return;
+  const idx = (window._agentBadges||[]).findIndex(x => x.icon === '🔥');
+  if (idx >= 0) { showBadgePopup(idx); return; }
+  // fallback if streak badge not in grid (streak < 3 but >= 2)
+  let popup = document.getElementById('badge-popup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'badge-popup';
+    popup.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#00000066;';
+    popup.innerHTML = '<div id="badge-popup-card" style="background:var(--card);border-radius:16px;padding:24px;max-width:300px;width:90%;box-shadow:0 8px 32px #0008;text-align:center;"></div>';
+    popup.addEventListener('click', function(ev){ if (ev.target === popup) closeBadgePopup(); });
+    document.body.appendChild(popup);
+  }
+  document.getElementById('badge-popup-card').innerHTML =
+    '<div style="font-size:36px;margin-bottom:8px;">🔥</div>' +
+    '<div style="font-size:15px;font-weight:800;color:var(--orange);margin-bottom:6px;">' + b.label + '</div>' +
+    '<div style="font-size:13px;color:var(--text-2);margin-bottom:14px;">' + b.desc + '</div>' +
+    '<div style="font-size:11px;color:var(--muted);background:var(--border);border-radius:8px;padding:8px 12px;">' + b.detail + '</div>' +
+    '<button onclick="closeBadgePopup()" style="margin-top:16px;background:var(--orange)22;border:1px solid var(--orange)44;color:var(--orange);border-radius:8px;padding:6px 20px;font-size:12px;font-weight:700;cursor:pointer;">Got it</button>';
+  popup.style.display = 'flex';
+}
 function closeBadgePopup() {
   const popup = document.getElementById('badge-popup');
   if (popup) popup.style.display = 'none';
@@ -9472,7 +9495,9 @@ function renderAgentDashboard(user) {
     // Streak
     if (streakEl) {
       if (streak >= 2) {
-        streakEl.innerHTML = '<div style="display:flex;align-items:center;gap:8px;background:var(--orange)18;border-radius:8px;padding:8px 12px;"><span style="font-size:18px;">🔥</span><div><div style="font-size:12px;font-weight:700;color:var(--orange);">' + streak + ' consecutive passes!</div><div style="font-size:10px;color:var(--muted);">Keep it up!</div></div></div>';
+        const streakDetail = 'Latest: Case ' + (agentEvals[0].caseNumber||'—') + ' · ' + Number(agentEvals[0].overall).toFixed(1) + '% · ' + (agentEvals[0].date||'');
+        window._streakBadge = {icon:'🔥', label: streak + ' Pass Streak', color:'var(--orange)', desc: 'You passed ' + streak + ' evaluations in a row above 90%.', detail: streakDetail};
+        streakEl.innerHTML = '<div onclick="showStreakPopup()" style="cursor:pointer;display:flex;align-items:center;gap:8px;background:var(--orange)18;border-radius:8px;padding:8px 12px;"><span style="font-size:18px;">🔥</span><div><div style="font-size:12px;font-weight:700;color:var(--orange);">' + streak + ' consecutive passes!</div><div style="font-size:10px;color:var(--muted);">Tap to see details</div></div></div>';
       } else {
         streakEl.innerHTML = '';
       }
