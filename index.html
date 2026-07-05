@@ -2247,6 +2247,15 @@ a { color:var(--purple-l); text-decoration:none; }
           </div>
         </div>
 
+        <!-- Badges & Streak -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">🏅 Achievements</div>
+          <div id="agent-streak" style="margin-bottom:12px;"></div>
+          <div id="agent-badges" style="display:flex;flex-wrap:wrap;gap:6px;">
+            <div style="color:var(--muted);font-size:12px;">No badges yet</div>
+          </div>
+        </div>
+
         <!-- Score trend -->
         <div class="card">
           <div class="card-title" style="margin-bottom:12px;">Score Trend</div>
@@ -9116,6 +9125,8 @@ function applyRoleAccess(user) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-agent').classList.add('active');
     document.getElementById('page-title').textContent = 'My Dashboard';
+    // Re-render after data loads from sheet (so badges show correctly)
+    setTimeout(function(){ try { renderAgentDashboard(user); } catch(e) {} }, 2000);
   } else if (user.role === 'tl') {
     renderTLHome(user);
     // Show TL home page
@@ -9378,6 +9389,51 @@ function renderAgentDashboard(user) {
   avatarEl.textContent = user.initials;
   avatarEl.style.background = `linear-gradient(135deg, ${user.color}, ${user.color}aa)`;
   document.getElementById('agent-welcome-name').textContent = `Hi, ${user.name.split(' ')[0]} 👋`;
+
+  // Badges & Streak
+  const agentEvals = _evalHistory.filter(e => e.agent === user.name).sort((a,b) => Number(b.uid)-Number(a.uid));
+  const badgesEl = document.getElementById('agent-badges');
+  const streakEl = document.getElementById('agent-streak');
+
+  if (badgesEl && agentEvals.length > 0) {
+    const badges = [];
+
+    // Perfect Score badge
+    if (agentEvals.some(e => Number(e.overall) === 100)) badges.push({icon:'⭐', label:'Perfect Score', color:'var(--gold)'});
+
+    // No CC errors in last 5 evals
+    const last5 = agentEvals.slice(0,5);
+    if (last5.length >= 3 && last5.every(e => !(e.errors||[]).some(x=>x.t==='cc'&&!x.isNA))) badges.push({icon:'🛡', label:'CC Clean Streak', color:'var(--green)'});
+
+    // Improved — last score better than first
+    if (agentEvals.length >= 2) {
+      const latest = Number(agentEvals[0].overall);
+      const oldest = Number(agentEvals[agentEvals.length-1].overall);
+      if (latest > oldest) badges.push({icon:'📈', label:'Improving', color:'var(--blue-l)'});
+    }
+
+    // Passing streak
+    let streak = 0;
+    for (let e of agentEvals) { if (Number(e.overall) >= 90) streak++; else break; }
+    if (streak >= 3) badges.push({icon:'🔥', label: streak + ' Pass Streak', color:'var(--orange)'});
+
+    if (badges.length > 0) {
+      badgesEl.innerHTML = badges.map(b =>
+        '<div style="display:flex;align-items:center;gap:5px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:' + b.color + ';">' + b.icon + ' ' + b.label + '</div>'
+      ).join('');
+    } else {
+      badgesEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">Submit more evals to earn badges</div>';
+    }
+
+    // Streak
+    if (streakEl) {
+      if (streak >= 2) {
+        streakEl.innerHTML = '<div style="display:flex;align-items:center;gap:8px;background:var(--orange)18;border-radius:8px;padding:8px 12px;"><span style="font-size:18px;">🔥</span><div><div style="font-size:12px;font-weight:700;color:var(--orange);">' + streak + ' consecutive passes!</div><div style="font-size:10px;color:var(--muted);">Keep it up!</div></div></div>';
+      } else {
+        streakEl.innerHTML = '';
+      }
+    }
+  }
 
   // Find agent in AGENTS data
   const agentData = getLiveAgents().find(a => a.n === user.name);
@@ -9729,6 +9785,12 @@ function loadFromGoogleSheets() {
           if(document.getElementById('page-history')?.classList.contains('active')) {
             const checked = document.querySelectorAll('.hist-row-check:checked').length;
             if (checked === 0) renderHistory();
+          }
+        } catch(e) {}
+        // Refresh agent dashboard badges after sync
+        try {
+          if (_currentUser?.role === 'agent' && document.getElementById('page-agent')?.classList.contains('active')) {
+            renderAgentDashboard(_currentUser);
           }
         } catch(e) {}
         // Second pass after short delay to ensure all DOM is ready
