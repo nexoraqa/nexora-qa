@@ -4778,10 +4778,9 @@ function exportAllHistory() {
   opData.forEach(function(r) {
     // NC score — show actual value or — if missing
     var ncScoreVal = (r.nc_score !== undefined && r.nc_score !== null)
-      ? Number(r.nc_score).toFixed(1)+'/30' : '—';
-    // CC/CB — convert Yes/No to Pass/Fail, show — if missing
-    var ccVal = r.cc === 'Yes' ? 'Pass' : r.cc === 'No' ? 'Fail' : '—';
-    var cbVal = r.cb === 'Yes' ? 'Pass' : r.cb === 'No' ? 'Fail' : '—';
+      ? Number(r.nc_score).toFixed(1)+'/30' : 'N/A';
+    var ccVal = r.cc === 'Yes' ? 'Pass' : r.cc === 'No' ? 'Fail' : 'N/A';
+    var cbVal = r.cb === 'Yes' ? 'Pass' : r.cb === 'No' ? 'Fail' : 'N/A';
     lines.push([
       'TL Operation',
       r.date||'', r.time||'', r.agent||'', r.tl||'', r.proj||'',
