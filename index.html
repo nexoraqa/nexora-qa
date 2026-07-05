@@ -1014,7 +1014,7 @@ a { color:var(--purple-l); text-decoration:none; }
               <div id="prev-elist"></div>
             </div>
             <div style="margin-top:20px;">
-              <button class="btn btn-primary" onclick="goToReview()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span> REVIEW SCORE</button>
+              <button id="qa-review-btn" class="btn btn-primary" onclick="goToReview()"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span> REVIEW SCORE</button>
             </div>
           </div>
         </div>
@@ -1982,7 +1982,7 @@ a { color:var(--purple-l); text-decoration:none; }
               <div id="op-prev-elist"></div>
             </div>
             <div style="margin-top:20px;">
-              <button class="btn btn-primary" onclick="opGoToReview()">
+              <button id="op-review-btn" class="btn btn-primary" onclick="opGoToReview()">
                 <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span> REVIEW SCORE
               </button>
             </div>
@@ -3642,6 +3642,9 @@ async function goToReview() {
     }
     // Live check against Google Sheets — catches a case number submitted
     // seconds ago by someone else, before this device has synced it in
+    const qaReviewBtn = document.getElementById('qa-review-btn');
+    const qaReviewBtnHTML = qaReviewBtn ? qaReviewBtn.innerHTML : '';
+    if (qaReviewBtn) { qaReviewBtn.disabled = true; qaReviewBtn.innerHTML = 'Checking case number…'; }
     try {
       const checkRes  = await fetch(GOOGLE_SHEET_URL + '?action=check_case&sheet=Evals&caseNumber=' + encodeURIComponent(caseNum));
       const checkData = await checkRes.json();
@@ -3653,6 +3656,8 @@ async function goToReview() {
       // If the live check itself fails (e.g. no internet), don't block the user —
       // fall back to the local check above, which already ran
       console.warn('Live case check failed, continuing with local check only:', err);
+    } finally {
+      if (qaReviewBtn) { qaReviewBtn.disabled = false; qaReviewBtn.innerHTML = qaReviewBtnHTML; }
     }
   }
 
@@ -7646,6 +7651,9 @@ async function opGoToReview() {
     if (dup) { showValidationToast('Case ' + caseCheck + ' already has a TL evaluation'); return; }
     // Live check against Google Sheets — catches a case number submitted
     // seconds ago by another TL, before this device has synced it in
+    const opReviewBtn = document.getElementById('op-review-btn');
+    const opReviewBtnHTML = opReviewBtn ? opReviewBtn.innerHTML : '';
+    if (opReviewBtn) { opReviewBtn.disabled = true; opReviewBtn.innerHTML = 'Checking case number…'; }
     try {
       const checkRes  = await fetch(GOOGLE_SHEET_URL + '?action=check_case&sheet=Operation&caseNumber=' + encodeURIComponent(caseCheck));
       const checkData = await checkRes.json();
@@ -7657,6 +7665,8 @@ async function opGoToReview() {
       // If the live check itself fails (e.g. no internet), don't block the user —
       // fall back to the local check above, which already ran
       console.warn('Live case check failed, continuing with local check only:', err);
+    } finally {
+      if (opReviewBtn) { opReviewBtn.disabled = false; opReviewBtn.innerHTML = opReviewBtnHTML; }
     }
   }
   var d = opComputeScore();
