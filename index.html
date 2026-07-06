@@ -937,7 +937,7 @@ a { color:var(--purple-l); text-decoration:none; }
           <div class="card">
             <div class="card-title">Agent Information</div>
             <div class="field" id="field-case">
-              <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
+              <label>Case Number <span style="color:var(--red);">*</span></label>
               <input type="text" id="c-case" placeholder="e.g. CASE-2026-04521" onclick="this.value=''" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
             </div>
             <div class="field" id="field-proj">
@@ -3711,6 +3711,7 @@ async function goToReview() {
     { id:'c-agent', field:'field-agent', label:'Agent Name' },
     { id:'c-qa',    field:'field-qa',    label:'QA Name' },
     { id:'c-lang',  field:'field-lang',  label:'Language' },
+    { id:'c-case',  field:'field-case',  label:'Case Number' },
   ];
   let firstEmpty = null;
   let emptyFields = [];
