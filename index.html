@@ -10008,7 +10008,7 @@ function loadFromGoogleSheets() {
               nc_score:  ncScore,
               cc:        ccFail ? 'No' : 'Yes',
               cb:        cbFail ? 'No' : 'Yes',
-              caseNumber:r.caseNumber || r.case_number || '',
+              caseNumber:r.caseNumber || r.case_number || r['case number'] || r['Case Number'] || r['caseNumber'] || '',
             };
           });
         } catch(e) {}
