@@ -1945,7 +1945,7 @@ a { color:var(--purple-l); text-decoration:none; }
           <div class="card">
             <div class="card-title">Agent Information</div>
             <div class="field">
-              <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
+              <label>Case Number <span style="color:var(--red);">*</span></label>
               <input type="text" id="op-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
             </div>
             <div class="field">
@@ -7957,6 +7957,7 @@ async function opGoToReview() {
   var caseCheck = (document.getElementById('op-case')?.value||'').trim();
   if (!agent) { alert('Please select an agent.'); return; }
   if (!proj)  { alert('Please select a project.'); return; }
+  if (!caseCheck) { showValidationToast('Case Number is required'); return; }
   // Block duplicate case number in TL operations
   if (caseCheck) {
     var dup = (window._operationHistory||[]).find(function(r) {
