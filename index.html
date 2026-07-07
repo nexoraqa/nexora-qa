@@ -3654,11 +3654,10 @@ function showNewAchievementNotification(newBadges, seenKey, seen) {
   }
   const badgeHTML = newBadges.map((b, i) => {
     const idx = (window._agentBadges||[]).findIndex(x => x.label === b.label);
-    const tap = idx >= 0 ? 'showBadgePopup(' + idx + ')' : '';
-    return '<div onclick="' + tap + '" style="cursor:' + (tap?'pointer':'default') + ';display:flex;align-items:center;gap:10px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:16px;padding:12px 18px;margin-bottom:10px;">' +
+    return '<div data-bidx="' + idx + '" style="cursor:' + (idx>=0?'pointer':'default') + ';display:flex;align-items:center;gap:10px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:16px;padding:12px 18px;margin-bottom:10px;">' +
     '<span style="font-size:28px;">' + b.icon + '</span>' +
     '<span style="font-size:15px;font-weight:800;color:' + b.color + ';">' + b.label + '</span>' +
-    '<span style="margin-left:auto;font-size:11px;color:' + b.color + ';opacity:0.7;">' + (tap?'Tap for details':'') + '</span>' +
+    (idx>=0?'<span style="margin-left:auto;font-size:11px;color:' + b.color + ';opacity:0.7;">Tap for details</span>':'') +
     '</div>';
   }).join('');
   popup.innerHTML =
@@ -3670,6 +3669,20 @@ function showNewAchievementNotification(newBadges, seenKey, seen) {
     '<button onclick="document.getElementById(\'achievement-notify-popup\').style.display=\'none\'" style="margin-top:12px;width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;">🙌 Got it!</button>' +
     '</div>';
   popup.style.display = 'flex';
+  // Add tap listeners to each badge row after DOM is ready
+  setTimeout(function() {
+    popup.querySelectorAll('[data-bidx]').forEach(function(el) {
+      const idx = parseInt(el.getAttribute('data-bidx'));
+      if (idx >= 0) {
+        el.addEventListener('click', function() {
+          popup.style.display = 'none';
+          var bp = document.getElementById('badge-popup');
+          if (bp) bp.style.zIndex = '10001';
+          showBadgePopup(idx);
+        });
+      }
+    });
+  }, 100);
 }
 
 function fmtBadgeDate(d) {
