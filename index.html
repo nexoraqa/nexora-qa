@@ -9650,7 +9650,11 @@ function renderAgentDashboard(user) {
       // Check for new badges the agent hasn't been notified about yet
       try {
         const seenKey = 'nexora_seen_badges_' + (user.name||'').replace(/\s+/g,'_');
-        const seen = JSON.parse(localStorage.getItem(seenKey)||'[]');
+        let seen = JSON.parse(localStorage.getItem(seenKey)||'[]');
+        // Remove badges from seen list if agent no longer has them (lost due to critical eval)
+        const currentLabels = badges.map(b => b.label);
+        seen = seen.filter(label => currentLabels.includes(label));
+        localStorage.setItem(seenKey, JSON.stringify(seen));
         const newBadges = badges.filter(b => !seen.includes(b.label));
         if (newBadges.length > 0) {
           setTimeout(function() { showNewAchievementNotification(newBadges, seenKey, seen); }, 800);
