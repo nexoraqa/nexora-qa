@@ -1944,8 +1944,8 @@ a { color:var(--purple-l); text-decoration:none; }
         <div>
           <div class="card">
             <div class="card-title">Agent Information</div>
-            <div class="field">
-              <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
+            <div class="field" id="field-op-case">
+              <label>Case Number <span style="color:var(--red);">*</span></label>
               <input type="text" id="op-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
             </div>
             <div class="field">
@@ -3637,6 +3637,46 @@ function showValidationToast(msg) {
   window._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 3000);
 }
 
+function showNewAchievementNotification(newBadges, seenKey, seen) {
+  // Mark all as seen immediately so it never shows again
+  try {
+    const updated = seen.concat(newBadges.map(b => b.label));
+    localStorage.setItem(seenKey, JSON.stringify(updated));
+  } catch(e) {}
+
+  // Build combined popup
+  let popup = document.getElementById('achievement-notify-popup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'achievement-notify-popup';
+    popup.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:#00000077;';
+    document.body.appendChild(popup);
+  }
+  const badgeHTML = newBadges.map(b =>
+    '<div style="display:flex;align-items:center;gap:10px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:16px;padding:12px 18px;margin-bottom:10px;">' +
+    '<span style="font-size:28px;">' + b.icon + '</span>' +
+    '<span style="font-size:15px;font-weight:800;color:' + b.color + ';">' + b.label + '</span>' +
+    '</div>'
+  ).join('');
+  popup.innerHTML =
+    '<div style="background:var(--card);border-radius:20px;padding:28px 24px;max-width:320px;width:90%;box-shadow:0 8px 40px #0009;text-align:center;">' +
+    '<div style="font-size:40px;margin-bottom:8px;">🎉</div>' +
+    '<div style="font-size:18px;font-weight:800;color:var(--gold);margin-bottom:4px;">New Achievement' + (newBadges.length > 1 ? 's' : '') + '!</div>' +
+    '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;">You earned something new — keep it up!</div>' +
+    badgeHTML +
+    '<button onclick="document.getElementById(\'achievement-notify-popup\').style.display=\'none\'" style="margin-top:12px;width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;">🙌 Got it!</button>' +
+    '</div>';
+  popup.style.display = 'flex';
+}
+
+function fmtBadgeDate(d) {
+  if (!d) return '';
+  try {
+    const dt = new Date(d);
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  } catch(e) { return d; }
+}
 function showBadgePopup(index) {
   const b = (window._agentBadges || [])[index];
   if (!b) return;
@@ -4716,6 +4756,10 @@ function saveToGoogleSheets(eval_data, errors) {
       cb_ticket_creation:  getAttrValue(errors, 'Ticket Creation and Categorization'),
       cb_control_the_call: getAttrValue(errors, 'Control the Call / Comprehension'),
       cb_ticketing_tree:   getAttrValue(errors, 'Ticketing Tree'),
+      // Sub-error text for Error Anatomy and QA Monitor
+      ccAttrs: errors.filter(e=>e.t==='cc'&&!e.isNA).map(e=>(e.attr||e.attrName||'')+(e.v&&e.v!==(e.attr||e.attrName||'')?(' → '+e.v):'')).join(' | ')||'NO',
+      cbAttrs: errors.filter(e=>e.t==='cb'&&!e.isNA).map(e=>(e.attr||e.attrName||'')+(e.v&&e.v!==(e.attr||e.attrName||'')?(' → '+e.v):'')).join(' | ')||'NO',
+      ncAttrs: errors.filter(e=>e.t==='nc'&&!e.isNA).map(e=>(e.attr||e.attrName||'')+(e.v&&e.v!==(e.attr||e.attrName||'')?(' → '+e.v):'')).join(' | ')||'NO',
     };
 
     fetch(GOOGLE_SHEET_URL, {
@@ -7963,6 +8007,8 @@ async function opGoToReview() {
   var caseCheck = (document.getElementById('op-case')?.value||'').trim();
   if (!agent) { alert('Please select an agent.'); return; }
   if (!proj)  { alert('Please select a project.'); return; }
+  if (!caseCheck) { setFieldError('field-op-case', true); showValidationToast('Required: Case Number'); return; }
+  setFieldError('field-op-case', false);
   // Block duplicate case number in TL operations
   if (caseCheck) {
     var dup = (window._operationHistory||[]).find(function(r) {
@@ -9551,7 +9597,7 @@ function renderAgentDashboard(user) {
     if (perfectEval) badges.push({
       icon:'⭐', label:'Perfect Score', color:'var(--gold)',
       desc: 'You scored 100% on an evaluation.',
-      detail: 'Case ' + (perfectEval.caseNumber||'—') + ' · 100% · ' + (perfectEval.date||'') + (perfectEval.qa ? ' · by ' + perfectEval.qa : '')
+      detail: 'Case ' + (perfectEval.caseNumber||'—') + ' · 100% · ' + fmtBadgeDate(perfectEval.date) + (perfectEval.qa ? ' · by ' + perfectEval.qa : '')
     });
 
     // No CC errors in last 5 evals
@@ -9559,7 +9605,7 @@ function renderAgentDashboard(user) {
     if (last5.length >= 3 && last5.every(e => !(e.errors||[]).some(x=>x.t==='cc'&&!x.isNA))) badges.push({
       icon:'🛡', label:'CC Clean Streak', color:'var(--green)',
       desc: 'No critical customer errors in your last ' + last5.length + ' evaluations.',
-      detail: 'Last eval: Case ' + (last5[0].caseNumber||'—') + ' · ' + Number(last5[0].overall).toFixed(1) + '% · ' + (last5[0].date||'')
+      detail: 'Last eval: Case ' + (last5[0].caseNumber||'—') + ' · ' + Number(last5[0].overall).toFixed(1) + '% · ' + fmtBadgeDate(last5[0].date)
     });
 
     // Improved — last score better than first
@@ -9569,7 +9615,7 @@ function renderAgentDashboard(user) {
       if (latest > oldest) badges.push({
         icon:'📈', label:'Improving', color:'var(--blue-l)',
         desc: 'Your latest score is higher than your first evaluation.',
-        detail: 'First: ' + oldest.toFixed(1) + '% → Latest: ' + latest.toFixed(1) + '% · Case ' + (agentEvals[0].caseNumber||'—')
+        detail: 'First: ' + oldest.toFixed(1) + '% → Latest: ' + latest.toFixed(1) + '% · Case ' + (agentEvals[0].caseNumber||'—') + ' · ' + fmtBadgeDate(agentEvals[0].date)
       });
     }
 
@@ -9579,15 +9625,25 @@ function renderAgentDashboard(user) {
     if (streak >= 3) badges.push({
       icon:'🔥', label: streak + ' Pass Streak', color:'var(--orange)',
       desc: 'You passed ' + streak + ' evaluations in a row above 90%.',
-      detail: 'Latest: Case ' + (agentEvals[0].caseNumber||'—') + ' · ' + Number(agentEvals[0].overall).toFixed(1) + '% · ' + (agentEvals[0].date||'')
+      detail: 'Latest: Case ' + (agentEvals[0].caseNumber||'—') + ' · ' + Number(agentEvals[0].overall).toFixed(1) + '% · ' + fmtBadgeDate(agentEvals[0].date)
     });
 
     if (badges.length > 0) {
       // Store badges globally so popup can read them
       window._agentBadges = badges;
-      badgesEl.innerHTML = badges.map((b, i) =>
-        '<div onclick="showBadgePopup(' + i + ')" style="cursor:pointer;display:flex;align-items:center;gap:5px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:' + b.color + ';">' + b.icon + ' ' + b.label + '</div>'
-      ).join('');
+      // Check for new badges the agent hasn't been notified about yet
+      try {
+        const seenKey = 'nexora_seen_badges_' + (user.name||'').replace(/\s+/g,'_');
+        const seen = JSON.parse(localStorage.getItem(seenKey)||'[]');
+        const newBadges = badges.filter(b => !seen.includes(b.label));
+        if (newBadges.length > 0) {
+          setTimeout(function() { showNewAchievementNotification(newBadges, seenKey, seen); }, 800);
+        }
+      } catch(e) {}
+      badgesEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">' +
+        badges.map((b, i) =>
+          '<div onclick="showBadgePopup(' + i + ')" style="cursor:pointer;display:flex;align-items:center;gap:8px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:24px;padding:10px 18px;font-size:15px;font-weight:800;color:' + b.color + ';">' + b.icon + ' ' + b.label + '</div>'
+        ).join('') + '</div>';
     } else {
       badgesEl.innerHTML = '<div style="color:var(--muted);font-size:12px;">Submit more evals to earn badges</div>';
     }
@@ -9595,7 +9651,7 @@ function renderAgentDashboard(user) {
     // Streak
     if (streakEl) {
       if (streak >= 2) {
-        const streakDetail = 'Latest: Case ' + (agentEvals[0].caseNumber||'—') + ' · ' + Number(agentEvals[0].overall).toFixed(1) + '% · ' + (agentEvals[0].date||'');
+        const streakDetail = 'Latest: Case ' + (agentEvals[0].caseNumber||'—') + ' · ' + Number(agentEvals[0].overall).toFixed(1) + '% · ' + fmtBadgeDate(agentEvals[0].date);
         window._streakBadge = {icon:'🔥', label: streak + ' Pass Streak', color:'var(--orange)', desc: 'You passed ' + streak + ' evaluations in a row above 90%.', detail: streakDetail};
         streakEl.innerHTML = '<div id="streak-banner-tap" style="cursor:pointer;display:flex;align-items:center;gap:8px;background:var(--orange)18;border-radius:8px;padding:8px 12px;"><span style="font-size:18px;">🔥</span><div><div style="font-size:12px;font-weight:700;color:var(--orange);">' + streak + ' consecutive passes!</div><div style="font-size:10px;color:var(--muted);">Tap to see details</div></div></div>';
         var bannerEl = document.getElementById('streak-banner-tap');
@@ -9926,6 +9982,20 @@ function loadFromGoogleSheets() {
         eval_obj.ccPct   = eval_obj.cc > 0 ? 0 : 100;
         eval_obj.cbPct   = eval_obj.cb > 0 ? 0 : 100;
         eval_obj.holdNA  = row['NC HOLD'] === 'N/A';
+        // Enrich errors with sub-error detail from ccAttrs/cbAttrs/ncAttrs if available
+        ['ccAttrs','cbAttrs','ncAttrs'].forEach(function(field) {
+          const raw = row[field] || '';
+          if (!raw || raw === 'NO') return;
+          const type = field === 'ccAttrs' ? 'cc' : field === 'cbAttrs' ? 'cb' : 'nc';
+          raw.split(' | ').forEach(function(chunk) {
+            const parts = chunk.split(' → ');
+            const attr = parts[0].trim();
+            const sub  = parts[1] ? parts[1].trim() : parts[0].trim();
+            // Update matching error entry with sub-error detail
+            const match = eval_obj.errors.find(function(e) { return e.t === type && e.attr === attr; });
+            if (match) { match.v = sub; }
+          });
+        });
         _evalHistory.push(eval_obj);
         if (eval_obj.agent) AGENT_META[eval_obj.agent] = {tl:eval_obj.tl||'',proj:eval_obj.proj||'',country:eval_obj.country||''};
         added++;
