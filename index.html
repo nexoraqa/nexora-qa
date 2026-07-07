@@ -3652,12 +3652,15 @@ function showNewAchievementNotification(newBadges, seenKey, seen) {
     popup.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:#00000077;';
     document.body.appendChild(popup);
   }
-  const badgeHTML = newBadges.map(b =>
-    '<div style="display:flex;align-items:center;gap:10px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:16px;padding:12px 18px;margin-bottom:10px;">' +
+  const badgeHTML = newBadges.map((b, i) => {
+    const idx = (window._agentBadges||[]).findIndex(x => x.label === b.label);
+    const tap = idx >= 0 ? 'showBadgePopup(' + idx + ')' : '';
+    return '<div onclick="' + tap + '" style="cursor:' + (tap?'pointer':'default') + ';display:flex;align-items:center;gap:10px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:16px;padding:12px 18px;margin-bottom:10px;">' +
     '<span style="font-size:28px;">' + b.icon + '</span>' +
     '<span style="font-size:15px;font-weight:800;color:' + b.color + ';">' + b.label + '</span>' +
-    '</div>'
-  ).join('');
+    '<span style="margin-left:auto;font-size:11px;color:' + b.color + ';opacity:0.7;">' + (tap?'Tap for details':'') + '</span>' +
+    '</div>';
+  }).join('');
   popup.innerHTML =
     '<div style="background:var(--card);border-radius:20px;padding:28px 24px;max-width:320px;width:90%;box-shadow:0 8px 40px #0009;text-align:center;">' +
     '<div style="font-size:40px;margin-bottom:8px;">🎉</div>' +
