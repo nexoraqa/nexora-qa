@@ -1060,7 +1060,7 @@ a { color:var(--purple-l); text-decoration:none; }
         </div>
       </div>
 
-      <button class="btn btn-success" style="font-size:15px;padding:14px;" onclick="submitEval()"><span class="si si-check" style="vertical-align:-1px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> SUBMIT EVALUATION</button>
+      <button id="qa-submit-btn" class="btn btn-success" style="font-size:15px;padding:14px;" onclick="submitEval()"><span class="si si-check" style="vertical-align:-1px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> SUBMIT EVALUATION</button>
     </div><!-- /step-review -->
 
     <!-- ── STEP 3: SUCCESS ── -->
@@ -2060,7 +2060,7 @@ a { color:var(--purple-l); text-decoration:none; }
           <div id="op-rev-elist"></div>
         </div>
       </div>
-      <button class="btn btn-success" style="font-size:15px;padding:14px;" onclick="submitOperation()">
+      <button id="op-submit-btn" class="btn btn-success" style="font-size:15px;padding:14px;" onclick="submitOperation()">
         <span class="si si-check" style="vertical-align:-1px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> SUBMIT OPERATION EVAL
       </button>
     </div><!-- /op-step-review -->
@@ -3858,6 +3858,9 @@ function goBack()    { showStep('form'); }
 function submitEval() {
   const d = _eval;
   if (!d) return;
+  // Disable button immediately to prevent duplicate submissions
+  const submitBtn = document.getElementById('qa-submit-btn');
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting…'; }
   // Check if editing existing eval
   if (window._editUid) {
     // Remove old record from history
@@ -8062,7 +8065,7 @@ async function opGoToReview() {
   _opEval = d;
   var col = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
   document.getElementById('op-rev-agent').textContent = agent;
-  document.getElementById('op-rev-tl').textContent    = document.getElementById('op-tl-display').textContent;
+  document.getElementById('op-rev-tl').textContent    = (document.getElementById('op-tl-display')||{textContent:''}).textContent;
   document.getElementById('op-rev-proj').textContent  = proj;
   var scoreEl = document.getElementById('op-rev-score');
   var pillEl  = document.getElementById('op-rev-pill');
@@ -8126,6 +8129,9 @@ function submitOperation() {
   var caseNum = document.getElementById('op-case')?.value.trim() || '';
   var tlName = _currentUser?.tl || _currentUser?.name || '';
   if (!agent || !proj) { alert('Please select agent and project.'); return; }
+  // Disable button immediately to prevent duplicate submissions
+  const opSubmitBtn = document.getElementById('op-submit-btn');
+  if (opSubmitBtn) { opSubmitBtn.disabled = true; opSubmitBtn.textContent = 'Submitting…'; }
 
   var d = opComputeScore();
   var now  = new Date();
