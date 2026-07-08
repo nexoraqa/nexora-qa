@@ -1060,7 +1060,7 @@ a { color:var(--purple-l); text-decoration:none; }
         </div>
       </div>
 
-      <button class="btn btn-success" style="font-size:15px;padding:14px;" onclick="this.disabled=true;submitEval();"><span class="si si-check" style="vertical-align:-1px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> SUBMIT EVALUATION</button>
+      <button id="qa-submit-btn" class="btn btn-success" style="font-size:15px;padding:14px;" onclick="submitEval()"><span class="si si-check" style="vertical-align:-1px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> SUBMIT EVALUATION</button>
     </div><!-- /step-review -->
 
     <!-- ── STEP 3: SUCCESS ── -->
@@ -3800,8 +3800,10 @@ async function goToReview() {
 function goBack()    { showStep('form'); }
 
 function submitEval() {
+  if (window._evalSubmitting) return; // prevent double submit
+  window._evalSubmitting = true;
   const d = _eval;
-  if (!d) return;
+  if (!d) { window._evalSubmitting = false; return; }
   // Check if editing existing eval
   if (window._editUid) {
     // Remove old record from history
@@ -3940,6 +3942,7 @@ function editEval(uid) {
 }
 
 function resetCalc() {
+  window._evalSubmitting = false;
   // Note: _editUid is NOT cleared here — cleared only after submit or cancel
   var bar = document.getElementById('edit-cancel-bar');
   if (bar) bar.style.display = 'none';
