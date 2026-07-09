@@ -1944,8 +1944,8 @@ a { color:var(--purple-l); text-decoration:none; }
         <div>
           <div class="card">
             <div class="card-title">Agent Information</div>
-            <div class="field">
-              <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
+            <div class="field" id="field-op-case">
+              <label>Case Number <span style="color:var(--red);">*</span></label>
               <input type="text" id="op-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
             </div>
             <div class="field">
@@ -9865,16 +9865,11 @@ function loadFromGoogleSheets() {
       const evalsData = res.evals || res.data || [];
 
       if (evalsData.length) {
-        const existingIds = new Set(_evalHistory.map(e => String(e.uid)));
-        let added = 0;
+        // Sheet is the single source of truth — replace local history entirely
+        const newHistory = [];
         evalsData.forEach(row => {
         if (!row.id || !row.agent) return;
-        if (String(row.deleted||'').toUpperCase().trim() === 'YES') {
-          // Remove from local if it was soft-deleted in sheet
-          _evalHistory = _evalHistory.filter(e => String(e.uid) !== String(row.id));
-          return;
-        }
-        if (existingIds.has(String(row.id))) return; // skip duplicates
+        if (String(row.deleted||'').toUpperCase().trim() === 'YES') return; // skip deleted
         // Convert sheet row back to eval object
         const eval_obj = {
           uid:     row.id,
@@ -9938,13 +9933,11 @@ function loadFromGoogleSheets() {
         eval_obj.ccPct   = eval_obj.cc > 0 ? 0 : 100;
         eval_obj.cbPct   = eval_obj.cb > 0 ? 0 : 100;
         eval_obj.holdNA  = row['NC HOLD'] === 'N/A';
-        _evalHistory.push(eval_obj);
+        newHistory.push(eval_obj);
         if (eval_obj.agent) AGENT_META[eval_obj.agent] = {tl:eval_obj.tl||'',proj:eval_obj.proj||'',country:eval_obj.country||''};
-        added++;
       });
-      if (added > 0) {
-        // Sort by date newest first
-        _evalHistory.sort((a,b) => Number(b.uid) - Number(a.uid));
+        // Replace local history with sheet data
+        _evalHistory = newHistory.sort((a,b) => Number(b.uid) - Number(a.uid));
         persistHistory();
         try { filtered = [...getLiveAgents()]; } catch(e) {}
         try { updateHomeKPIs(); } catch(e) {}
@@ -9988,8 +9981,7 @@ function loadFromGoogleSheets() {
             setTimeout(() => { try { updateCalibBadge(); } catch(e) {} }, 1000);
           } catch(e) {}
         }, 500);
-        console.log(`✅ Loaded ${added} new evals from Google Sheets`);
-      }
+        console.log('✅ Synced evals from Google Sheets');
       } // end evalsData block
 
       // Merge coaching items from Google Sheets
