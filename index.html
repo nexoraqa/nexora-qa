@@ -3845,10 +3845,8 @@ async function goToReview() {
 function goBack()    { showStep('form'); }
 
 function submitEval() {
-  if (window._evalSubmitting) return; // prevent double submit
-  window._evalSubmitting = true;
   const d = _eval;
-  if (!d) { window._evalSubmitting = false; return; }
+  if (!d) return;
   // Check if editing existing eval
   if (window._editUid) {
     // Remove old record from history
@@ -3987,7 +3985,6 @@ function editEval(uid) {
 }
 
 function resetCalc() {
-  window._evalSubmitting = false;
   // Note: _editUid is NOT cleared here — cleared only after submit or cancel
   var bar = document.getElementById('edit-cancel-bar');
   if (bar) bar.style.display = 'none';
@@ -9992,6 +9989,19 @@ function loadFromGoogleSheets() {
         eval_obj.ccPct   = eval_obj.cc > 0 ? 0 : 100;
         eval_obj.cbPct   = eval_obj.cb > 0 ? 0 : 100;
         eval_obj.holdNA  = row['NC HOLD'] === 'N/A';
+        // Enrich errors with sub-error detail from sheet columns
+        ['ccAttrs','cbAttrs','ncAttrs'].forEach(function(field) {
+          const raw = row[field] || '';
+          if (!raw || raw === 'NO') return;
+          const type = field === 'ccAttrs' ? 'cc' : field === 'cbAttrs' ? 'cb' : 'nc';
+          raw.split(' | ').forEach(function(chunk) {
+            const parts = chunk.split(' → ');
+            const attr = parts[0].trim();
+            const sub  = parts[1] ? parts[1].trim() : parts[0].trim();
+            const match = eval_obj.errors.find(function(e) { return e.t === type && e.attr === attr; });
+            if (match) { match.v = sub; }
+          });
+        });
         _evalHistory.push(eval_obj);
         if (eval_obj.agent) AGENT_META[eval_obj.agent] = {tl:eval_obj.tl||'',proj:eval_obj.proj||'',country:eval_obj.country||''};
         added++;
