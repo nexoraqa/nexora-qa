@@ -3837,7 +3837,7 @@ function submitEval() {
     const compareBox = document.getElementById('success-compare');
     if (compareBox) {
       const tlMatch = (window._operationHistory||[]).find(r =>
-        r.caseNumber && d.caseNumber && r.caseNumber.trim().toLowerCase() === d.caseNumber.trim().toLowerCase()
+        r.caseNumber && d.caseNumber && String(r.caseNumber).trim().toLowerCase() === String(d.caseNumber).trim().toLowerCase()
       );
       if (tlMatch) {
         document.getElementById('success-compare-score').textContent = parseFloat(tlMatch.overall).toFixed(1)+'%';
@@ -3849,7 +3849,8 @@ function submitEval() {
     }
     showStep('success');
   } catch(err) {
-    alert('DEBUG — success screen error: ' + err.message);
+    showStep('success'); // show success even if compare box fails
+    console.warn('Success screen error:', err);
   }
   // Show coaching popup if errors found
   const hasCC = d.cc > 0;
@@ -7976,7 +7977,7 @@ function opGoToReview() {
   // Block duplicate case number in TL operations (local check)
   if (caseCheck) {
     var dup = (window._operationHistory||[]).find(function(r) {
-      return r.caseNumber && r.caseNumber.trim().toLowerCase() === caseCheck.toLowerCase();
+      return r.caseNumber && String(r.caseNumber).trim().toLowerCase() === caseCheck.toLowerCase();
     });
     if (dup) { showValidationToast('Case ' + caseCheck + ' already has a TL evaluation'); return; }
   }
