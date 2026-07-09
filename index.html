@@ -3768,7 +3768,10 @@ async function goToReview() {
     } catch (err) {
       console.warn('Live case check failed, continuing with local check only:', err);
     } finally {
-      if (qaReviewBtn) { qaReviewBtn.disabled = false; qaReviewBtn.innerHTML = qaReviewBtnHTML; }
+      // Button stays disabled until form is reset - prevents double-fire overwriting success screen
+      if (qaReviewBtn && document.getElementById('step-review').style.display !== 'none') {
+        qaReviewBtn.disabled = false; qaReviewBtn.innerHTML = qaReviewBtnHTML;
+      }
     }
   }
 
@@ -3940,6 +3943,9 @@ function editEval(uid) {
 }
 
 function resetCalc() {
+  // Re-enable Review Score button for next submission
+  const qaReviewBtn = document.getElementById('qa-review-btn');
+  if (qaReviewBtn) { qaReviewBtn.disabled = false; qaReviewBtn.innerHTML = '<span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></span> REVIEW SCORE'; }
   // Note: _editUid is NOT cleared here — cleared only after submit or cancel
   var bar = document.getElementById('edit-cancel-bar');
   if (bar) bar.style.display = 'none';
