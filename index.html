@@ -3824,29 +3824,33 @@ function submitEval() {
   // Immediately sync so Manager and TL see it right away
   setTimeout(function(){ try { loadFromGoogleSheets(); } catch(e) {} }, 1500);
   // Success screen
-  const scoreEl = document.getElementById('success-score');
-  scoreEl.textContent = d.overall.toFixed(1)+'%';
-  scoreEl.style.color = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
-  document.getElementById('success-agent').textContent  = d.agent+' · '+d.proj;
-  document.getElementById('success-detail').textContent = `${d.agent}'s evaluation (${d.overall.toFixed(1)}%) recorded on ${d.today}`;
-  // Hide old coaching box
-  const coachBox = document.getElementById('success-coaching');
-  if (coachBox) coachBox.style.display = 'none';
-  // Show TL score if TL already evaluated this case
-  const compareBox = document.getElementById('success-compare');
-  if (compareBox) {
-    const tlMatch = (window._operationHistory||[]).find(r =>
-      r.caseNumber && d.caseNumber && r.caseNumber.trim().toLowerCase() === d.caseNumber.trim().toLowerCase()
-    );
-    if (tlMatch) {
-      document.getElementById('success-compare-score').textContent = parseFloat(tlMatch.overall).toFixed(1)+'%';
-      document.getElementById('success-compare-detail').textContent = (tlMatch.tl||'TL') + ' scored this case';
-      compareBox.style.display = 'block';
-    } else {
-      compareBox.style.display = 'none';
+  try {
+    const scoreEl = document.getElementById('success-score');
+    scoreEl.textContent = d.overall.toFixed(1)+'%';
+    scoreEl.style.color = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
+    document.getElementById('success-agent').textContent  = d.agent+' · '+d.proj;
+    document.getElementById('success-detail').textContent = `${d.agent}'s evaluation (${d.overall.toFixed(1)}%) recorded on ${d.today}`;
+    // Hide old coaching box
+    const coachBox = document.getElementById('success-coaching');
+    if (coachBox) coachBox.style.display = 'none';
+    // Show TL score if TL already evaluated this case
+    const compareBox = document.getElementById('success-compare');
+    if (compareBox) {
+      const tlMatch = (window._operationHistory||[]).find(r =>
+        r.caseNumber && d.caseNumber && r.caseNumber.trim().toLowerCase() === d.caseNumber.trim().toLowerCase()
+      );
+      if (tlMatch) {
+        document.getElementById('success-compare-score').textContent = parseFloat(tlMatch.overall).toFixed(1)+'%';
+        document.getElementById('success-compare-detail').textContent = (tlMatch.tl||'TL') + ' scored this case';
+        compareBox.style.display = 'block';
+      } else {
+        compareBox.style.display = 'none';
+      }
     }
+    showStep('success');
+  } catch(err) {
+    alert('DEBUG — success screen error: ' + err.message);
   }
-  showStep('success');
   // Show coaching popup if errors found
   const hasCC = d.cc > 0;
   const hasCB = d.cb > 0;
