@@ -937,7 +937,7 @@ a { color:var(--purple-l); text-decoration:none; }
           <div class="card">
             <div class="card-title">Agent Information</div>
             <div class="field" id="field-case">
-              <label>Case Number <span style="color:var(--red);">*</span></label>
+              <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
               <input type="text" id="c-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
             </div>
             <div class="field" id="field-proj">
@@ -1060,7 +1060,7 @@ a { color:var(--purple-l); text-decoration:none; }
         </div>
       </div>
 
-      <button id="qa-submit-btn" class="btn btn-success" style="font-size:15px;padding:14px;" onclick="submitEval()"><span class="si si-check" style="vertical-align:-1px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> SUBMIT EVALUATION</button>
+      <button class="btn btn-success" style="font-size:15px;padding:14px;" onclick="submitEval()"><span class="si si-check" style="vertical-align:-1px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> SUBMIT EVALUATION</button>
     </div><!-- /step-review -->
 
     <!-- ── STEP 3: SUCCESS ── -->
@@ -1944,8 +1944,8 @@ a { color:var(--purple-l); text-decoration:none; }
         <div>
           <div class="card">
             <div class="card-title">Agent Information</div>
-            <div class="field" id="field-op-case">
-              <label>Case Number <span style="color:var(--red);">*</span></label>
+            <div class="field">
+              <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
               <input type="text" id="op-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
             </div>
             <div class="field">
@@ -3635,51 +3635,6 @@ function showValidationToast(msg) {
   t.style.display = 'block';
   clearTimeout(window._toastTimer);
   window._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 3000);
-}
-
-function showNewAchievementNotification(newBadges, seenKey, seen) {
-  // Mark all as seen immediately
-  try {
-    const updated = seen.concat(newBadges.map(b => b.label));
-    localStorage.setItem(seenKey, JSON.stringify(updated));
-  } catch(e) {}
-  let popup = document.getElementById('achievement-notify-popup');
-  if (!popup) {
-    popup = document.createElement('div');
-    popup.id = 'achievement-notify-popup';
-    popup.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:#00000077;';
-    document.body.appendChild(popup);
-  }
-  const badgeHTML = newBadges.map((b, i) => {
-    const idx = (window._agentBadges||[]).findIndex(x => x.label === b.label);
-    return '<div data-bidx="' + idx + '" style="cursor:' + (idx>=0?'pointer':'default') + ';display:flex;align-items:center;gap:10px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:16px;padding:12px 18px;margin-bottom:10px;">' +
-    '<span style="font-size:28px;">' + b.icon + '</span>' +
-    '<span style="font-size:15px;font-weight:800;color:' + b.color + ';">' + b.label + '</span>' +
-    (idx>=0?'<span style="margin-left:auto;font-size:11px;color:' + b.color + ';opacity:0.7;">Tap for details</span>':'') +
-    '</div>';
-  }).join('');
-  popup.innerHTML =
-    '<div style="background:var(--card);border-radius:20px;padding:28px 24px;max-width:320px;width:90%;box-shadow:0 8px 40px #0009;text-align:center;">' +
-    '<div style="font-size:40px;margin-bottom:8px;">🎉</div>' +
-    '<div style="font-size:18px;font-weight:800;color:var(--gold);margin-bottom:4px;">New Achievement' + (newBadges.length > 1 ? 's' : '') + '!</div>' +
-    '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;">You earned something new — keep it up!</div>' +
-    badgeHTML +
-    '<button onclick="document.getElementById(\'achievement-notify-popup\').style.display=\'none\'" style="margin-top:12px;width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;">🙌 Got it!</button>' +
-    '</div>';
-  popup.style.display = 'flex';
-  setTimeout(function() {
-    popup.querySelectorAll('[data-bidx]').forEach(function(el) {
-      const idx = parseInt(el.getAttribute('data-bidx'));
-      if (idx >= 0) {
-        el.addEventListener('click', function() {
-          popup.style.display = 'none';
-          var bp = document.getElementById('badge-popup');
-          if (bp) bp.style.zIndex = '10001';
-          showBadgePopup(idx);
-        });
-      }
-    });
-  }, 100);
 }
 
 function showBadgePopup(index) {
@@ -8008,8 +7963,6 @@ function opGoToReview() {
   var caseCheck = (document.getElementById('op-case')?.value||'').trim();
   if (!agent) { showValidationToast('Please select an agent'); return; }
   if (!proj)  { showValidationToast('Please select a project'); return; }
-  if (!caseCheck) { setFieldError('field-op-case', true); showValidationToast('Required: Case Number'); return; }
-  setFieldError('field-op-case', false);
   // Block duplicate case number in TL operations (local check)
   if (caseCheck) {
     var dup = (window._operationHistory||[]).find(function(r) {
@@ -8017,12 +7970,8 @@ function opGoToReview() {
     });
     if (dup) { showValidationToast('Case ' + caseCheck + ' already has a TL evaluation'); return; }
   }
-  // Live check via callback (not async/await to avoid silent mobile crashes)
-  var opReviewBtn = document.getElementById('op-review-btn');
-  var opReviewBtnHTML = opReviewBtn ? opReviewBtn.innerHTML : '';
-  if (opReviewBtn) { opReviewBtn.disabled = true; opReviewBtn.innerHTML = 'Checking case number…'; }
-  function proceedToReview() {
-    if (opReviewBtn) { opReviewBtn.disabled = false; opReviewBtn.innerHTML = opReviewBtnHTML; }
+  // Build review screen
+  function showReview() {
     var d = opComputeScore();
     _opEval = d;
     var col = d.overall>=90?'var(--green)':d.overall>=80?'var(--gold)':'var(--red)';
@@ -8052,29 +8001,28 @@ function opGoToReview() {
     }
     opShowStep('review');
   }
-  // Live server check via fetch callback
+  // Live server check via fetch callback (not async to avoid silent mobile crashes)
+  var opReviewBtn = document.getElementById('op-review-btn');
+  var opReviewBtnHTML = opReviewBtn ? opReviewBtn.innerHTML : '';
+  if (opReviewBtn) { opReviewBtn.disabled = true; opReviewBtn.innerHTML = 'Checking case number…'; }
   fetch(GOOGLE_SHEET_URL + '?action=check_case&sheet=Operation&caseNumber=' + encodeURIComponent(caseCheck))
     .then(function(r) { return r.json(); })
     .then(function(checkData) {
+      if (opReviewBtn) { opReviewBtn.disabled = false; opReviewBtn.innerHTML = opReviewBtnHTML; }
       if (checkData.exists) {
-        if (checkData.sameForm) {
-          if (opReviewBtn) { opReviewBtn.disabled = false; opReviewBtn.innerHTML = opReviewBtnHTML; }
-          showValidationToast('Case ' + caseCheck + ' already has a TL evaluation');
-          return;
-        }
+        if (checkData.sameForm) { showValidationToast('Case ' + caseCheck + ' already has a TL evaluation'); return; }
         var curLang = document.getElementById('op-lang')?.value || '';
         var mismatch = String(checkData.agent).trim().toLowerCase()   !== agent.trim().toLowerCase() ||
                        String(checkData.project).trim().toLowerCase() !== proj.trim().toLowerCase() ||
                        String(checkData.language).trim().toLowerCase()!== curLang.trim().toLowerCase();
-        if (mismatch) {
-          if (opReviewBtn) { opReviewBtn.disabled = false; opReviewBtn.innerHTML = opReviewBtnHTML; }
-          showValidationToast('Case ' + caseCheck + ' is already recorded for a different agent/project/language');
-          return;
-        }
+        if (mismatch) { showValidationToast('Case ' + caseCheck + ' is already recorded for a different agent/project/language'); return; }
       }
-      proceedToReview();
+      showReview();
     })
-    .catch(function() { proceedToReview(); }); // if check fails, proceed anyway
+    .catch(function() {
+      if (opReviewBtn) { opReviewBtn.disabled = false; opReviewBtn.innerHTML = opReviewBtnHTML; }
+      showReview(); // if check fails, proceed anyway
+    });
 }
 
 function opGoBack() { opShowStep('form'); }
@@ -9636,18 +9584,6 @@ function renderAgentDashboard(user) {
     if (badges.length > 0) {
       // Store badges globally so popup can read them
       window._agentBadges = badges;
-      // Check for new badges and show notification
-      try {
-        const seenKey = 'nexora_seen_badges_' + (user.name||'').replace(/\s+/g,'_');
-        let seen = JSON.parse(localStorage.getItem(seenKey)||'[]');
-        const currentLabels = badges.map(b => b.label);
-        seen = seen.filter(label => currentLabels.includes(label));
-        localStorage.setItem(seenKey, JSON.stringify(seen));
-        const newBadges = badges.filter(b => !seen.includes(b.label));
-        if (newBadges.length > 0) {
-          setTimeout(function() { showNewAchievementNotification(newBadges, seenKey, seen); }, 800);
-        }
-      } catch(e) {}
       badgesEl.innerHTML = badges.map((b, i) =>
         '<div onclick="showBadgePopup(' + i + ')" style="cursor:pointer;display:flex;align-items:center;gap:5px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:' + b.color + ';">' + b.icon + ' ' + b.label + '</div>'
       ).join('');
@@ -9989,19 +9925,6 @@ function loadFromGoogleSheets() {
         eval_obj.ccPct   = eval_obj.cc > 0 ? 0 : 100;
         eval_obj.cbPct   = eval_obj.cb > 0 ? 0 : 100;
         eval_obj.holdNA  = row['NC HOLD'] === 'N/A';
-        // Enrich errors with sub-error detail from sheet columns
-        ['ccAttrs','cbAttrs','ncAttrs'].forEach(function(field) {
-          const raw = row[field] || '';
-          if (!raw || raw === 'NO') return;
-          const type = field === 'ccAttrs' ? 'cc' : field === 'cbAttrs' ? 'cb' : 'nc';
-          raw.split(' | ').forEach(function(chunk) {
-            const parts = chunk.split(' → ');
-            const attr = parts[0].trim();
-            const sub  = parts[1] ? parts[1].trim() : parts[0].trim();
-            const match = eval_obj.errors.find(function(e) { return e.t === type && e.attr === attr; });
-            if (match) { match.v = sub; }
-          });
-        });
         _evalHistory.push(eval_obj);
         if (eval_obj.agent) AGENT_META[eval_obj.agent] = {tl:eval_obj.tl||'',proj:eval_obj.proj||'',country:eval_obj.country||''};
         added++;
