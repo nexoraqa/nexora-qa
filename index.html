@@ -7974,6 +7974,8 @@ function opGoToReview() {
   var caseCheck = (document.getElementById('op-case')?.value||'').trim();
   if (!agent) { showValidationToast('Please select an agent'); return; }
   if (!proj)  { showValidationToast('Please select a project'); return; }
+  if (!caseCheck) { setFieldError('field-op-case', true); showValidationToast('Required: Case Number'); return; }
+  setFieldError('field-op-case', false);
   // Block duplicate case number in TL operations (local check)
   if (caseCheck) {
     var dup = (window._operationHistory||[]).find(function(r) {
@@ -8028,11 +8030,11 @@ function opGoToReview() {
                        String(checkData.language).trim().toLowerCase()!== curLang.trim().toLowerCase();
         if (mismatch) { showValidationToast('Case ' + caseCheck + ' is already recorded for a different agent/project/language'); return; }
       }
-      showReview();
+      try { showReview(); } catch(e) { alert('DEBUG TL review error: ' + e.message); }
     })
-    .catch(function() {
+    .catch(function(err) {
       if (opReviewBtn) { opReviewBtn.disabled = false; opReviewBtn.innerHTML = opReviewBtnHTML; }
-      showReview(); // if check fails, proceed anyway
+      try { showReview(); } catch(e) { alert('DEBUG TL review error: ' + e.message); }
     });
 }
 
