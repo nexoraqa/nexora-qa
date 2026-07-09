@@ -937,7 +937,7 @@ a { color:var(--purple-l); text-decoration:none; }
           <div class="card">
             <div class="card-title">Agent Information</div>
             <div class="field" id="field-case">
-              <label>Case Number <span style="color:var(--muted);font-weight:400;">(optional — for call recording reference)</span></label>
+              <label>Case Number <span style="color:var(--red);">*</span></label>
               <input type="text" id="c-case" placeholder="e.g. CASE-2026-04521" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font-b);">
             </div>
             <div class="field" id="field-proj">
@@ -9883,12 +9883,12 @@ function loadFromGoogleSheets() {
           country: row.country  || '',
           caseNumber: row.caseNumber || '',
           overall: parseFloat(row.overall) || 0,
-          cc:      row['CC Customer Profile']==='No'||row['CC Wrong Information']==='No'||
-                   row['CC Missing Information']==='No'||row['CC Ticket Escalation']==='No'||
-                   row['CC Transfer Process']==='No'||row['CC Professionalism']==='No'||
-                   row['CC Ticket Description']==='No' ? 1 : 0,
-          cb:      row['CB Ticket Creation']==='No'||row['CB Control the Call']==='No'||
-                   row['CB Ticketing Tree']==='No' ? 1 : 0,
+          cc:      row['cc_customer_profile']==='No'||row['cc_wrong_information']==='No'||
+                   row['cc_missing_information']==='No'||row['cc_ticket_escalation']==='No'||
+                   row['cc_transfer_process']==='No'||row['cc_professionalism']==='No'||
+                   row['cc_ticket_description']==='No' ? 1 : 0,
+          cb:      row['cb_ticket_creation']==='No'||row['cb_control_the_call']==='No'||
+                   row['cb_ticketing_tree']==='No' ? 1 : 0,
           errors:  [],
           ncCount: 0,
         };
@@ -9933,6 +9933,19 @@ function loadFromGoogleSheets() {
         eval_obj.ccPct   = eval_obj.cc > 0 ? 0 : 100;
         eval_obj.cbPct   = eval_obj.cb > 0 ? 0 : 100;
         eval_obj.holdNA  = row['NC HOLD'] === 'N/A';
+        // Enrich errors with sub-error detail from ccAttrs/cbAttrs/ncAttrs columns
+        ['ccAttrs','cbAttrs','ncAttrs'].forEach(function(field) {
+          const raw = row[field] || '';
+          if (!raw || raw === 'NO') return;
+          const type = field === 'ccAttrs' ? 'cc' : field === 'cbAttrs' ? 'cb' : 'nc';
+          raw.split(' | ').forEach(function(chunk) {
+            const parts = chunk.split(' → ');
+            const attr = parts[0].trim();
+            const sub  = parts[1] ? parts[1].trim() : parts[0].trim();
+            const match = eval_obj.errors.find(function(e) { return e.t === type && e.attr === attr; });
+            if (match) { match.v = sub; }
+          });
+        });
         newHistory.push(eval_obj);
         if (eval_obj.agent) AGENT_META[eval_obj.agent] = {tl:eval_obj.tl||'',proj:eval_obj.proj||'',country:eval_obj.country||''};
       });
