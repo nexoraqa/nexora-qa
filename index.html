@@ -5975,6 +5975,51 @@ function renderNCTab() {
       }).join('')}
     </div>
 
+    <!-- Agents with NC errors — same style as CC/CB -->
+    <div class="card" style="margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="card-title">Agents with NC Errors</div>
+        <div style="font-size:11px;color:var(--muted);">${[...new Set(evals.filter(ev=>(ev.errors||[]).some(e=>e.t==='nc'&&!e.isNA)).map(ev=>ev.agent))].length} agent${[...new Set(evals.filter(ev=>(ev.errors||[]).some(e=>e.t==='nc'&&!e.isNA)).map(ev=>ev.agent))].length !== 1 ? 's' : ''}</div>
+      </div>
+      ${(() => {
+        const ncPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory))
+          .filter(p => p.type === 'nc')
+          .filter(p => {
+            if (fp !== 'all' && (p.meta?.proj||p.proj) !== fp) return false;
+            if (ft !== 'all' && (p.meta?.tl||p.tl) !== ft) return false;
+            if (fc !== 'all' && (p.country||'') !== fc) return false;
+            return true;
+          })
+          .sort((a,b) => b.count - a.count);
+        if (ncPatterns.length === 0) return '<div style="padding:16px;text-align:center;color:var(--muted);font-size:13px;">No NC errors found with current filters</div>';
+        return '<div style="overflow-x:auto;"><table class="tbl" style="width:100%;font-size:12px;"><thead><tr><th></th><th>Agent</th><th>TL</th><th>Repeats</th><th>Level</th><th>Project</th></tr></thead><tbody>' +
+          ncPatterns.map((p, idx) => {
+            const lvl = p.level || {};
+            const lvlColor = lvl.key==='escalate'?'var(--red)':lvl.key==='intervene'?'var(--orange)':'#4a86e8';
+            const subErrors = [];
+            _evalHistory.filter(ev=>ev.agent===p.agent).forEach(ev=>{
+              (ev.errors||[]).filter(e=>e.t==='nc'&&!e.isNA).forEach(e=>{
+                const s = e.v||e.attr||'';
+                if(s&&!subErrors.includes(s)) subErrors.push(s);
+              });
+            });
+            const detailHTML = subErrors.length ?
+              '<div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;">NC Sub-Errors</div>' +
+              subErrors.map(s=>'<div style="display:inline-block;padding:5px 10px;background:rgba(232,162,61,.1);border:1px solid rgba(232,162,61,.3);border-radius:6px;margin:0 5px 5px 0;font-size:11px;font-weight:600;color:var(--gold);">↳ '+s+'</div>').join('') :
+              '<div style="color:var(--muted);font-size:12px;">No sub-error detail available</div>';
+            const expandId = 'nc-err-expand-'+idx;
+            return '<tr onclick="toggleNCRow(this,\''+expandId+'\')" style="cursor:pointer;border-bottom:1px solid var(--border);">' +
+              '<td><span class="nc-arrow" style="color:var(--muted);font-size:10px;">▶</span></td>' +
+              '<td style="font-weight:700;">'+p.agent+'</td>' +
+              '<td style="color:var(--muted);">'+(p.meta?.tl||p.tl||'—')+'</td>' +
+              '<td style="font-family:var(--font-mono);font-weight:700;color:'+lvlColor+';">×'+p.count+'</td>' +
+              '<td><span style="background:'+lvlColor+'22;color:'+lvlColor+';border:1px solid '+lvlColor+'44;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;">'+(lvl.label||'MONITOR').toUpperCase()+'</span></td>' +
+              '<td style="color:var(--muted);">'+(p.meta?.proj||p.proj||'—')+'</td>' +
+              '</tr><tr id="'+expandId+'" style="display:none;"><td colspan="6" style="background:var(--bg);padding:14px 16px;">'+detailHTML+'</td></tr>';
+          }).join('') + '</tbody></table></div>';
+      })()}
+    </div>
+
     <!-- Agents with low NC scores -->
     <div class="card">
       <div class="card-title" style="margin-bottom:14px;">Agents with Low NC Scores <span style="font-size:11px;color:var(--muted);font-weight:400;">(below 24/30)</span></div>
