@@ -2123,6 +2123,16 @@ a { color:var(--purple-l); text-decoration:none; }
         <div class="setting-row" style="border:none;"><div><div style="font-size:13px;font-weight:600;">Projects</div></div><div class="setting-val">MOPH_MCI · PHCC · MOPH</div></div>
       </div>
 
+      <!-- Clear Cache -->
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title" style="margin-bottom:8px;">🔄 Data & Cache</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Clears local data on this device and reloads everything fresh from Google Sheets. Your Google Sheets data is never affected.</div>
+        <button id="clear-cache-btn" onclick="clearLocalCache()" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:var(--radius-s);padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);width:100%;">
+          🗑️ Clear Local Cache &amp; Refresh
+        </button>
+        <div id="clear-cache-msg" style="display:none;margin-top:10px;font-size:12px;color:var(--green);text-align:center;font-weight:600;">✓ Cache cleared — syncing fresh data...</div>
+      </div>
+
       <!-- App Info -->
       <div class="card">
         <div class="card-title" style="margin-bottom:16px;">ℹ️ App Info</div>
@@ -8329,6 +8339,35 @@ function hideTLAgentHover() {
   if (popup) popup.style.display = 'none';
 }
 
+
+function clearLocalCache() {
+  if (!confirm('Clear local cache on this device?\n\nThis will reload all data fresh from Google Sheets.\nYour Google Sheets data is NOT affected.')) return;
+  try {
+    // Clear eval and operation history from localStorage
+    localStorage.removeItem('nexora_history');
+    localStorage.removeItem('nexora_op_history');
+    localStorage.removeItem('nexora_coaching');
+    // Reset in-memory data
+    _evalHistory = [];
+    window._operationHistory = [];
+    // Show message
+    const msg = document.getElementById('clear-cache-msg');
+    const btn = document.getElementById('clear-cache-btn');
+    if (msg) msg.style.display = 'block';
+    if (btn) btn.disabled = true;
+    // Sync fresh from Google Sheets
+    setTimeout(function() {
+      try { loadFromGoogleSheets(); } catch(e) {}
+    }, 500);
+    // Re-enable button after 5 seconds
+    setTimeout(function() {
+      if (btn) { btn.disabled = false; }
+      if (msg) msg.style.display = 'none';
+    }, 5000);
+  } catch(e) {
+    alert('Error clearing cache: ' + e.message);
+  }
+}
 
 function showAboutModal() {
   document.getElementById('about-modal').style.display = 'flex';
