@@ -665,7 +665,7 @@ a { color:var(--purple-l); text-decoration:none; }
   </div>
   <div class="topbar-right">
     <div class="top-date" id="top-date"></div>
-    <button id="sync-btn" onclick="manualSync()" title="Sync data from Google Sheets" style="background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);padding:5px 8px;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;transition:all .2s;">
+    <button id="sync-btn" onclick="manualSync()" title="Sync data from Google Sheets" style="background:var(--gold-dim,#e8a23d22);border:1px solid var(--gold);border-radius:6px;color:var(--gold);padding:5px 8px;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;transition:all .2s;">
       <svg id="sync-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0115-6.7L21 8M21 3v5h-5"/><path d="M21 12a9 9 0 01-15 6.7L3 16M3 21v-5h5"/></svg>
       Sync
     </button>
@@ -10245,6 +10245,15 @@ setInterval(loadFromGoogleSheets, 5000);
 
 // Manual sync function — triggered by Sync button in topbar
 function manualSync() {
+  if (!confirm('Refresh all data from Google Sheets?\n\nThis will clear local cache and reload fresh data.')) return;
+  // Clear local cache first
+  try {
+    localStorage.removeItem('nexora_history');
+    localStorage.removeItem('nexora_op_history');
+    localStorage.removeItem('nexora_coaching');
+    _evalHistory = [];
+    window._operationHistory = [];
+  } catch(e) {}
   const btn  = document.getElementById('sync-btn');
   const icon = document.getElementById('sync-icon');
   if (!btn || !icon) { loadFromGoogleSheets(); return; }
