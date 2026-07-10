@@ -4772,9 +4772,9 @@ function saveToGoogleSheets(eval_data, errors) {
       cb_control_the_call: getAttrValue(errors, 'Control the Call / Comprehension'),
       cb_ticketing_tree:   getAttrValue(errors, 'Ticketing Tree'),
       // Sub-error text for Error Anatomy and QA Monitor
-      ccAttrs: errors.filter(e=>e.type==='cc'&&!e.isNA).map(e=>(e.attrName||'')+(e.subError&&e.subError!==(e.attrName||'')?(' → '+e.subError):'')).join(' | ')||'NO',
-      cbAttrs: errors.filter(e=>e.type==='cb'&&!e.isNA).map(e=>(e.attrName||'')+(e.subError&&e.subError!==(e.attrName||'')?(' → '+e.subError):'')).join(' | ')||'NO',
-      ncAttrs: errors.filter(e=>e.type==='nc'&&!e.isNA).map(e=>(e.attrName||'')+(e.subError&&e.subError!==(e.attrName||'')?(' → '+e.subError):'')).join(' | ')||'NO',
+      ccAttrs: errors.filter(e=>e.t==='cc'&&!e.isNA).map(e=>(e.attr||'')+(e.v&&e.v!==(e.attr||'')?(' → '+e.v):'')).join(' | ')||'NO',
+      cbAttrs: errors.filter(e=>e.t==='cb'&&!e.isNA).map(e=>(e.attr||'')+(e.v&&e.v!==(e.attr||'')?(' → '+e.v):'')).join(' | ')||'NO',
+      ncAttrs: errors.filter(e=>e.t==='nc'&&!e.isNA).map(e=>(e.attr||'')+(e.v&&e.v!==(e.attr||'')?(' → '+e.v):'')).join(' | ')||'NO',
     };
 
     fetch(GOOGLE_SHEET_URL, {
