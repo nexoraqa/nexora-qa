@@ -9865,11 +9865,15 @@ function loadFromGoogleSheets() {
       const evalsData = res.evals || res.data || [];
 
       if (evalsData.length) {
-        // Sheet is the single source of truth — replace local history entirely
-        const newHistory = [];
+        const existingIds = new Set(_evalHistory.map(e => String(e.uid)));
+        let added = 0;
         evalsData.forEach(row => {
         if (!row.id || !row.agent) return;
-        if (String(row.deleted||'').toUpperCase().trim() === 'YES') return; // skip deleted
+        if (String(row.deleted||'').toUpperCase().trim() === 'YES') {
+          _evalHistory = _evalHistory.filter(e => String(e.uid) !== String(row.id));
+          return;
+        }
+        if (existingIds.has(String(row.id))) return; // skip duplicates
         // Convert sheet row back to eval object
         const eval_obj = {
           uid:     row.id,
@@ -9946,11 +9950,12 @@ function loadFromGoogleSheets() {
             if (match) { match.v = sub; }
           });
         });
-        newHistory.push(eval_obj);
+        _evalHistory.push(eval_obj);
         if (eval_obj.agent) AGENT_META[eval_obj.agent] = {tl:eval_obj.tl||'',proj:eval_obj.proj||'',country:eval_obj.country||''};
+        added++;
       });
-        // Replace local history with sheet data
-        _evalHistory = newHistory.sort((a,b) => Number(b.uid) - Number(a.uid));
+      if (added > 0) {
+        _evalHistory.sort((a,b) => Number(b.uid) - Number(a.uid));
         persistHistory();
         try { filtered = [...getLiveAgents()]; } catch(e) {}
         try { updateHomeKPIs(); } catch(e) {}
@@ -9994,7 +9999,8 @@ function loadFromGoogleSheets() {
             setTimeout(() => { try { updateCalibBadge(); } catch(e) {} }, 1000);
           } catch(e) {}
         }, 500);
-        console.log('✅ Synced evals from Google Sheets');
+        console.log(`✅ Loaded ${added} new evals from Google Sheets`);
+      }
       } // end evalsData block
 
       // Merge coaching items from Google Sheets
