@@ -5892,6 +5892,33 @@ function renderNCTab() {
     'Showing Empathy','Active Listening','HOLD'
   ];
 
+  // Map every NC sub-error to its parent attribute for accurate bar counting
+  const NC_SUB_TO_ATTR = {
+    // Call Opening/Closure
+    'Opening Script':'Call Opening / Closure','Opening within 3 Sec':'Call Opening / Closure',
+    'Greet the caller':'Call Opening / Closure','Reply to the customer greeting':'Call Opening / Closure',
+    'Correct language':'Call Opening / Closure','O/C tone of voice':'Call Opening / Closure',
+    'Closure Script':'Call Opening / Closure','Didn\'t end the call after 3 Sec of closure':'Call Opening / Closure',
+    'Assistance question':'Call Opening / Closure',
+    // Choice of Words
+    'Choice of words':'Choice of Words','Slang':'Choice of Words','Technical Terms':'Choice of Words',
+    'Using prefix':'Choice of Words','Using customer name':'Choice of Words','Ask for customer name':'Choice of Words',
+    // Tone of Voice
+    'Not Clear':'Tone of Voice','Sleepy/cheerless/Inactive':'Tone of Voice','Aggressive/irritated/argumentative':'Tone of Voice',
+    'Sarcastic':'Tone of Voice','Chewing/eating':'Tone of Voice','Sounding hesitant/non-confident':'Tone of Voice',
+    'Speaking too fast/rushing the conversation':'Tone of Voice','Sounding distracted':'Tone of Voice','Using verbal nods':'Tone of Voice',
+    // Showing Empathy
+    'Not Showing Empathy':'Showing Empathy','Not handling objection':'Showing Empathy',
+    // Active Listening
+    'Interrupting the Customer':'Active Listening','Concentrating on the call':'Active Listening',
+    'Repeating an answered questions':'Active Listening','Dead air':'Active Listening',
+    'Talking/laughing to others':'Active Listening','Mute':'Active Listening',
+    // HOLD
+    'Customer Permission':'HOLD','Mentioning Hold Time':'HOLD','Customer Approval':'HOLD',
+    'Mentioning Hold reason':'HOLD','Thanking a customer for holding':'HOLD',
+    'Not exceeding hold duration':'HOLD','Draw the caller/user attention after hold':'HOLD',
+  };
+
   const attrCounts = {};
   ncAttrs.forEach(a => attrCounts[a] = 0);
 
@@ -5905,13 +5932,20 @@ function renderNCTab() {
     totalNC += ncScore;
     if (ncScore < 24) atRisk++; // NC below 80% of 30pts
     (ev.errors||[]).filter(e => e.t === 'nc' && !e.isNA).forEach(e => {
-      const name = e.attrName || e.attr || e.v || '';
-      ncAttrs.forEach(na => {
-        if (name.toLowerCase().includes(na.toLowerCase().split('/')[0]) || 
-            na.toLowerCase().includes(name.toLowerCase())) {
-          attrCounts[na]++;
-        }
-      });
+      const name = e.v || e.attr || e.attrName || '';
+      // First try exact mapping from sub-error to parent attribute
+      const mapped = NC_SUB_TO_ATTR[name];
+      if (mapped && attrCounts[mapped] !== undefined) {
+        attrCounts[mapped]++;
+      } else {
+        // Fallback: loose text match
+        ncAttrs.forEach(na => {
+          if (name.toLowerCase().includes(na.toLowerCase().split('/')[0].trim()) ||
+              na.toLowerCase().includes(name.toLowerCase())) {
+            attrCounts[na]++;
+          }
+        });
+      }
     });
   });
 
