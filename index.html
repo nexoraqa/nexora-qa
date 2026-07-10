@@ -3637,6 +3637,50 @@ function showValidationToast(msg) {
   window._toastTimer = setTimeout(() => { t.style.display = 'none'; }, 3000);
 }
 
+function showNewAchievementNotification(newBadges, seenKey, seen) {
+  try {
+    const updated = seen.concat(newBadges.map(b => b.label));
+    localStorage.setItem(seenKey, JSON.stringify(updated));
+  } catch(e) {}
+  let popup = document.getElementById('achievement-notify-popup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'achievement-notify-popup';
+    popup.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:#00000077;';
+    document.body.appendChild(popup);
+  }
+  const badgeHTML = newBadges.map((b, i) => {
+    const idx = (window._agentBadges||[]).findIndex(x => x.label === b.label);
+    return '<div data-bidx="' + idx + '" style="cursor:' + (idx>=0?'pointer':'default') + ';display:flex;align-items:center;gap:10px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:16px;padding:12px 18px;margin-bottom:10px;">' +
+    '<span style="font-size:28px;">' + b.icon + '</span>' +
+    '<span style="font-size:15px;font-weight:800;color:' + b.color + ';">' + b.label + '</span>' +
+    (idx>=0?'<span style="margin-left:auto;font-size:11px;color:' + b.color + ';opacity:0.7;">Tap for details</span>':'') +
+    '</div>';
+  }).join('');
+  popup.innerHTML =
+    '<div style="background:var(--card);border-radius:20px;padding:28px 24px;max-width:320px;width:90%;box-shadow:0 8px 40px #0009;text-align:center;">' +
+    '<div style="font-size:40px;margin-bottom:8px;">🎉</div>' +
+    '<div style="font-size:18px;font-weight:800;color:var(--gold);margin-bottom:4px;">New Achievement' + (newBadges.length > 1 ? 's' : '') + '!</div>' +
+    '<div style="font-size:13px;color:var(--muted);margin-bottom:20px;">You earned something new — keep it up!</div>' +
+    badgeHTML +
+    '<button onclick="document.getElementById(\'achievement-notify-popup\').style.display=\'none\'" style="margin-top:12px;width:100%;background:var(--gold);color:#000;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:800;cursor:pointer;">🙌 Got it!</button>' +
+    '</div>';
+  popup.style.display = 'flex';
+  setTimeout(function() {
+    popup.querySelectorAll('[data-bidx]').forEach(function(el) {
+      const idx = parseInt(el.getAttribute('data-bidx'));
+      if (idx >= 0) {
+        el.addEventListener('click', function() {
+          popup.style.display = 'none';
+          var bp = document.getElementById('badge-popup');
+          if (bp) bp.style.zIndex = '10001';
+          showBadgePopup(idx);
+        });
+      }
+    });
+  }, 100);
+}
+
 function showBadgePopup(index) {
   const b = (window._agentBadges || [])[index];
   if (!b) return;
@@ -8140,7 +8184,7 @@ function submitOperation() {
   if (opCompareBox) {
     var caseNum = (document.getElementById('op-case')?.value||'').trim();
     var qaMatch = (_evalHistory||[]).find(function(ev) {
-      return ev.caseNumber && caseNum && ev.caseNumber.trim().toLowerCase() === caseNum.trim().toLowerCase();
+      return ev.caseNumber && caseNum && String(ev.caseNumber).trim().toLowerCase() === String(caseNum).trim().toLowerCase();
     });
     if (qaMatch) {
       document.getElementById('op-success-compare-score').textContent = parseFloat(qaMatch.overall).toFixed(1)+'%';
@@ -9229,6 +9273,12 @@ function applyRoleAccess(user) {
   // Welcome pill
   document.querySelector('.welcome-pill').innerHTML = `${cfg.label}`;
 
+  // For TL role: hide TL Name and Country filters (they only see their own team)
+  const fTL      = document.getElementById('f-tl');
+  const fCountry = document.getElementById('f-country');
+  if (fTL)      fTL.style.display      = user.role === 'tl' ? 'none' : '';
+  if (fCountry) fCountry.style.display = user.role === 'tl' ? 'none' : '';
+
   // Lock QA Name field for QA Assessors — they can only submit under their own name
   const qaSelect = document.getElementById('c-qa');
   if (qaSelect) {
@@ -9412,8 +9462,14 @@ function renderTLHome(user) {
   document.getElementById('tl-home-title').textContent = tlName + "'s Team";
   document.getElementById('tl-home-sub').textContent   = 'Team performance overview · ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 
-  // Get team agents from eval history
-  const teamAgents = getLiveAgents().filter(a => a.tl === tlName);
+  // Get ALL team agents — evaluated and unevaluated
+  const liveAgents = getLiveAgents();
+  const evaluatedNames = new Set(liveAgents.map(a => a.n));
+  const allTeamAgents = AGENTS.filter(a => a.tl === tlName).map(a => {
+    const live = liveAgents.find(l => l.n === a.n);
+    return live || { ...a, o: null, nc: null, cc: null, cb: null };
+  });
+  const teamAgents = allTeamAgents.filter(a => a.o !== null); // for KPIs only use evaluated
   const passing    = teamAgents.filter(a => a.o >= 90).length;
   const atRisk     = teamAgents.filter(a => a.o >= 80 && a.o < 90).length;
   const critical   = teamAgents.filter(a => a.o < 80).length;
@@ -9441,14 +9497,19 @@ function renderTLHome(user) {
 
   // Agent grid
   const agentGrid = document.getElementById('tl-agents-grid');
-  if (teamAgents.length === 0) {
-    agentGrid.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0;">No evaluations submitted yet for your team</div>';
+  if (allTeamAgents.length === 0) {
+    agentGrid.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px 0;">No agents in your team yet</div>';
   } else {
-    agentGrid.innerHTML = teamAgents.sort((a,b) => a.o-b.o).map(a => {
-      const col = a.o>=90?'var(--green)':a.o>=80?'var(--gold)':'var(--red)';
+    agentGrid.innerHTML = allTeamAgents.sort((a,b) => {
+      if (a.o === null && b.o !== null) return 1;
+      if (a.o !== null && b.o === null) return -1;
+      return (a.o||0)-(b.o||0);
+    }).map(a => {
+      const hasData = a.o !== null;
+      const col = !hasData ? 'var(--muted)' : a.o>=90?'var(--green)':a.o>=80?'var(--gold)':'var(--red)';
       const init = a.n.split(' ').map(x=>x[0]).join('').slice(0,2);
-      const status = a.o>=90?iconCheck()+' Pass':a.o>=80?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Critical';
-      const agentPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory)).filter(p => p.agent === a.n);
+      const status = !hasData ? '<span style="color:var(--muted);font-size:11px;">No evaluations yet</span>' : a.o>=90?iconCheck()+' Pass':a.o>=80?'<span class="si-dot si-dot-gold"></span> At Risk':iconCross()+' Critical';
+      const agentPatterns = hasData ? buildPatterns(evalHistoryToPatternData(_evalHistory)).filter(p => p.agent === a.n) : [];
       const topError = agentPatterns.length ? agentPatterns[0].error : null;
       return `<div onclick="openProfile('${a.n.replace(/'/g,"\\'")}')"
         onmouseenter="showTLAgentHover(event, '${a.n.replace(/'/g,"\\'")}', '${a.o}', '${a.o>=90?'pass':a.o>=80?'risk':'critical'}', '${topError||''}')"
@@ -9460,7 +9521,7 @@ function renderTLHome(user) {
           <div style="font-size:10px;color:var(--muted);margin-top:2px;">${a.proj}</div>
         </div>
         <div style="text-align:right;flex-shrink:0;">
-          <div style="font-family:var(--font-mono);font-size:15px;font-weight:800;color:${col};">${a.o}%</div>
+          <div style="font-family:var(--font-mono);font-size:15px;font-weight:800;color:${col};">${hasData ? a.o+'%' : '—'}</div>
           <div style="font-size:10px;color:${col};margin-top:2px;">${status}</div>
         </div>
       </div>`;
@@ -9597,6 +9658,18 @@ function renderAgentDashboard(user) {
     if (badges.length > 0) {
       // Store badges globally so popup can read them
       window._agentBadges = badges;
+      // Check for new badges and notify agent
+      try {
+        const seenKey = 'nexora_seen_badges_' + (user.name||'').replace(/\s+/g,'_');
+        let seen = JSON.parse(localStorage.getItem(seenKey)||'[]');
+        const currentLabels = badges.map(b => b.label);
+        seen = seen.filter(label => currentLabels.includes(label));
+        localStorage.setItem(seenKey, JSON.stringify(seen));
+        const newBadges = badges.filter(b => !seen.includes(b.label));
+        if (newBadges.length > 0) {
+          setTimeout(function() { showNewAchievementNotification(newBadges, seenKey, seen); }, 800);
+        }
+      } catch(e) {}
       badgesEl.innerHTML = badges.map((b, i) =>
         '<div onclick="showBadgePopup(' + i + ')" style="cursor:pointer;display:flex;align-items:center;gap:5px;background:' + b.color + '18;border:1px solid ' + b.color + '44;border-radius:20px;padding:5px 12px;font-size:11px;font-weight:700;color:' + b.color + ';">' + b.icon + ' ' + b.label + '</div>'
       ).join('');
