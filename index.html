@@ -1921,6 +1921,9 @@ a { color:var(--purple-l); text-decoration:none; }
       <button onclick="setCoachingTab('closed')" id="ctab-closed" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
         ✓ Closed <span id="ctab-closed-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
       </button>
+      <button onclick="setCoachingTab('appeal')" id="ctab-appeal" class="ctab" style="padding:8px 16px;border-radius:var(--radius-s);font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--muted);font-family:var(--font-b);">
+        ⚠️ Appeal <span id="ctab-appeal-count" style="font-family:var(--font-mono);margin-left:4px;">0</span>
+      </button>
     </div>
 
     <!-- Coaching items list -->
@@ -7516,6 +7519,7 @@ function renderCoaching() {
     pending_agent: items.filter(c => c.status==='pending_agent').length,
     disputed:      items.filter(c => c.status==='disputed').length,
     closed:        items.filter(c => c.status==='closed').length,
+    appeal:        items.filter(c => c.isAppeal==='YES').length,
   };
   document.getElementById('ctab-all-count').textContent           = items.length;
   const pq = document.getElementById('ctab-pending_qa-count');    if(pq) pq.textContent = statusGroups.pending_qa;
@@ -7523,6 +7527,7 @@ function renderCoaching() {
   const pa = document.getElementById('ctab-pending_agent-count'); if(pa) pa.textContent = statusGroups.pending_agent;
   const pd = document.getElementById('ctab-disputed-count');      if(pd) pd.textContent = statusGroups.disputed;
   const pc = document.getElementById('ctab-closed-count');        if(pc) pc.textContent = statusGroups.closed;
+  const pap = document.getElementById('ctab-appeal-count');       if(pap) pap.textContent = statusGroups.appeal;
 
   // Filter by selected status tab
   if (_coachingTab === 'pending_qa')    items = items.filter(c => c.status==='pending_comment' || c.status==='disputed');
@@ -7530,6 +7535,7 @@ function renderCoaching() {
   else if (_coachingTab === 'pending_agent') items = items.filter(c => c.status==='pending_agent');
   else if (_coachingTab === 'disputed')      items = items.filter(c => c.status==='disputed');
   else if (_coachingTab === 'closed')        items = items.filter(c => c.status==='closed');
+  else if (_coachingTab === 'appeal')        items = items.filter(c => c.isAppeal==='YES');
 
   // Update subtitle
   const sub = document.getElementById('coaching-subtitle');
