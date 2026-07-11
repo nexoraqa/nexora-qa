@@ -7712,31 +7712,34 @@ function openCoachingModal(id) {
 
   // TL — can accept or dispute when pending_tl
   else if (role==='tl' && c.status==='pending_tl' && c.tl===name) {
-    if (c.isAppeal === 'YES') {
-      area.innerHTML = `
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--orange);margin-bottom:8px;">⚠️ Score Appeal — Agent's Reason: "${c.appealReason||''}"</div>
-        <textarea id="cm-tl-input" placeholder="Add your response (required)..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:80px;outline:none;box-sizing:border-box;"></textarea>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+    const appealNote = c.isAppeal==='YES' && c.appealReason
+      ? `<div style="margin-bottom:10px;padding:8px 10px;background:#e8a23d11;border-left:3px solid var(--orange);border-radius:0 6px 6px 0;font-size:11px;"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">⚠️ Agent Appeal Reason</div><div style="color:var(--orange);font-weight:600;">${c.appealReason}</div></div>`
+      : '';
+    const tlButtons = c.isAppeal==='YES'
+      ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
           <button onclick="submitTLResponse('resolved')" style="background:var(--green-dim);border:1px solid var(--green);color:var(--green);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">${iconCheck()} Resolve</button>
           <button onclick="submitTLResponse('escalated')" style="background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">⚡ Escalate to QA</button>
-        </div>`;
-    } else {
-      area.innerHTML = `
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Your Response</div>
-        <textarea id="cm-tl-input" placeholder="Add your comment (required)..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:80px;outline:none;box-sizing:border-box;"></textarea>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        </div>`
+      : `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
           <button onclick="submitTLResponse('accepted')" style="background:var(--green-dim);border:1px solid var(--green);color:var(--green);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">${iconCheck()} Accept</button>
           <button onclick="submitTLResponse('disputed')" style="background:var(--red-dim);border:1px solid var(--red);color:var(--red);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">${iconCross()} Dispute</button>
         </div>`;
-    }
+    area.innerHTML = `
+      ${appealNote}
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Your Response</div>
+      <textarea id="cm-tl-input" placeholder="Add your comment (required)..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:80px;outline:none;box-sizing:border-box;"></textarea>
+      ${tlButtons}`;
   }
 
-  // Agent — can acknowledge when pending_agent
+  // Agent — can acknowledge OR appeal when pending_agent
   else if (role==='agent' && c.status==='pending_agent' && c.agent===name) {
     area.innerHTML = `
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Your Acknowledgement</div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">Your Response</div>
       <textarea id="cm-agent-input" placeholder="Add your comment (optional)..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:60px;outline:none;box-sizing:border-box;"></textarea>
-      <button onclick="submitAgentAck()" style="margin-top:10px;width:100%;background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">${iconCheck()} I Acknowledge This Coaching</button>`;
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <button onclick="submitAgentAck()" style="background:var(--green);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">${iconCheck()} Acknowledge</button>
+        <button onclick="submitAgentAppeal()" style="background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">⚠️ Appeal Score</button>
+      </div>`;
   }
 
   document.getElementById('coaching-modal').style.display = 'block';
@@ -7745,46 +7748,6 @@ function openCoachingModal(id) {
 function closeCoachingModal() {
   document.getElementById('coaching-modal').style.display = 'none';
   _coachingModal = null;
-}
-
-function submitAppeal(evalUid, agent, tl, qa, score, caseNumber) {
-  const reason = prompt('Why are you appealing this score?\n\nPlease explain clearly:');
-  if (!reason || !reason.trim()) return;
-  const id = 'appeal_' + Date.now();
-  const today = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  const payload = {
-    action: 'save_coaching',
-    id: id,
-    evalUid: evalUid,
-    caseNumber: caseNumber||'',
-    date: today,
-    agent: agent,
-    tl: tl,
-    qa: qa||'',
-    qaAuthor: qa||'',
-    project: '',
-    country: '',
-    errorType: 'score_appeal',
-    priority: 'HIGH',
-    label: 'Score Appeal',
-    hasCC: false, hasCB: false, hasNC: false,
-    ccAttrs: 'NO', cbAttrs: 'NO', ncAttrs: 'NO',
-    qaComment: 'Agent appealed score of ' + score + '%',
-    status: 'pending_comment',
-    isAppeal: 'YES',
-    appealReason: reason.trim(),
-    finalScore: ''
-  };
-  _coachingData.unshift({...payload, uid: id, evalId: evalUid});
-  try { localStorage.setItem('nexora_coaching', JSON.stringify(_coachingData)); } catch(e) {}
-  fetch(GOOGLE_SHEET_URL, {
-    method: 'POST', mode: 'no-cors',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify(payload)
-  });
-  alert('✅ Your appeal has been submitted. Your TL will review it shortly.');
-  try { renderAgentDashboard(_currentUser); } catch(e) {}
-  try { updateCoachingBadge(); } catch(e) {}
 }
 
 function submitQAComment() {
@@ -7808,16 +7771,13 @@ function submitTLResponse(decision) {
   if (idx === -1) return;
   _coachingData[idx].tlResponse = comment;
   _coachingData[idx].tlStatus   = decision;
-  // Appeal-specific statuses
-  if (_coachingData[idx].isAppeal === 'YES') {
-    if (decision === 'resolved') {
-      _coachingData[idx].status = 'closed';
-      _coachingData[idx].closedDate = new Date().toLocaleDateString('en-GB');
-    } else if (decision === 'escalated') {
-      _coachingData[idx].status = 'pending_comment'; // back to QA
-    }
+  if (decision === 'resolved') {
+    _coachingData[idx].status    = 'closed';
+    _coachingData[idx].closedDate = new Date().toLocaleDateString('en-GB');
+  } else if (decision === 'escalated') {
+    _coachingData[idx].status    = 'pending_comment'; // QA handles it
   } else {
-    _coachingData[idx].status = decision === 'accepted' ? 'pending_agent' : 'disputed';
+    _coachingData[idx].status    = decision === 'accepted' ? 'pending_agent' : 'disputed';
   }
   saveCoaching();
   syncCoachingItem(_coachingData[idx]);
@@ -7834,6 +7794,22 @@ function submitAgentAck() {
   _coachingData[idx].agentAck     = true;
   _coachingData[idx].status       = 'closed';
   _coachingData[idx].closedDate   = new Date().toLocaleDateString('en-GB');
+  saveCoaching();
+  syncCoachingItem(_coachingData[idx]);
+  closeCoachingModal();
+  renderCoaching();
+  updateCoachingBadge();
+}
+
+function submitAgentAppeal() {
+  const reason = document.getElementById('cm-agent-input')?.value?.trim();
+  if (!reason) { alert('Please explain your reason for appealing before submitting.'); return; }
+  const idx = _coachingData.findIndex(c => String(c.id) === String(_coachingModal.id));
+  if (idx === -1) return;
+  _coachingData[idx].agentComment = reason;
+  _coachingData[idx].isAppeal     = 'YES';
+  _coachingData[idx].appealReason = reason;
+  _coachingData[idx].status       = 'pending_tl'; // goes back to TL
   saveCoaching();
   syncCoachingItem(_coachingData[idx]);
   closeCoachingModal();
@@ -10017,18 +9993,6 @@ function renderAgentDashboard(user) {
           </div>
           ${errDetails}
           ${tlNote}
-          ${(() => {
-            if (e.overall >= 90) return '';
-            const hoursAgo = (Date.now() - Number(e.uid)) / (1000 * 60 * 60);
-            if (hoursAgo > 72) return '<div style="font-size:10px;color:var(--muted);margin-top:8px;text-align:center;">Appeal window closed (72h)</div>';
-            const existingAppeal = (_coachingData||[]).find(c => c.isAppeal === 'YES' && String(c.evalUid||c.evalId) === String(e.uid) && c.agent === e.agent);
-            if (existingAppeal) {
-              const statusColor = existingAppeal.tlStatus === 'resolved' ? 'var(--green)' : existingAppeal.tlStatus === 'escalated' ? 'var(--orange)' : 'var(--gold)';
-              const statusText = existingAppeal.tlStatus === 'resolved' ? '✓ Appeal Resolved' : existingAppeal.tlStatus === 'escalated' ? '⚡ Escalated to QA' : '⏳ Appeal Pending TL Review';
-              return '<div style="margin-top:8px;padding:8px 10px;background:var(--gold-dim);border-left:3px solid var(--gold);border-radius:0 6px 6px 0;font-size:11px;color:'+statusColor+';font-weight:700;">'+statusText+'</div>';
-            }
-            return '<button onclick="submitAppeal(\''+e.uid+'\',\''+e.agent+'\',\''+e.tl+'\',\''+e.qa+'\','+e.overall+',\''+e.caseNumber+'\')" style="margin-top:10px;width:100%;background:var(--orange-dim);border:1px solid var(--orange);color:var(--orange);border-radius:var(--radius-s);padding:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font-b);">⚠️ Appeal This Score</button>';
-          })()}
         </div>
       </div>`;
     }).join('');
