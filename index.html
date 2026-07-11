@@ -1629,6 +1629,7 @@ a { color:var(--purple-l); text-decoration:none; }
       <button onclick="switchCalibTab('active')" id="calib-tab-active" style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:var(--purple);color:#fff;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;">Active Sessions</button>
       <button onclick="switchCalibTab('create')" id="calib-tab-create" style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:none;">+ New Session</button>
       <button onclick="switchCalibTab('history')" id="calib-tab-history" style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;">History</button>
+      <button onclick="switchCalibTab('tracker')" id="calib-tab-tracker" style="flex:1;padding:9px 16px;border:none;border-radius:8px;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;">📊 Tracker</button>
     </div>
 
     <!-- Active Sessions Tab -->
@@ -1681,6 +1682,10 @@ a { color:var(--purple-l); text-decoration:none; }
     <!-- History Tab -->
     <div id="calib-tab-history-content" style="display:none;">
       <div id="calib-history-list"></div>
+    </div>
+
+    <div id="calib-tab-tracker-content" style="display:none;">
+      <div id="calib-tracker-content"></div>
     </div>
 
     <!-- Calibration Evaluate Modal -->
@@ -10574,7 +10579,7 @@ function saveCalibSessions() {
 }
 
 function switchCalibTab(tab) {
-  ['active','create','history'].forEach(t => {
+  ['active','create','history','tracker'].forEach(t => {
     const btn = document.getElementById('calib-tab-'+t);
     const el  = document.getElementById('calib-tab-'+t+'-content');
     if (btn) { btn.style.background = t===tab?'var(--purple)':'transparent'; btn.style.color = t===tab?'#fff':'var(--muted)'; }
@@ -10583,6 +10588,89 @@ function switchCalibTab(tab) {
   if (tab === 'active')  renderCalibActive();
   if (tab === 'history') renderCalibHistory();
   if (tab === 'create')  populateCalibForm();
+  if (tab === 'tracker') renderCalibTracker();
+}
+
+function renderCalibTracker() {
+  const el = document.getElementById('calib-tracker-content');
+  if (!el) return;
+  const sessions = (_calibSessions||[]).filter(s => s.verdict);
+  if (sessions.length === 0) {
+    el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;font-size:14px;">No completed calibration sessions yet</div>';
+    return;
+  }
+
+  // Build summary stats per TL
+  const tlStats = {};
+  sessions.forEach(s => {
+    const qaScore = parseFloat(s.qaScore||0);
+    const tlResults = (() => { try { return JSON.parse(s.tlResults||'[]'); } catch(e) { return []; } })();
+    tlResults.forEach(tr => {
+      const tlScore = parseFloat(tr.score||0);
+      const gap = Math.abs(qaScore - tlScore);
+      if (!tlStats[tr.tl]) tlStats[tr.tl] = { sessions: 0, totalGap: 0, aligned: 0 };
+      tlStats[tr.tl].sessions++;
+      tlStats[tr.tl].totalGap += gap;
+      if (gap <= 5) tlStats[tr.tl].aligned++;
+    });
+  });
+
+  // Summary cards
+  let summaryHTML = '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">';
+  summaryHTML += `<div style="background:var(--card);border-radius:var(--radius);padding:16px 20px;min-width:120px;text-align:center;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Sessions</div><div style="font-size:26px;font-weight:800;color:var(--purple);">${sessions.length}</div></div>`;
+  const avgGapAll = sessions.reduce((sum, s) => {
+    const qa = parseFloat(s.qaScore||0);
+    const tls = (() => { try { return JSON.parse(s.tlResults||'[]'); } catch(e) { return []; } })();
+    const gapSum = tls.reduce((g, tr) => g + Math.abs(qa - parseFloat(tr.score||0)), 0);
+    return sum + (tls.length ? gapSum / tls.length : 0);
+  }, 0) / sessions.length;
+  const avgGapColor = avgGapAll <= 5 ? 'var(--green)' : avgGapAll <= 10 ? 'var(--gold)' : 'var(--red)';
+  summaryHTML += `<div style="background:var(--card);border-radius:var(--radius);padding:16px 20px;min-width:120px;text-align:center;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Avg Gap</div><div style="font-size:26px;font-weight:800;color:${avgGapColor};">${avgGapAll.toFixed(1)}%</div></div>`;
+  const alignedCount = sessions.filter(s => {
+    const qa = parseFloat(s.qaScore||0);
+    const tls = (() => { try { return JSON.parse(s.tlResults||'[]'); } catch(e) { return []; } })();
+    return tls.every(tr => Math.abs(qa - parseFloat(tr.score||0)) <= 5);
+  }).length;
+  summaryHTML += `<div style="background:var(--card);border-radius:var(--radius);padding:16px 20px;min-width:120px;text-align:center;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Aligned</div><div style="font-size:26px;font-weight:800;color:var(--green);">${alignedCount}</div></div>`;
+  summaryHTML += '</div>';
+
+  // TL alignment table
+  let tlTableHTML = '<div style="background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:20px;">';
+  tlTableHTML += '<div style="font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">TL Alignment Summary</div>';
+  tlTableHTML += '<table style="width:100%;font-size:12px;border-collapse:collapse;"><thead><tr style="color:var(--muted);text-align:left;"><th style="padding:6px 8px;">TL Name</th><th style="padding:6px 8px;text-align:center;">Sessions</th><th style="padding:6px 8px;text-align:center;">Avg Gap</th><th style="padding:6px 8px;text-align:center;">Aligned</th><th style="padding:6px 8px;text-align:center;">Status</th></tr></thead><tbody>';
+  Object.entries(tlStats).sort((a,b) => a[1].totalGap/a[1].sessions - b[1].totalGap/b[1].sessions).forEach(([tl, st]) => {
+    const avg = (st.totalGap / st.sessions).toFixed(1);
+    const pct = Math.round(st.aligned / st.sessions * 100);
+    const status = pct >= 80 ? ['✓ Aligned', 'var(--green)'] : pct >= 50 ? ['⚠ Needs Attention', 'var(--gold)'] : ['✕ Not Aligned', 'var(--red)'];
+    tlTableHTML += `<tr style="border-top:1px solid var(--border);"><td style="padding:8px;">${tl}</td><td style="padding:8px;text-align:center;">${st.sessions}</td><td style="padding:8px;text-align:center;color:${avg<=5?'var(--green)':avg<=10?'var(--gold)':'var(--red)'};">${avg}%</td><td style="padding:8px;text-align:center;">${pct}%</td><td style="padding:8px;text-align:center;color:${status[1]};font-weight:700;">${status[0]}</td></tr>`;
+  });
+  tlTableHTML += '</tbody></table></div>';
+
+  // Sessions table
+  let sessionsHTML = '<div style="background:var(--card);border-radius:var(--radius);padding:16px;">';
+  sessionsHTML += '<div style="font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">All Calibration Sessions</div>';
+  sessionsHTML += '<table style="width:100%;font-size:12px;border-collapse:collapse;"><thead><tr style="color:var(--muted);text-align:left;"><th style="padding:6px 8px;">Case</th><th style="padding:6px 8px;">Agent</th><th style="padding:6px 8px;">QA Score</th><th style="padding:6px 8px;">TL Scores</th><th style="padding:6px 8px;text-align:center;">Max Gap</th><th style="padding:6px 8px;text-align:center;">Verdict</th></tr></thead><tbody>';
+  sessions.sort((a,b) => String(b.id).localeCompare(String(a.id))).forEach((s, i) => {
+    const qa = parseFloat(s.qaScore||0);
+    const tlResults = (() => { try { return JSON.parse(s.tlResults||'[]'); } catch(e) { return []; } })();
+    const gaps = tlResults.map(tr => Math.abs(qa - parseFloat(tr.score||0)));
+    const maxGap = gaps.length ? Math.max(...gaps) : 0;
+    const gapColor = maxGap <= 5 ? 'var(--green)' : maxGap <= 10 ? 'var(--gold)' : 'var(--red)';
+    const verdictColor = s.verdict === 'pass' ? 'var(--green)' : 'var(--red)';
+    const tlScoreList = tlResults.map(tr => `${tr.tl||'?'}: <b>${parseFloat(tr.score||0).toFixed(1)}%</b>`).join(' · ') || '—';
+    const rowBg = i % 2 === 0 ? 'var(--bg)' : 'transparent';
+    sessionsHTML += `<tr style="border-top:1px solid var(--border);background:${rowBg};">
+      <td style="padding:8px;color:var(--gold);">${s.caseNumber||'—'}</td>
+      <td style="padding:8px;">${s.agent||'—'}</td>
+      <td style="padding:8px;font-weight:700;color:var(--purple);">${qa.toFixed(1)}%</td>
+      <td style="padding:8px;color:var(--muted);">${tlScoreList}</td>
+      <td style="padding:8px;text-align:center;font-weight:700;color:${gapColor};">${maxGap.toFixed(1)}%</td>
+      <td style="padding:8px;text-align:center;font-weight:800;color:${verdictColor};text-transform:uppercase;">${s.verdict||'—'}</td>
+    </tr>`;
+  });
+  sessionsHTML += '</tbody></table></div>';
+
+  el.innerHTML = summaryHTML + tlTableHTML + sessionsHTML;
 }
 
 function populateCalibForm() {
