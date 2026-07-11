@@ -7704,10 +7704,14 @@ function openCoachingModal(id) {
 
   // QA — can add/edit comment when pending_comment or disputed
   if ((role==='manager'||role==='qa') && (c.status==='pending_comment'||c.status==='disputed')) {
+    const closeBtn = c.isAppeal==='YES'
+      ? `<button onclick="closeAppealByQA()" style="margin-top:8px;width:100%;background:var(--green-dim);border:1px solid var(--green);color:var(--green);border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">${iconCheck()} Close Appeal</button>`
+      : '';
     area.innerHTML = `
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;">${c.status==='disputed'?'↩ Add Updated Comment':'Add Coaching Comment'}</div>
       <textarea id="cm-qa-input" placeholder="Write your coaching comment here..." style="width:100%;background:var(--bg);border:1px solid var(--border-l);border-radius:var(--radius-s);padding:10px;color:var(--text);font-size:13px;font-family:var(--font-b);resize:vertical;min-height:80px;outline:none;box-sizing:border-box;">${c.qaComment||''}</textarea>
-      <button onclick="submitQAComment()" style="margin-top:10px;width:100%;background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Send to TL →</button>`;
+      <button onclick="submitQAComment()" style="margin-top:10px;width:100%;background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-b);">Send to TL →</button>
+      ${closeBtn}`;
   }
 
   // TL — can accept or dispute when pending_tl
@@ -7757,6 +7761,20 @@ function submitQAComment() {
   if (idx === -1) return;
   _coachingData[idx].qaComment = comment;
   _coachingData[idx].status    = 'pending_tl';
+  saveCoaching();
+  syncCoachingItem(_coachingData[idx]);
+  closeCoachingModal();
+  renderCoaching();
+  updateCoachingBadge();
+}
+
+function closeAppealByQA() {
+  const comment = document.getElementById('cm-qa-input')?.value?.trim();
+  const idx = _coachingData.findIndex(c => String(c.id) === String(_coachingModal.id));
+  if (idx === -1) return;
+  if (comment) _coachingData[idx].qaComment = comment;
+  _coachingData[idx].status     = 'closed';
+  _coachingData[idx].closedDate = new Date().toLocaleDateString('en-GB');
   saveCoaching();
   syncCoachingItem(_coachingData[idx]);
   closeCoachingModal();
