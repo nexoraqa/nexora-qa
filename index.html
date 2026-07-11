@@ -10161,44 +10161,44 @@ function loadFromGoogleSheets() {
           country: row.country  || '',
           caseNumber: row.caseNumber || '',
           overall: parseFloat(row.overall) || 0,
-          cc:      row['cc_customer_profile']==='No'||row['cc_wrong_information']==='No'||
-                   row['cc_missing_information']==='No'||row['cc_ticket_escalation']==='No'||
-                   row['cc_transfer_process']==='No'||row['cc_professionalism']==='No'||
-                   row['cc_ticket_description']==='No' ? 1 : 0,
-          cb:      row['cb_ticket_creation']==='No'||row['cb_control_the_call']==='No'||
-                   row['cb_ticketing_tree']==='No' ? 1 : 0,
+          cc:      row['CC Customer Profile']==='No'||row['CC Wrong Information']==='No'||
+                   row['CC Missing Information']==='No'||row['CC Ticket Escalation']==='No'||
+                   row['CC Transfer Process']==='No'||row['CC Professionalism']==='No'||
+                   row['CC Ticket Description']==='No' ? 1 : 0,
+          cb:      row['CB Ticket Creation']==='No'||row['CB Control the Call']==='No'||
+                   row['CB Ticketing Tree']==='No' ? 1 : 0,
           errors:  [],
           ncCount: 0,
         };
         // Build errors array from Yes/No/N/A columns
         const ncMap = {
-          'nc_call_opening':    'Call Opening/Closure',
-          'nc_choice_of_words': 'Choice of Words / Avoid Slang / Technical Terms',
-          'nc_tone_of_voice':   'Tone of Voice',
-          'nc_showing_empathy': 'Showing Empathy / handling objection',
-          'nc_active_listening':'Active Listening',
-          'nc_hold':            'HOLD',
+          'NC Call Opening':    'Call Opening/Closure',
+          'NC Choice of Words': 'Choice of Words / Avoid Slang / Technical Terms',
+          'NC Tone of Voice':   'Tone of Voice',
+          'NC Showing Empathy': 'Showing Empathy / handling objection',
+          'NC Active Listening':'Active Listening',
+          'NC HOLD':            'HOLD',
         };
         Object.entries(ncMap).forEach(([col, attr]) => {
           if (row[col] === 'No') { eval_obj.errors.push({t:'nc', v:attr, attr:attr, isNA:false}); eval_obj.ncCount++; }
           if (row[col] === 'N/A') { eval_obj.errors.push({t:'nc', v:attr, attr:attr, isNA:true}); }
         });
         const ccMap = {
-          'cc_customer_profile':   'Customer Profile',
-          'cc_wrong_information':  'Wrong Information',
-          'cc_missing_information':'Missing Information',
-          'cc_ticket_escalation':  'Ticket Escalation and Status',
-          'cc_transfer_process':   'Transfer Process',
-          'cc_professionalism':    'Professionalism / Attitude',
-          'cc_ticket_description': 'Ticket Description',
+          'CC Customer Profile':   'Customer Profile',
+          'CC Wrong Information':  'Wrong Information',
+          'CC Missing Information':'Missing Information',
+          'CC Ticket Escalation':  'Ticket Escalation and Status',
+          'CC Transfer Process':   'Transfer Process',
+          'CC Professionalism':    'Professionalism / Attitude',
+          'CC Ticket Description': 'Ticket Description',
         };
         Object.entries(ccMap).forEach(([col, attr]) => {
           if (row[col] === 'No') eval_obj.errors.push({t:'cc', v:attr, attr:attr, isNA:false});
         });
         const cbMap = {
-          'cb_ticket_creation':  'Ticket Creation and Categorization',
-          'cb_control_the_call': 'Control the Call / Comprehension',
-          'cb_ticketing_tree':   'Ticketing Tree',
+          'CB Ticket Creation':  'Ticket Creation and Categorization',
+          'CB Control the Call': 'Control the Call / Comprehension',
+          'CB Ticketing Tree':   'Ticketing Tree',
         };
         Object.entries(cbMap).forEach(([col, attr]) => {
           if (row[col] === 'No') eval_obj.errors.push({t:'cb', v:attr, attr:attr, isNA:false});
