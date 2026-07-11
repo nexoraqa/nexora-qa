@@ -10275,6 +10275,36 @@ function loadFromGoogleSheets() {
         try { mergeCoachingFromSheets(res.coaching); } catch(e) {}
       }
 
+      // Sync calibration sessions from sheet
+      if (res.calibration && res.calibration.length) {
+        try {
+          res.calibration.forEach(function(row) {
+            if (!row.id) return;
+            const existing = _calibSessions.findIndex(s => String(s.id) === String(row.id));
+            const session = {
+              id:          row.id,
+              caseNumber:  row.caseNumber || '',
+              agent:       row.agent || '',
+              createdBy:   row.createdBy || '',
+              completedAt: row.completedAt || '',
+              status:      'completed',
+              qaScore:     row.qaScore || '',
+              qaName:      row.qaName || '',
+              verdict:     row.verdict || '',
+              tlResults:   row.tlResults || '[]',
+              report:      { verdict: row.verdict || '' },
+              participants: [],
+            };
+            if (existing >= 0) {
+              _calibSessions[existing] = { ..._calibSessions[existing], ...session };
+            } else {
+              _calibSessions.push(session);
+            }
+          });
+          saveCalibSessions();
+        } catch(e) {}
+      }
+
       // Store operation evals for Manager view
       if (res.operation && res.operation.length) {
         try {
@@ -10594,17 +10624,29 @@ function switchCalibTab(tab) {
 function renderCalibTracker() {
   const el = document.getElementById('calib-tracker-content');
   if (!el) return;
-  const sessions = (_calibSessions||[]).filter(s => s.verdict);
+  const sessions = (_calibSessions||[]).filter(s => s.verdict || s.status === 'complete' || s.status === 'completed' || s.report);
   if (sessions.length === 0) {
     el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;font-size:14px;">No completed calibration sessions yet</div>';
     return;
   }
 
+  // Helper to get TL results from session (works for both local and sheet formats)
+  function getSessionTLResults(s) {
+    if (s.tlResults) { try { return JSON.parse(s.tlResults); } catch(e) {} }
+    if (s.participants) return s.participants.filter(p=>p.role==='tl'&&p.submitted&&p.score!=null).map(p=>({tl:p.name,score:p.score}));
+    return [];
+  }
+  function getSessionQAScore(s) {
+    if (s.qaScore) return parseFloat(s.qaScore);
+    if (s.participants) { const qa = s.participants.find(p=>p.role==='qa'&&p.submitted); return qa ? parseFloat(qa.score||0) : 0; }
+    return 0;
+  }
+
   // Build summary stats per TL
   const tlStats = {};
   sessions.forEach(s => {
-    const qaScore = parseFloat(s.qaScore||0);
-    const tlResults = (() => { try { return JSON.parse(s.tlResults||'[]'); } catch(e) { return []; } })();
+    const qaScore = getSessionQAScore(s);
+    const tlResults = getSessionTLResults(s);
     tlResults.forEach(tr => {
       const tlScore = parseFloat(tr.score||0);
       const gap = Math.abs(qaScore - tlScore);
@@ -10619,16 +10661,16 @@ function renderCalibTracker() {
   let summaryHTML = '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">';
   summaryHTML += `<div style="background:var(--card);border-radius:var(--radius);padding:16px 20px;min-width:120px;text-align:center;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Sessions</div><div style="font-size:26px;font-weight:800;color:var(--purple);">${sessions.length}</div></div>`;
   const avgGapAll = sessions.reduce((sum, s) => {
-    const qa = parseFloat(s.qaScore||0);
-    const tls = (() => { try { return JSON.parse(s.tlResults||'[]'); } catch(e) { return []; } })();
+    const qa = getSessionQAScore(s);
+    const tls = getSessionTLResults(s);
     const gapSum = tls.reduce((g, tr) => g + Math.abs(qa - parseFloat(tr.score||0)), 0);
     return sum + (tls.length ? gapSum / tls.length : 0);
   }, 0) / sessions.length;
   const avgGapColor = avgGapAll <= 5 ? 'var(--green)' : avgGapAll <= 10 ? 'var(--gold)' : 'var(--red)';
   summaryHTML += `<div style="background:var(--card);border-radius:var(--radius);padding:16px 20px;min-width:120px;text-align:center;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Avg Gap</div><div style="font-size:26px;font-weight:800;color:${avgGapColor};">${avgGapAll.toFixed(1)}%</div></div>`;
   const alignedCount = sessions.filter(s => {
-    const qa = parseFloat(s.qaScore||0);
-    const tls = (() => { try { return JSON.parse(s.tlResults||'[]'); } catch(e) { return []; } })();
+    const qa = getSessionQAScore(s);
+    const tls = getSessionTLResults(s);
     return tls.every(tr => Math.abs(qa - parseFloat(tr.score||0)) <= 5);
   }).length;
   summaryHTML += `<div style="background:var(--card);border-radius:var(--radius);padding:16px 20px;min-width:120px;text-align:center;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Aligned</div><div style="font-size:26px;font-weight:800;color:var(--green);">${alignedCount}</div></div>`;
@@ -10651,12 +10693,13 @@ function renderCalibTracker() {
   sessionsHTML += '<div style="font-size:12px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">All Calibration Sessions</div>';
   sessionsHTML += '<table style="width:100%;font-size:12px;border-collapse:collapse;"><thead><tr style="color:var(--muted);text-align:left;"><th style="padding:6px 8px;">Case</th><th style="padding:6px 8px;">Agent</th><th style="padding:6px 8px;">QA Score</th><th style="padding:6px 8px;">TL Scores</th><th style="padding:6px 8px;text-align:center;">Max Gap</th><th style="padding:6px 8px;text-align:center;">Verdict</th></tr></thead><tbody>';
   sessions.sort((a,b) => String(b.id).localeCompare(String(a.id))).forEach((s, i) => {
-    const qa = parseFloat(s.qaScore||0);
-    const tlResults = (() => { try { return JSON.parse(s.tlResults||'[]'); } catch(e) { return []; } })();
+    const qa = getSessionQAScore(s);
+    const tlResults = getSessionTLResults(s);
     const gaps = tlResults.map(tr => Math.abs(qa - parseFloat(tr.score||0)));
     const maxGap = gaps.length ? Math.max(...gaps) : 0;
     const gapColor = maxGap <= 5 ? 'var(--green)' : maxGap <= 10 ? 'var(--gold)' : 'var(--red)';
-    const verdictColor = s.verdict === 'pass' ? 'var(--green)' : 'var(--red)';
+    const verdictColor = s.verdict === 'pass' || s.verdict === 'CALIBRATED' ? 'var(--green)' : 'var(--red)';
+    const verdictDisplay = s.verdict || (s.report?.verdict) || '—';
     const tlScoreList = tlResults.map(tr => `${tr.tl||'?'}: <b>${parseFloat(tr.score||0).toFixed(1)}%</b>`).join(' · ') || '—';
     const rowBg = i % 2 === 0 ? 'var(--bg)' : 'transparent';
     sessionsHTML += `<tr style="border-top:1px solid var(--border);background:${rowBg};">
@@ -10665,7 +10708,7 @@ function renderCalibTracker() {
       <td style="padding:8px;font-weight:700;color:var(--purple);">${qa.toFixed(1)}%</td>
       <td style="padding:8px;color:var(--muted);">${tlScoreList}</td>
       <td style="padding:8px;text-align:center;font-weight:700;color:${gapColor};">${maxGap.toFixed(1)}%</td>
-      <td style="padding:8px;text-align:center;font-weight:800;color:${verdictColor};text-transform:uppercase;">${s.verdict||'—'}</td>
+      <td style="padding:8px;text-align:center;font-weight:800;color:${verdictColor};text-transform:uppercase;">${verdictDisplay}</td>
     </tr>`;
   });
   sessionsHTML += '</tbody></table></div>';
