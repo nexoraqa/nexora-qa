@@ -11559,12 +11559,15 @@ function updateCalibBadge() {
 <script>
 // ── DEMO DATA — Pre-loaded fake data for CX Solutions International ──
 (function injectDemoData() {
+  // Always reset to ensure no real data ever shows
+  localStorage.removeItem('demo_eval_history');
+  localStorage.removeItem('demo_coaching');
+  localStorage.removeItem('demo_op_history');
+  localStorage.removeItem('demo_version');
+
   const DEMO_EVAL_KEY = 'demo_eval_history';
   const DEMO_COACH_KEY = 'demo_coaching';
   const DEMO_OP_KEY = 'demo_op_history';
-
-  // Only inject if no demo data exists yet
-  if (localStorage.getItem(DEMO_EVAL_KEY)) return;
 
   const evals = [
     { uid:'d001', date:'15 Jul 2026', time:'09:14', agent:'Sarah Mitchell', tl:'James Mitchell', proj:'Tech Support', country:'UAE', lang:'English', qa:'Dr. Jane Watson', overall:94, ncScore:24, cc:0, cb:0, caseNumber:'TS-1041', errors:[], ncAttrs:[], ccAttrs:[], cbAttrs:[] },
