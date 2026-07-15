@@ -10144,6 +10144,7 @@ function loadFromGoogleSheets() {
           const idx = _evalHistory.findIndex(e => String(e.uid) === String(row.id));
           if (idx > -1 && !_evalHistory[idx].caseNumber) {
             _evalHistory[idx].caseNumber = row['Case Number'] || '';
+            added++;
           }
           return;
         }
