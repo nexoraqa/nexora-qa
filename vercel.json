@@ -2,6 +2,7 @@
   "rewrites": [
     { "source": "/nexora-landing", "destination": "/nexora_landing.html" },
     { "source": "/nexora-presentation", "destination": "/nexora_presentation.html" },
+    { "source": "/demo", "destination": "/demo.html" },
     { "source": "/((?!.*\\.html$).*)", "destination": "/index.html" }
   ]
 }
