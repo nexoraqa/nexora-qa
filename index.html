@@ -10140,7 +10140,13 @@ function loadFromGoogleSheets() {
           _evalHistory = _evalHistory.filter(e => String(e.uid) !== String(row.id));
           return;
         }
-        if (existingIds.has(String(row.id))) return; // skip duplicates
+        if (existingIds.has(String(row.id))) {
+          const idx = _evalHistory.findIndex(e => String(e.uid) === String(row.id));
+          if (idx > -1 && !_evalHistory[idx].caseNumber) {
+            _evalHistory[idx].caseNumber = row['Case Number'] || '';
+          }
+          return;
+        }
         // Convert sheet row back to eval object
         const eval_obj = {
           uid:     row.id,
