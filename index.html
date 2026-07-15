@@ -10152,7 +10152,7 @@ function loadFromGoogleSheets() {
           qa:      row.assessor,
           lang:    row.language || '',
           country: row.country  || '',
-          caseNumber: row.caseNumber || row['Case Number'] || '',
+          caseNumber: row.caseNumber || row['Case Number'] || row.case_number || row['caseNumber'] || row['CASE NUMBER'] || '',
           overall: parseFloat(row.overall) || 0,
           cc:      row['CC Customer Profile']==='No'||row['CC Wrong Information']==='No'||
                    row['CC Missing Information']==='No'||row['CC Ticket Escalation']==='No'||
