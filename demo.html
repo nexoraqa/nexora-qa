@@ -557,14 +557,14 @@ a { color:var(--purple-l); text-decoration:none; }
       <div style="font-family:var(--font-h);font-size:16px;font-weight:800;margin-bottom:6px;">Sign In — Demo</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Select your account and enter your PIN</div>
 
-      <!-- Demo credentials -->
+      <!-- Demo credentials - always visible -->
       <div style="background:rgba(135,91,247,.08);border:1px solid rgba(135,91,247,.25);border-radius:8px;padding:12px;margin-bottom:18px;">
-        <div style="font-size:10px;font-weight:700;color:var(--purple-l);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🎯 Demo Credentials</div>
+        <div style="font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">🎯 Demo Credentials</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:11px;">
-          <div style="color:var(--muted);">Manager → <strong style="color:#fff;">demo</strong> / PIN <strong style="color:var(--gold);">0000</strong></div>
-          <div style="color:var(--muted);">QA → <strong style="color:#fff;">demoqa</strong> / PIN <strong style="color:var(--gold);">1111</strong></div>
-          <div style="color:var(--muted);">Team Lead → <strong style="color:#fff;">demotl</strong> / PIN <strong style="color:var(--gold);">2222</strong></div>
-          <div style="color:var(--muted);">Agent → <strong style="color:#fff;">demoagent</strong> / PIN <strong style="color:var(--gold);">3333</strong></div>
+          <div style="color:rgba(200,200,255,.7);">Manager → <strong style="color:#fff;">demo</strong> / <strong style="color:#fbbf24;">0000</strong></div>
+          <div style="color:rgba(200,200,255,.7);">QA → <strong style="color:#fff;">demoqa</strong> / <strong style="color:#fbbf24;">1111</strong></div>
+          <div style="color:rgba(200,200,255,.7);">Team Lead → <strong style="color:#fff;">demotl</strong> / <strong style="color:#fbbf24;">2222</strong></div>
+          <div style="color:rgba(200,200,255,.7);">Agent → <strong style="color:#fff;">demoagent</strong> / <strong style="color:#fbbf24;">3333</strong></div>
         </div>
       </div>
 
@@ -605,16 +605,6 @@ a { color:var(--purple-l); text-decoration:none; }
         Sign In →
       </button>
 
-      <!-- Demo hint -->
-      <div style="margin-top:20px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:12px;">
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600;">Demo PINs</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-          <div style="font-size:11px;color:var(--text-2);"><span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 19h18l-1.5-9-4 3-3.5-6-3.5 6-4-3L3 19z"/></svg></span> Manager <b style="color:var(--gold);">1111</b></div>
-          <div style="font-size:11px;color:var(--text-2);"><span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6a1 1 0 011 1v1H8V5a1 1 0 011-1z"/><rect x="5" y="6" width="14" height="15" rx="1.5"/><path d="M9 12h6M9 16h6"/></svg></span> QA Assessor <b style="color:var(--purple-l);">2222</b></div>
-          <div style="font-size:11px;color:var(--text-2);"><span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span> Team Lead <b style="color:var(--blue-l);">3333</b></div>
-          <div style="font-size:11px;color:var(--text-2);"><span style="display:inline-flex;vertical-align:-2px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></span> Agent <b style="color:var(--green);">4444</b></div>
-        </div>
-      </div>
     </div>
   </div>
 </div>
@@ -649,7 +639,7 @@ a { color:var(--purple-l); text-decoration:none; }
     <div class="user-badge">
       <div class="avatar" id="sb-avatar">YS</div>
       <div style="flex:1;min-width:0;">
-        <div class="user-name" id="sb-name">Younes Sid</div>
+        <div class="user-name" id="sb-name">Alex Morgan</div>
         <div id="sb-role-badge" style="display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;margin-top:3px;letter-spacing:.5px;text-transform:uppercase;">Manager</div>
       </div>
     </div>
@@ -752,8 +742,8 @@ a { color:var(--purple-l); text-decoration:none; }
 
     <!-- Filters -->
     <div class="filter-bar">
-      <select class="fsel" id="f-proj"    onchange="applyFilters()"><option value="all">All Projects</option><option value="MOPH_MCI">MOPH_MCI</option><option value="PHCC">PHCC</option><option value="MOPH">MOPH</option></select>
-      <select class="fsel" id="f-tl" onchange="applyFilters()"><option value="all">All TL Names</option><option value="Walid Bouzidi">Walid Bouzidi</option><option value="Walid Hassan Eissa">Walid Hassan Eissa</option><option value="Mustafa Yusef Hamid Mohammed Ali">Mustafa Yusef Hamid Mohammed Ali</option><option value="Lotfi Hamrouni">Lotfi Hamrouni</option><option value="Duaa Ismail Odeh Abumansour">Duaa Ismail Odeh Abumansour</option><option value="Ahmad Alsmadi">Ahmad Alsmadi</option><option value="Akshay Munde">Akshay Munde</option><option value="Haneen Akram Eid Alsharari">Haneen Akram Eid Alsharari</option><option value="Jay-Ar Pautan">Jay-Ar Pautan</option><option value="Salsabeel Azmi Mahmoud Aldardasawi">Salsabeel Azmi Mahmoud Aldardasawi</option></select>
+      <select class="fsel" id="f-proj"    onchange="applyFilters()"><option value="all">All Projects</option><option value="Tech Support">Tech Support</option><option value="Telecom">Telecom</option><option value="MOPH">MOPH</option></select>
+      <select class="fsel" id="f-tl" onchange="applyFilters()"><option value="all">All TL Names</option><option value="James Mitchell">James Mitchell</option><option value="Sofia Reyes">Sofia Reyes</option><option value="David Kim">David Kim</option><option value="Omar Nasser">Omar Nasser</option><option value="Lisa Chen">Lisa Chen</option><option value="Maria Santos">Maria Santos</option><option value="John Park">John Park</option><option value="Emma Wilson">Emma Wilson</option><option value="Carlos Rivera">Carlos Rivera</option><option value="Ana Garcia">Ana Garcia</option></select>
       <select class="fsel" id="f-country" onchange="applyFilters()"><option value="all">All Countries</option><option value="Qatar">Qatar</option><option value="India">India</option><option value="Jordan">Jordan</option><option value="Philippines">Philippines</option></select>
       <select class="fsel" id="f-date" onchange="toggleCustomDate();applyFilters()"><option value="all">All Time</option><option value="this_week">This Week</option><option value="this_month">This Month</option><option value="last_month">Last Month</option><option value="last_3_months">Last 3 Months</option><option value="custom">Custom Range</option></select>
       <div id="f-date-custom" style="display:none;gap:6px;align-items:center;">
@@ -947,12 +937,12 @@ a { color:var(--purple-l); text-decoration:none; }
             </div>
             <div class="field" id="field-proj">
               <label>Project <span style="color:var(--red);">*</span></label>
-              <select id="c-proj" onchange="clearFieldError('field-proj')"><option value="">Select project</option><option>MOPH_MCI</option><option>PHCC</option><option>MOPH</option></select>
+              <select id="c-proj" onchange="clearFieldError('field-proj')"><option value="">Select project</option><option>Tech Support</option><option>Telecom</option><option>MOPH</option></select>
               <div class="field-err" id="err-proj" style="display:none;font-size:11px;color:var(--red);margin-top:5px;"><span class="si si-cross"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg></span> Please select a project</div>
             </div>
             <div class="field" id="field-tl">
               <label>TL Name <span style="color:var(--red);">*</span></label>
-              <select id="c-tl" onchange="clearFieldError('field-tl')"><option value="">Select TL</option><option>Walid Bouzidi</option><option>Walid Hassan Eissa</option><option>Mustafa Yusef Hamid Mohammed Ali</option><option>Lotfi Hamrouni</option><option>Duaa Ismail Odeh Abumansour</option><option>Ahmad Alsmadi</option><option>Akshay Munde</option><option>Haneen Akram Eid Alsharari</option><option>Jay-Ar Pautan</option><option>Salsabeel Azmi Mahmoud Aldardasawi</option></select>
+              <select id="c-tl" onchange="clearFieldError('field-tl')"><option value="">Select TL</option><option>James Mitchell</option><option>Sofia Reyes</option><option>David Kim</option><option>Omar Nasser</option><option>Lisa Chen</option><option>Maria Santos</option><option>John Park</option><option>Emma Wilson</option><option>Carlos Rivera</option><option>Ana Garcia</option></select>
               <div class="field-err" id="err-tl" style="display:none;font-size:11px;color:var(--red);margin-top:5px;"><span class="si si-cross"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg></span> Please select a TL</div>
             </div>
             <div class="field" id="field-agent">
@@ -962,7 +952,7 @@ a { color:var(--purple-l); text-decoration:none; }
             </div>
             <div class="field" id="field-qa">
               <label>QA Name <span style="color:var(--red);">*</span></label>
-              <select id="c-qa" onchange="clearFieldError('field-qa')"><option value="">Select QA</option><option>Younes Sid</option><option>Shahd Mohamed</option></select>
+              <select id="c-qa" onchange="clearFieldError('field-qa')"><option value="">Select QA</option><option>Alex Morgan</option><option>Dr. Jane Watson</option></select>
               <div class="field-err" id="err-qa" style="display:none;font-size:11px;color:var(--red);margin-top:5px;"><span class="si si-cross"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg></span> Please select a QA</div>
             </div>
             <div class="field" id="field-lang">
@@ -1160,13 +1150,13 @@ a { color:var(--purple-l); text-decoration:none; }
         style="padding:7px 16px;border-radius:20px;border:1px solid var(--purple);background:var(--purple);color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);">
         <span style="display:inline-flex;vertical-align:-2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-5.5 6.5-5.5s6.5 2 6.5 5.5"/><circle cx="17" cy="9" r="2.7"/><path d="M16 14.2c2.6.3 4.5 2 4.5 5"/></svg></span> All QAs
       </button>
-      <button onclick="setHistQAFilter('Younes Sid')" id="hist-tab-younes"
+      <button onclick="setHistQAFilter('Alex Morgan')" id="hist-tab-younes"
         style="padding:7px 16px;border-radius:20px;border:1px solid var(--border-l);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);">
-        🟣 Younes Sid
+        🟣 Alex Morgan
       </button>
-      <button onclick="setHistQAFilter('Shahd Mohamed')" id="hist-tab-shahd"
+      <button onclick="setHistQAFilter('Dr. Jane Watson')" id="hist-tab-shahd"
         style="padding:7px 16px;border-radius:20px;border:1px solid var(--border-l);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all var(--transition);font-family:var(--font-b);">
-        <span class="si-dot si-dot-blue"></span> Shahd Mohamed
+        <span class="si-dot si-dot-blue"></span> Dr. Jane Watson
       </button>
     </div>
 
@@ -1319,8 +1309,8 @@ a { color:var(--purple-l); text-decoration:none; }
       </div>
       <!-- Filters — unified style matching Dashboard -->
       <div class="filter-bar" style="margin:0;">
-        <select class="fsel" id="mon-f-proj" onchange="applyMonFilter()"><option value="all">All Projects</option><option value="MOPH_MCI">MOPH_MCI</option><option value="PHCC">PHCC</option><option value="MOPH">MOPH</option></select>
-        <select class="fsel" id="mon-f-tl" onchange="applyMonFilter()"><option value="all">All TL Names</option><option value="Walid Bouzidi">Walid Bouzidi</option><option value="Walid Hassan Eissa">Walid Hassan Eissa</option><option value="Mustafa Yusef Hamid Mohammed Ali">Mustafa Yusef Hamid Mohammed Ali</option><option value="Lotfi Hamrouni">Lotfi Hamrouni</option><option value="Duaa Ismail Odeh Abumansour">Duaa Ismail Odeh Abumansour</option><option value="Ahmad Alsmadi">Ahmad Alsmadi</option><option value="Akshay Munde">Akshay Munde</option><option value="Haneen Akram Eid Alsharari">Haneen Akram Eid Alsharari</option><option value="Jay-Ar Pautan">Jay-Ar Pautan</option><option value="Salsabeel Azmi Mahmoud Aldardasawi">Salsabeel Azmi Mahmoud Aldardasawi</option></select>
+        <select class="fsel" id="mon-f-proj" onchange="applyMonFilter()"><option value="all">All Projects</option><option value="Tech Support">Tech Support</option><option value="Telecom">Telecom</option><option value="MOPH">MOPH</option></select>
+        <select class="fsel" id="mon-f-tl" onchange="applyMonFilter()"><option value="all">All TL Names</option><option value="James Mitchell">James Mitchell</option><option value="Sofia Reyes">Sofia Reyes</option><option value="David Kim">David Kim</option><option value="Omar Nasser">Omar Nasser</option><option value="Lisa Chen">Lisa Chen</option><option value="Maria Santos">Maria Santos</option><option value="John Park">John Park</option><option value="Emma Wilson">Emma Wilson</option><option value="Carlos Rivera">Carlos Rivera</option><option value="Ana Garcia">Ana Garcia</option></select>
         <select class="fsel" id="mon-f-country" onchange="applyMonFilter()"><option value="all">All Countries</option><option value="Qatar">Qatar</option><option value="India">India</option><option value="Jordan">Jordan</option><option value="Philippines">Philippines</option></select>
         <button class="btn-clear" onclick="clearMonFilters()">✕ Clear</button>
       </div>
@@ -1752,8 +1742,8 @@ a { color:var(--purple-l); text-decoration:none; }
           <div style="font-size:11px;color:var(--muted);">Full ranking with NC, CC, CB breakdown — <span id="lb-count"></span></div>
         </div>
         <div class="filter-bar" style="margin:0;">
-          <select class="fsel" id="rep-proj" onchange="renderLeaderboard()"><option value="all">All Projects</option><option value="MOPH_MCI">MOPH_MCI</option><option value="PHCC">PHCC</option><option value="MOPH">MOPH</option></select>
-          <select class="fsel" id="rep-tl" onchange="renderLeaderboard()"><option value="all">All TLs</option><option value="Walid Bouzidi">Walid Bouzidi</option><option value="Walid Hassan Eissa">Walid Hassan Eissa</option><option value="Mustafa Yusef Hamid Mohammed Ali">Mustafa Yusef Hamid Mohammed Ali</option><option value="Lotfi Hamrouni">Lotfi Hamrouni</option><option value="Duaa Ismail Odeh Abumansour">Duaa Ismail Odeh Abumansour</option><option value="Ahmad Alsmadi">Ahmad Alsmadi</option><option value="Akshay Munde">Akshay Munde</option><option value="Haneen Akram Eid Alsharari">Haneen Akram Eid Alsharari</option><option value="Jay-Ar Pautan">Jay-Ar Pautan</option><option value="Salsabeel Azmi Mahmoud Aldardasawi">Salsabeel Azmi Mahmoud Aldardasawi</option></select>
+          <select class="fsel" id="rep-proj" onchange="renderLeaderboard()"><option value="all">All Projects</option><option value="Tech Support">Tech Support</option><option value="Telecom">Telecom</option><option value="MOPH">MOPH</option></select>
+          <select class="fsel" id="rep-tl" onchange="renderLeaderboard()"><option value="all">All TLs</option><option value="James Mitchell">James Mitchell</option><option value="Sofia Reyes">Sofia Reyes</option><option value="David Kim">David Kim</option><option value="Omar Nasser">Omar Nasser</option><option value="Lisa Chen">Lisa Chen</option><option value="Maria Santos">Maria Santos</option><option value="John Park">John Park</option><option value="Emma Wilson">Emma Wilson</option><option value="Carlos Rivera">Carlos Rivera</option><option value="Ana Garcia">Ana Garcia</option></select>
           <select class="fsel" id="rep-status" onchange="renderLeaderboard()"><option value="all">All Status</option><option value="pass">✓ Pass only</option><option value="risk">At Risk only</option><option value="critical">✕ Critical only</option></select>
           <button class="btn-clear" onclick="resetRepFilters()">✕ Clear</button>
           <button onclick="downloadLeaderboard()" style="background:var(--purple);border:none;color:#fff;border-radius:var(--radius-s);padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:var(--font-b);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 19h16"/></svg> Download Excel</button>
@@ -1870,7 +1860,7 @@ a { color:var(--purple-l); text-decoration:none; }
             <div style="font-size:28px;">🏥</div>
             <div style="flex:1;">
               <div style="font-size:14px;font-weight:700;margin-bottom:3px;">Project Health Report</div>
-              <div style="font-size:11px;color:var(--muted);">MOPH_MCI · PHCC · MOPH</div>
+              <div style="font-size:11px;color:var(--muted);">Tech Support · Telecom · MOPH</div>
             </div>
             <button onclick="downloadProjectHealth()" style="background:var(--gold-dim);border:1px solid var(--gold);color:var(--gold);border-radius:var(--radius-s);padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-b);white-space:nowrap;">↓ CSV</button>
           </div>
@@ -1969,8 +1959,8 @@ a { color:var(--purple-l); text-decoration:none; }
               <label>Project <span style="color:var(--red);">*</span></label>
               <select id="op-proj" onchange="opLiveCalc()">
                 <option value="">Select project</option>
-                <option value="MOPH_MCI">MOPH_MCI</option>
-                <option value="PHCC">PHCC</option>
+                <option value="Tech Support">Tech Support</option>
+                <option value="Telecom">Telecom</option>
                 <option value="MOPH">MOPH</option>
               </select>
             </div>
@@ -2133,7 +2123,7 @@ a { color:var(--purple-l); text-decoration:none; }
         <div class="setting-row"><div><div style="font-size:13px;font-weight:600;">Total Agents</div></div><div class="setting-val" style="font-family:var(--font-mono);" id="set-total-agents">174</div></div>
         <div class="setting-row"><div><div style="font-size:13px;font-weight:600;">Team Leads</div></div><div class="setting-val" style="font-family:var(--font-mono);">10</div></div>
         <div class="setting-row"><div><div style="font-size:13px;font-weight:600;">Countries</div></div><div class="setting-val">Qatar · India · Jordan · Philippines</div></div>
-        <div class="setting-row" style="border:none;"><div><div style="font-size:13px;font-weight:600;">Projects</div></div><div class="setting-val">MOPH_MCI · PHCC · MOPH</div></div>
+        <div class="setting-row" style="border:none;"><div><div style="font-size:13px;font-weight:600;">Projects</div></div><div class="setting-val">Tech Support · Telecom · MOPH</div></div>
       </div>
 
       <!-- Clear Cache -->
@@ -2625,7 +2615,7 @@ a { color:var(--purple-l); text-decoration:none; }
 function renderProjectHealth() {
   const el = document.getElementById('home-project-health');
   if (!el) return;
-  const projs = ['MOPH_MCI', 'PHCC', 'MOPH'];
+  const projs = ['Tech Support', 'Telecom', 'MOPH'];
   // Read project scores from eval history directly (since agents float between projects)
   if (!_evalHistory || _evalHistory.length === 0) {
     el.innerHTML = projs.map(p => `
@@ -2682,185 +2672,185 @@ function setTopDate() {
 }
 
 const AGENTS = [
-  {n:'Janosa Amor Abysa Rendora', tl:'Duaa Ismail Odeh Abumansour', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Zuhur Ahmed Mohamed Haji', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Riham Mohamed Nour', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Senae Siraj Yosuf', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Hamed Marwan Barah', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Daminii Limbaji Jadhav', tl:'Akshay Munde', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Sushmita Shashikant Nikam', tl:'Akshay Munde', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Shweta Rupekar', tl:'Akshay Munde', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Arya Kumar', tl:'Akshay Munde', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Satej Sonawane', tl:'Akshay Munde', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Tejal Chavan', tl:'Akshay Munde', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Omer Abduselam Mohammed Ibrahim', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohamed Suleiman Mohammed', tl:'Walid Hassan Eissa', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ansam Hamoudeh', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Rahmeh Hammad Odeh', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Tala Mohammad Eisa AlArjeh', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Dana Khaled Ahmad AlNasah', tl:'Haneen Akram Eid Alsharari', lang:'Arabic', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Dyala ZuheIr Musbah AlSalhi', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Esraa Jamal Khamees Abu Awad', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ohoud Mohammed D. A. AlDosari', tl:'Walid Hassan Eissa', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Houida Abdalla', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ieman Hussain Dehqan', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Diana Santos Salvador', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Marwa Abdelmoniem Mohamed', tl:'Walid Hassan Eissa', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Bianca Bagabaldo', tl:'Walid Bouzidi', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Yohannes Sema Gebrhiwot', tl:'Walid Hassan Eissa', lang:'English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Jonna Lacap Ordillas', tl:'Lotfi Hamrouni', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Hamza Grati', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Rinshidha Valiya Veettil Basheer', tl:'Walid Hassan Eissa', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohamed Mustafa Mohamed AlTaher', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Majdeldeeen Elsiddieg Mohamed Ajeeb', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Riaz Ahmad', tl:'Walid Hassan Eissa', lang:'English / Hindi', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mansoor Gholam Dadi', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Abdu Mohammed Abdella', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Hani Elkabashi', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Omer Gasim Omar Fadlalseed', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohanad Ali', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mahmoud Bakhit', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Amenallah Kheirallah', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Nooreldin Ahmed', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Walla Abdulazeem Suliman AlHussain', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ahmed Gamal Ismail Mohamed Metawea', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Vanessa Lacap Quiliza', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Roaa Ali Taleb Altawarah', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Sajeda Hani Jum Ah Al Marafi', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Esraa Belal Mahmoood Zabout', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Eman Kamel Yousef Alkudari', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Shahinaz Thib Mohammed Aqabawi', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Stuti Ohol', tl:'Akshay Munde', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohammad Noor Edin NuMan Abu Taleb', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Zaid Bashar Mahmoud Al Jadallah', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Dareen Loay Ziyad Abu Halimah', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Yousef Faris Darweesh Aldarweesh', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Roaa Hamdan', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohamed Sabrery Mohamed Ali', tl:'Walid Hassan Eissa', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Atika Alliaoui', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Hiba Mostafa Idris Elidrissi', tl:'Walid Hassan Eissa', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Leena Yosuf Ali', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Abdelrahman Mohamed Mizar Ibrahim', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Rawan Rafat Mohammad Almomani', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Njood Abdallah', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Seba Ahmed', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ola Ali Soud Alsmadi', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Abeer Abedalmajed Abdelatef Abdelnabi', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Aissara Mamduh Mubarak Elmanaseer', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Eman Omar Turki Alkhami', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Maymona Hassan Ibrahim Alrowwad', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mahmoud Hisham Sadi Obeid', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ahmed Sedeeg Gdalla Sedeeg', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Shiren Eid Hamid Ahmad', tl:'Lotfi Hamrouni', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohamed Ismail Khashmelmous El Mahdi', tl:'Walid Hassan Eissa', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Shahd Mamoun Kamal Algzoli', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Islam Diab Abdelbaset Mahmoud', tl:'Walid Hassan Eissa', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Houssem Dhahri', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Sami Nasser Hassen', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ibtisam Gamal Mohammed', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Youssef Kalai', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ali Hassen Ali', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Hind Yahya', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Huzaifa Abdalla Saeed Hamid', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Areen Omar Jumaeian Altrabean', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Aya Rafat Salman Alqadi', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ayham Khaled Attallah Hammouri', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Huda Salameh Suleiman Alayhawat', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Manar Abdallah Ali Abuawali', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Maria Ali Mohammad Albasouny', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Rashd Majied Zuheir Alghneimine', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Tuleen Moujeebalkahman Saleh Al Qaryouti', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Yasmine Nedal Rushdi Barhom', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Hadeel Ibrahim Ismail Alnamrouti', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Marwa Mohammad Khaleel Aljanadyeh', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Nabaa Bassem Awwad Abuashour', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Yousef Mohammad Maroof Alaaldeen', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Shaikh Tarannum Shakil', tl:'Akshay Munde', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Darin Haidar Mousa Alhawawreh', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Sewar Faris Damin Alkhalafat', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Marwan Mohammad Ismail Alshqirat', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Tasnim Sweilem Mutleq Alzawaidah', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Salem Mohammad Salem Kreisahn', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Rana Omar Khaleel Almsadien', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Aliya Mahdi Mohmad Ali', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Abdelmahmoud Majzoub Khalifa Rahma', tl:'Walid Hassan Eissa', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Yassine Hadj Bachir', tl:'Lotfi Hamrouni', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Husna Abdullah Mohammed Al Junaidi', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Zaineb Ammar Mbarek Jebali', tl:'Lotfi Hamrouni', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Om El Khir Ferhi', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Vaishnavi Talla', tl:'Akshay Munde', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mujahid Barday Mushtaq Barday', tl:'Walid Bouzidi', lang:'English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Abdelhaq Riahi', tl:'Walid Bouzidi', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Sushant Kadam', tl:'Akshay Munde', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Kholoud Ben Khalifa', tl:'Walid Hassan Eissa', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'George Njuguna Ngigi', tl:'Walid Bouzidi', lang:'English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ayub Adem Saleh', tl:'Walid Hassan Eissa', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Youcef Seddik Latreche', tl:'Walid Bouzidi', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Wafa Haji', tl:'Walid Hassan Eissa', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Misaa Adil Mustafa Yassin', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Reem Abdulrahman Mohammad', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Kamar Kasas', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Sarah Adil Mohamed Saeed', tl:'Lotfi Hamrouni', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Rama Ahmed Muslim Alshoubaki', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Alaa Saleh Saeed Alnajjar', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Esraa Asem Ahmad Aloran', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Omnia Zeyad Ahmad Alsawalq', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Lama Amer Abdel Fattah Ibrahim', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Alzahra Jamal Salem Mousa', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Heba Abdulla Khalil Elgharably', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohammad Khaled Jamal Rinno', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Nabaa Mahd Rashid Yasin', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ahmed Ismail Mahdi', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Billal Azzazene', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Houda Elfakhkhar', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Duaa Mukhtar Mohammed Farah', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Lidia Merzoug', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Marowa Sheikhtawil ElSheikh Mohamed', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Chaimaa Belhadj', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Lahcene Bouziane', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ramzi Haddad', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohamed Amine Salem', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Aymen Berkani', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Arsha K S', tl:'Akshay Munde', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Kishor K', tl:'Akshay Munde', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Abdallah Ahmad Ghazi Albataynen', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Aos Hani Khaled Alsaub', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Arj Mohammed Mohammed Shehadeh', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Islam Okath Ismail Alazzeh', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Khulud Ahmed Ali Garadah', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Leen Adnan Mahmoud Abukheile', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Lujain Fayiz Khalaf Alzidanin', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Maryam Haitham Ayed Alkhawaldeh', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohamed Jaser Adel Atya', tl:'Ahmad Alsmadi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Raneem Ibrahim Mahmoud Shehadeh', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Razan Mohammad Ahmad Alhelatat', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Salwa Yahia Hasan Abuafash', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Seren Issam Hasan Abumueitic', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Serena Odeh Mohammad Alnaanah', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Zakieh Mohammad Jaser Saleh', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ther Abdelbaset Shafiq Altakhainen', tl:'Haneen Akram Eid Alsharari', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Oussama Ramdani', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Harshad Pulayar Vayalil', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Shamna Mammed Koya', tl:'Duaa Ismail Odeh Abumansour', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Amina Nishwa', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Shafna Asharaf', tl:'Walid Bouzidi', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohamed Ifran Mohamed Roshan', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Ezikiel Chester Simbulan Salon', tl:'Jay-Ar Pautan', lang:'English / Tagalog', country:'Philippines', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Souhaib Boularouk', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Omnia Dafaalla', tl:'Duaa Ismail Odeh Abumansour', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohammad Jandy Sehaban', tl:'Lotfi Hamrouni', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Adrian Sabino Raymundo', tl:'Lotfi Hamrouni', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Emile Lauren Pelayo', tl:'Walid Bouzidi', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Paul Angelo Asuncion Ronario', tl:'Walid Bouzidi', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Russell Johang II Lleva Balilia', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Roilan Alexis Francisco Concepcion', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Jan Timothy Florres Perez', tl:'Duaa Ismail Odeh Abumansour', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Sittie Rahma Lucman Imam', tl:'Duaa Ismail Odeh Abumansour', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Noora Bakhit', tl:'Mustafa Yusef Hamid Mohammed Ali', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Reem Abdulrahman Mohammad', tl:'Walid Hassan Eissa', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Marwa Abdelmoniem', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Mohamed Sabrery', tl:'Walid Bouzidi', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
-  {n:'Roa Hamdhan', tl:'Salsabeel Azmi Mahmoud Aldardasawi', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Janosa Amor Abysa Rendora', tl:'Lisa Chen', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Zuhur Ahmed Mohamed Haji', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Riham Mohamed Nour', tl:'Lisa Chen', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Senae Siraj Yosuf', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Hamed Marwan Barah', tl:'Lisa Chen', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Daminii Limbaji Jadhav', tl:'John Park', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Sushmita Shashikant Nikam', tl:'John Park', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Shweta Rupekar', tl:'John Park', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Arya Kumar', tl:'John Park', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Satej Sonawane', tl:'John Park', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Tejal Chavan', tl:'John Park', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Omer Abduselam Mohammed Ibrahim', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohamed Suleiman Mohammed', tl:'Sofia Reyes', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ansam Hamoudeh', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Rahmeh Hammad Odeh', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Tala Mohammad Eisa AlArjeh', tl:'Ana Garcia', lang:'Arabic', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Dana Khaled Ahmad AlNasah', tl:'Emma Wilson', lang:'Arabic', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Dyala ZuheIr Musbah AlSalhi', tl:'Ana Garcia', lang:'Arabic', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Esraa Jamal Khamees Abu Awad', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ohoud Mohammed D. A. AlDosari', tl:'Sofia Reyes', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Houida Abdalla', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ieman Hussain Dehqan', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Diana Santos Salvador', tl:'David Kim', lang:'Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Marwa Abdelmoniem Mohamed', tl:'Sofia Reyes', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Bianca Bagabaldo', tl:'James Mitchell', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Yohannes Sema Gebrhiwot', tl:'Sofia Reyes', lang:'English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Jonna Lacap Ordillas', tl:'Omar Nasser', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Hamza Grati', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Rinshidha Valiya Veettil Basheer', tl:'Sofia Reyes', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohamed Mustafa Mohamed AlTaher', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Majdeldeeen Elsiddieg Mohamed Ajeeb', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Riaz Ahmad', tl:'Sofia Reyes', lang:'English / Hindi', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mansoor Gholam Dadi', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Abdu Mohammed Abdella', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Hani Elkabashi', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Omer Gasim Omar Fadlalseed', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohanad Ali', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mahmoud Bakhit', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Amenallah Kheirallah', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Nooreldin Ahmed', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Walla Abdulazeem Suliman AlHussain', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ahmed Gamal Ismail Mohamed Metawea', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Vanessa Lacap Quiliza', tl:'David Kim', lang:'Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Roaa Ali Taleb Altawarah', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Sajeda Hani Jum Ah Al Marafi', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Esraa Belal Mahmoood Zabout', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Eman Kamel Yousef Alkudari', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Shahinaz Thib Mohammed Aqabawi', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Stuti Ohol', tl:'John Park', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohammad Noor Edin NuMan Abu Taleb', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Zaid Bashar Mahmoud Al Jadallah', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Dareen Loay Ziyad Abu Halimah', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Yousef Faris Darweesh Aldarweesh', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Roaa Hamdan', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohamed Sabrery Mohamed Ali', tl:'Sofia Reyes', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Atika Alliaoui', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Hiba Mostafa Idris Elidrissi', tl:'Sofia Reyes', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Leena Yosuf Ali', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'David Chen', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Rawan Rafat Mohammad Almomani', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Njood Abdallah', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Seba Ahmed', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ola Ali Soud Alsmadi', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Abeer Abedalmajed Abdelatef Abdelnabi', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Aissara Mamduh Mubarak Elmanaseer', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Eman Omar Turki Alkhami', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Maymona Hassan Ibrahim Alrowwad', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mahmoud Hisham Sadi Obeid', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ahmed Sedeeg Gdalla Sedeeg', tl:'David Kim', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Shiren Eid Hamid Ahmad', tl:'Omar Nasser', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohamed Ismail Khashmelmous El Mahdi', tl:'Sofia Reyes', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Shahd Mamoun Kamal Algzoli', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Islam Diab Abdelbaset Mahmoud', tl:'Sofia Reyes', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Houssem Dhahri', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Sami Nasser Hassen', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ibtisam Gamal Mohammed', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Youssef Kalai', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ali Hassen Ali', tl:'David Kim', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Maya Patel', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Huzaifa Abdalla Saeed Hamid', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Areen Omar Jumaeian Altrabean', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Aya Rafat Salman Alqadi', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ayham Khaled Attallah Hammouri', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Huda Salameh Suleiman Alayhawat', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Manar Abdallah Ali Abuawali', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Maria Ali Mohammad Albasouny', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Rashd Majied Zuheir Alghneimine', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Tuleen Moujeebalkahman Saleh Al Qaryouti', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Yasmine Nedal Rushdi Barhom', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Hadeel Ibrahim Ismail Alnamrouti', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Marwa Mohammad Khaleel Aljanadyeh', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Nabaa Bassem Awwad Abuashour', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Yousef Mohammad Maroof Alaaldeen', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Shaikh Tarannum Shakil', tl:'John Park', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Darin Haidar Mousa Alhawawreh', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Sewar Faris Damin Alkhalafat', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Marwan Mohammad Ismail Alshqirat', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Tasnim Sweilem Mutleq Alzawaidah', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Salem Mohammad Salem Kreisahn', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Rana Omar Khaleel Almsadien', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Aliya Mahdi Mohmad Ali', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Abdelmahmoud Majzoub Khalifa Rahma', tl:'Sofia Reyes', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Yassine Hadj Bachir', tl:'Omar Nasser', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Husna Abdullah Mohammed Al Junaidi', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Zaineb Ammar Mbarek Jebali', tl:'Omar Nasser', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Om El Khir Ferhi', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Vaishnavi Talla', tl:'John Park', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mujahid Barday Mushtaq Barday', tl:'James Mitchell', lang:'English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Abdelhaq Riahi', tl:'James Mitchell', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Sushant Kadam', tl:'John Park', lang:'English / Hindi', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Kholoud Ben Khalifa', tl:'Sofia Reyes', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'George Njuguna Ngigi', tl:'James Mitchell', lang:'English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ayub Adem Saleh', tl:'Sofia Reyes', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Youcef Seddik Latreche', tl:'James Mitchell', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Wafa Haji', tl:'Sofia Reyes', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Misaa Adil Mustafa Yassin', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Reem Abdulrahman Mohammad', tl:'Lisa Chen', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Kamar Kasas', tl:'David Kim', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Sarah Adil Mohamed Saeed', tl:'Omar Nasser', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Rama Ahmed Muslim Alshoubaki', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Alaa Saleh Saeed Alnajjar', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Esraa Asem Ahmad Aloran', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Omnia Zeyad Ahmad Alsawalq', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Lama Amer Abdel Fattah Ibrahim', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Alzahra Jamal Salem Mousa', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Heba Abdulla Khalil Elgharably', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohammad Khaled Jamal Rinno', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Nabaa Mahd Rashid Yasin', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ahmed Ismail Mahdi', tl:'David Kim', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Billal Azzazene', tl:'Lisa Chen', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Houda Elfakhkhar', tl:'Lisa Chen', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Duaa Mukhtar Mohammed Farah', tl:'Lisa Chen', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Lidia Merzoug', tl:'Lisa Chen', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Marowa Sheikhtawil ElSheikh Mohamed', tl:'Lisa Chen', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Emma Davis', tl:'Lisa Chen', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Lahcene Bouziane', tl:'Lisa Chen', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Carlos Rivera', tl:'Lisa Chen', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohamed Amine Salem', tl:'Lisa Chen', lang:'Arabic', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Aymen Berkani', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Arsha K S', tl:'John Park', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Kishor K', tl:'John Park', lang:'English / Hindi / Malayalam', country:'India', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Abdallah Ahmad Ghazi Albataynen', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Aos Hani Khaled Alsaub', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Arj Mohammed Mohammed Shehadeh', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Islam Okath Ismail Alazzeh', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Khulud Ahmed Ali Garadah', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Leen Adnan Mahmoud Abukheile', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Lujain Fayiz Khalaf Alzidanin', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Maryam Haitham Ayed Alkhawaldeh', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohamed Jaser Adel Atya', tl:'Maria Santos', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Raneem Ibrahim Mahmoud Shehadeh', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Razan Mohammad Ahmad Alhelatat', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Salwa Yahia Hasan Abuafash', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Seren Issam Hasan Abumueitic', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Serena Odeh Mohammad Alnaanah', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Zakieh Mohammad Jaser Saleh', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ther Abdelbaset Shafiq Altakhainen', tl:'Emma Wilson', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Oussama Ramdani', tl:'Lisa Chen', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Harshad Pulayar Vayalil', tl:'David Kim', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Shamna Mammed Koya', tl:'Lisa Chen', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Amina Nishwa', tl:'David Kim', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Shafna Asharaf', tl:'James Mitchell', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohamed Ifran Mohamed Roshan', tl:'David Kim', lang:'English / Malayalam', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Ezikiel Chester Simbulan Salon', tl:'Carlos Rivera', lang:'English / Tagalog', country:'Philippines', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Souhaib Boularouk', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Omnia Dafaalla', tl:'Lisa Chen', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohammad Jandy Sehaban', tl:'Omar Nasser', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Adrian Sabino Raymundo', tl:'Omar Nasser', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Emile Lauren Pelayo', tl:'James Mitchell', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Paul Angelo Asuncion Ronario', tl:'James Mitchell', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Russell Johang II Lleva Balilia', tl:'David Kim', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Roilan Alexis Francisco Concepcion', tl:'David Kim', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Jan Timothy Florres Perez', tl:'Lisa Chen', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Sittie Rahma Lucman Imam', tl:'Lisa Chen', lang:'English / Tagalog', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Noora Bakhit', tl:'David Kim', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Reem Abdulrahman Mohammad', tl:'Sofia Reyes', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Marwa Abdelmoniem', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Mohamed Sabrery', tl:'James Mitchell', lang:'Arabic / English', country:'Qatar', proj:'', o:0, nc:0, cc:0, cb:0},
+  {n:'Roa Hamdhan', tl:'Ana Garcia', lang:'Arabic / English', country:'Jordan', proj:'', o:0, nc:0, cc:0, cb:0},
 ];
 
 // ── Live Agent Scores ─────────────────────────────────────────
@@ -2907,7 +2897,7 @@ function getLiveKPIs() {
   const agentNames = [...new Set(_evalHistory.map(e => e.agent).filter(Boolean))];
   const projNames  = [...new Set(_evalHistory.map(e => e.proj).filter(Boolean))];
   const agents     = agentNames.length || live.length;
-  const projects   = 3; // Always 3 fixed projects: MOPH_MCI, PHCC, MOPH
+  const projects   = 3; // Always 3 fixed projects: Tech Support, Telecom, MOPH
   const avg        = live.length ? (live.reduce((s,a) => s+a.o, 0) / live.length).toFixed(1)
                    : _evalHistory.length ? (_evalHistory.reduce((s,e) => s+(e.overall||0), 0) / _evalHistory.length).toFixed(1)
                    : '—';
@@ -3160,7 +3150,7 @@ function renderDashboard() {
   }
 
   // ── TL Pattern Mini ──
-  var tlPat = {'Walid Bouzidi':0,'Walid Hassan Eissa':0,'Mustafa Yusef Hamid Mohammed Ali':0,'Lotfi Hamrouni':0,'Duaa Ismail Odeh Abumansour':0,'Ahmad Alsmadi':0,'Akshay Munde':0,'Haneen Akram Eid Alsharari':0,'Jay-Ar Pautan':0,'Salsabeel Azmi Mahmoud Aldardasawi':0};
+  var tlPat = {'James Mitchell':0,'Sofia Reyes':0,'David Kim':0,'Omar Nasser':0,'Lisa Chen':0,'Maria Santos':0,'John Park':0,'Emma Wilson':0,'Carlos Rivera':0,'Ana Garcia':0};
   const tlPatterns = buildPatterns(evalHistoryToPatternData(filteredEvals));
   tlPatterns.forEach(function(p){ if(p.tl && tlPat.hasOwnProperty(p.tl)) tlPat[p.tl]=(tlPat[p.tl]||0)+1; });
   var maxTL = Math.max.apply(null,Object.values(tlPat).concat([1]));
@@ -3181,7 +3171,7 @@ function renderDashboard() {
   }
 
   // Charts — use filteredEvals already defined above
-  const projs=['MOPH_MCI','PHCC','MOPH'];
+  const projs=['Tech Support','Telecom','MOPH'];
   const pScores=projs.map(p=>{ const d=filteredEvals.filter(e=>e.proj===p); return d.length?(d.reduce((s,e)=>s+(e.overall||0),0)/d.length):null; });
   if(barChart){ barChart.data.datasets[0].data=pScores; barChart.update(); }
   const ncE=filteredEvals.reduce((sum,e)=>sum+(e.errors?e.errors.filter(err=>err.t==='nc'&&!err.isNA).length:0),0);
@@ -3206,8 +3196,8 @@ function renderDashboard() {
       return evs.length ? evs.reduce((s,e)=>s+(e.overall||0),0)/evs.length : 0;
     };
     const projData = [
-      {label:'MOPH_MCI', score:projAvg('MOPH_MCI')},
-      {label:'PHCC',     score:projAvg('PHCC')},
+      {label:'Tech Support', score:projAvg('Tech Support')},
+      {label:'Telecom',     score:projAvg('Telecom')},
       {label:'MOPH',     score:projAvg('MOPH')},
     ];
     projMini.innerHTML = projData.map(p => {
@@ -3310,7 +3300,7 @@ function initDashboard() {
   if (barChart) { renderDashboard(); return; }
   barChart = new Chart(document.getElementById('barChart'),{
     type:'bar',
-    data:{ labels:['MOPH_MCI','PHCC','MOPH'], datasets:[{data:[null,null,null],backgroundColor:['#18b87044','#f0b42944','#f04f4f44'],borderColor:['#18b870','#f0b429','#f04f4f'],borderWidth:2,borderRadius:10,borderSkipped:false}] },
+    data:{ labels:['Tech Support','Telecom','MOPH'], datasets:[{data:[null,null,null],backgroundColor:['#18b87044','#f0b42944','#f04f4f44'],borderColor:['#18b870','#f0b429','#f04f4f'],borderWidth:2,borderRadius:10,borderSkipped:false}] },
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Score: ${c.raw?c.raw.toFixed(1):'—'}%`}}},scales:{y:{min:0,max:100,grid:{color:'#1c1c42'},ticks:{color:'#55557a',font:{size:11},callback:v=>v+'%'}},x:{grid:{display:false},ticks:{color:'#55557a',font:{size:11}}}}}
   });
   donutChart = new Chart(document.getElementById('donutChart'),{
@@ -3548,17 +3538,17 @@ function buildSubList(cat,idx,attr) { return ''; }
 
 /* ── Score Calculator ── */
 const AGENT_MAP = {
-  'Walid Bouzidi':                        ['Abdelhaq Riahi','Mohamed Sabrery','Marwa Abdelmoniem','Houida Abdalla','Atika Alliaoui','Mahmoud Bakhit','Bianca Bagabaldo','Mohanad Ali','Hani Elkabashi','Zuhur Ahmed Mohamed Haji','Youcef Seddik Latreche','Shafna Asharaf','Aymen Berkani','Souhaib Boularouk','Ahmed Gamal Ismail Mohamed Metawea','Emile Lauren Pelayo','Paul Angelo Asuncion Ronario','Husna Abdullah Mohammed Al Junaidi','George Njuguna Ngigi','Huzaifa Abdalla Saeed Hamid','Mohamed Mustafa Mohamed AlTaher','Mujahid Barday Mushtaq Barday','Youssef Kalai'],
-  'Walid Hassan Eissa':                   ['Rinshidha Valiya Veettil Basheer','Yohannes Sema Gebrhiwot','Ohoud Mohammed D. A. AlDosari','Mohamed Suleiman Mohammed','Marwa Abdelmoniem Mohamed','Hiba Mostafa Idris Elidrissi','Wafa Haji','Mohamed Ismail Khashmelmous El Mahdi','Islam Diab Abdelbaset Mahmoud','Abdelmahmoud Majzoub Khalifa Rahma','Kholoud Ben Khalifa','Reem Abdulrahman Mohammad','Ayub Adem Saleh','Mohamed Sabrery Mohamed Ali','Riaz Ahmad'],
-  'Mustafa Yusef Hamid Mohammed Ali':     ['Om El Khir Ferhi','Vanessa Lacap Quiliza','Omer Gasim Omar Fadlalseed','Ieman Hussain Dehqan','Noora Bakhit','Leena Yosuf Ali','Ahmed Sedeeg Gdalla Sedeeg','Sami Nasser Hassen','Ibtisam Gamal Mohammed','Hind Yahya','Kamar Kasas','Ali Hassen Ali','Nooreldin Ahmed','Walla Abdulazeem Suliman AlHussain','Diana Santos Salvador','Russell Johang II Lleva Balilia','Roilan Alexis Francisco Concepcion','Harshad Pulayar Vayalil','Amina Nishwa','Mohamed Ifran Mohamed Roshan','Ahmed Ismail Mahdi','Senae Siraj Yosuf'],
-  'Lotfi Hamrouni':                       ['Hamza Grati','Jonna Lacap Ordillas','Houssem Dhahri','Amenallah Kheirallah','Abdu Mohammed Abdella','Abdelrahman Mohamed Mizar Ibrahim','Shiren Eid Hamid Ahmad','Shahd Mamoun Kamal Algzoli','Yassine Hadj Bachir','Misaa Adil Mustafa Yassin','Sarah Adil Mohamed Saeed','Zaineb Ammar Mbarek Jebali','Mansoor Gholam Dadi','Majdeldeeen Elsiddieg Mohamed Ajeeb','Mohammad Jandy Sehaban','Adrian Sabino Raymundo','Omer Abduselam Mohammed Ibrahim'],
-  'Duaa Ismail Odeh Abumansour':          ['Janosa Amor Abysa Rendora','Riham Mohamed Nour','Hamed Marwan Barah','Reem Abdulrahman Mohammad','Marowa Sheikhtawil ElSheikh Mohamed','Duaa Mukhtar Mohammed Farah','Chaimaa Belhadj','Houda Elfakhkhar','Ramzi Haddad','Billal Azzazene','Lahcene Bouziane','Mohamed Amine Salem','Omnia Dafaalla','Oussama Ramdani','Lidia Merzoug','Jan Timothy Florres Perez','Sittie Rahma Lucman Imam','Shamna Mammed Koya'],
-  'Ahmad Alsmadi':                        ['Mohammad Noor Edin NuMan Abu Taleb','Nabaa Bassem Awwad Abuashour','Zaid Bashar Mahmoud Al Jadallah','Dareen Loay Ziyad Abu Halimah','Yousef Faris Darweesh Aldarweesh','Aissara Mamduh Mubarak Elmanaseer','Eman Omar Turki Alkhami','Mahmoud Hisham Sadi Obeid','Aya Rafat Salman Alqadi','Ayham Khaled Attallah Hammouri','Huda Salameh Suleiman Alayhawat','Marwan Mohammad Ismail Alshqirat','Tasnim Sweilem Mutleq Alzawaidah','Salem Mohammad Salem Kreisahn','Aliya Mahdi Mohmad Ali','Abdallah Ahmad Ghazi Albataynen','Aos Hani Khaled Alsaub','Maryam Haitham Ayed Alkhawaldeh','Mohamed Jaser Adel Atya','Njood Abdallah','Yousef Mohammad Maroof Alaaldeen','Rashd Majied Zuheir Alghneimine','Marwan Mohammad Ismail Alshqirat','Mohammad Khaled Jamal Rinno'],
+  'James Mitchell':                        ['Abdelhaq Riahi','Mohamed Sabrery','Marwa Abdelmoniem','Houida Abdalla','Atika Alliaoui','Mahmoud Bakhit','Bianca Bagabaldo','Mohanad Ali','Hani Elkabashi','Zuhur Ahmed Mohamed Haji','Youcef Seddik Latreche','Shafna Asharaf','Aymen Berkani','Souhaib Boularouk','Ahmed Gamal Ismail Mohamed Metawea','Emile Lauren Pelayo','Paul Angelo Asuncion Ronario','Husna Abdullah Mohammed Al Junaidi','George Njuguna Ngigi','Huzaifa Abdalla Saeed Hamid','Mohamed Mustafa Mohamed AlTaher','Mujahid Barday Mushtaq Barday','Youssef Kalai'],
+  'Sofia Reyes':                   ['Rinshidha Valiya Veettil Basheer','Yohannes Sema Gebrhiwot','Ohoud Mohammed D. A. AlDosari','Mohamed Suleiman Mohammed','Marwa Abdelmoniem Mohamed','Hiba Mostafa Idris Elidrissi','Wafa Haji','Mohamed Ismail Khashmelmous El Mahdi','Islam Diab Abdelbaset Mahmoud','Abdelmahmoud Majzoub Khalifa Rahma','Kholoud Ben Khalifa','Reem Abdulrahman Mohammad','Ayub Adem Saleh','Mohamed Sabrery Mohamed Ali','Riaz Ahmad'],
+  'David Kim':     ['Om El Khir Ferhi','Vanessa Lacap Quiliza','Omer Gasim Omar Fadlalseed','Ieman Hussain Dehqan','Noora Bakhit','Leena Yosuf Ali','Ahmed Sedeeg Gdalla Sedeeg','Sami Nasser Hassen','Ibtisam Gamal Mohammed','Maya Patel','Kamar Kasas','Ali Hassen Ali','Nooreldin Ahmed','Walla Abdulazeem Suliman AlHussain','Diana Santos Salvador','Russell Johang II Lleva Balilia','Roilan Alexis Francisco Concepcion','Harshad Pulayar Vayalil','Amina Nishwa','Mohamed Ifran Mohamed Roshan','Ahmed Ismail Mahdi','Senae Siraj Yosuf'],
+  'Omar Nasser':                       ['Hamza Grati','Jonna Lacap Ordillas','Houssem Dhahri','Amenallah Kheirallah','Abdu Mohammed Abdella','David Chen','Shiren Eid Hamid Ahmad','Shahd Mamoun Kamal Algzoli','Yassine Hadj Bachir','Misaa Adil Mustafa Yassin','Sarah Adil Mohamed Saeed','Zaineb Ammar Mbarek Jebali','Mansoor Gholam Dadi','Majdeldeeen Elsiddieg Mohamed Ajeeb','Mohammad Jandy Sehaban','Adrian Sabino Raymundo','Omer Abduselam Mohammed Ibrahim'],
+  'Lisa Chen':          ['Janosa Amor Abysa Rendora','Riham Mohamed Nour','Hamed Marwan Barah','Reem Abdulrahman Mohammad','Marowa Sheikhtawil ElSheikh Mohamed','Duaa Mukhtar Mohammed Farah','Emma Davis','Houda Elfakhkhar','Carlos Rivera','Billal Azzazene','Lahcene Bouziane','Mohamed Amine Salem','Omnia Dafaalla','Oussama Ramdani','Lidia Merzoug','Jan Timothy Florres Perez','Sittie Rahma Lucman Imam','Shamna Mammed Koya'],
+  'Maria Santos':                        ['Mohammad Noor Edin NuMan Abu Taleb','Nabaa Bassem Awwad Abuashour','Zaid Bashar Mahmoud Al Jadallah','Dareen Loay Ziyad Abu Halimah','Yousef Faris Darweesh Aldarweesh','Aissara Mamduh Mubarak Elmanaseer','Eman Omar Turki Alkhami','Mahmoud Hisham Sadi Obeid','Aya Rafat Salman Alqadi','Ayham Khaled Attallah Hammouri','Huda Salameh Suleiman Alayhawat','Marwan Mohammad Ismail Alshqirat','Tasnim Sweilem Mutleq Alzawaidah','Salem Mohammad Salem Kreisahn','Aliya Mahdi Mohmad Ali','Abdallah Ahmad Ghazi Albataynen','Aos Hani Khaled Alsaub','Maryam Haitham Ayed Alkhawaldeh','Mohamed Jaser Adel Atya','Njood Abdallah','Yousef Mohammad Maroof Alaaldeen','Rashd Majied Zuheir Alghneimine','Marwan Mohammad Ismail Alshqirat','Mohammad Khaled Jamal Rinno'],
 
-  'Akshay Munde':                         ['Daminii Limbaji Jadhav','Sushmita Shashikant Nikam','Shweta Rupekar','Arya Kumar','Satej Sonawane','Tejal Chavan','Stuti Ohol','Shaikh Tarannum Shakil','Vaishnavi Talla','Sushant Kadam','Arsha K S','Kishor K'],
-  'Haneen Akram Eid Alsharari':           ['Dana Khaled Ahmad AlNasah','Esraa Jamal Khamees Abu Awad','Roaa Ali Taleb Altawarah','Rawan Rafat Mohammad Almomani','Seba Ahmed','Ola Ali Soud Alsmadi','Areen Omar Jumaeian Altrabean','Marwa Mohammad Khaleel Aljanadyeh','Darin Haidar Mousa Alhawawreh','Sewar Faris Damin Alkhalafat','Razan Mohammad Ahmad Alhelatat','Salwa Yahia Hasan Abuafash','Seren Issam Hasan Abumueitic','Serena Odeh Mohammad Alnaanah','Zakieh Mohammad Jaser Saleh','Ther Abdelbaset Shafiq Altakhainen','Alaa Saleh Saeed Alnajjar','Esraa Asem Ahmad Aloran','Omnia Zeyad Ahmad Alsawalq','Lama Amer Abdel Fattah Ibrahim','Alzahra Jamal Salem Mousa','Maymona Hassan Ibrahim Alrowwad','Rama Ahmed Muslim Alshoubaki'],
-  'Jay-Ar Pautan':                        ['Ezikiel Chester Simbulan Salon'],
-  'Salsabeel Azmi Mahmoud Aldardasawi':   ['Ansam Hamoudeh','Rahmeh Hammad Odeh','Tala Mohammad Eisa AlArjeh','Dyala ZuheIr Musbah AlSalhi','Esraa Belal Mahmoood Zabout','Eman Kamel Yousef Alkudari','Shahinaz Thib Mohammed Aqabawi','Roaa Hamdan','Sajeda Hani Jum Ah Al Marafi','Abeer Abedalmajed Abdelatef Abdelnabi','Manar Abdallah Ali Abuawali','Maria Ali Mohammad Albasouny','Raneem Ibrahim Mahmoud Shehadeh','Rana Omar Khaleel Almsadien','Nabaa Mahd Rashid Yasin','Hadeel Ibrahim Ismail Alnamrouti','Yasmine Nedal Rushdi Barhom','Tuleen Moujeebalkahman Saleh Al Qaryouti','Roa Hamdhan','Arj Mohammed Mohammed Shehadeh','Islam Okath Ismail Alazzeh','Khulud Ahmed Ali Garadah','Leen Adnan Mahmoud Abukheile','Lujain Fayiz Khalaf Alzidanin','Heba Abdulla Khalil Elgharably'],
+  'John Park':                         ['Daminii Limbaji Jadhav','Sushmita Shashikant Nikam','Shweta Rupekar','Arya Kumar','Satej Sonawane','Tejal Chavan','Stuti Ohol','Shaikh Tarannum Shakil','Vaishnavi Talla','Sushant Kadam','Arsha K S','Kishor K'],
+  'Emma Wilson':           ['Dana Khaled Ahmad AlNasah','Esraa Jamal Khamees Abu Awad','Roaa Ali Taleb Altawarah','Rawan Rafat Mohammad Almomani','Seba Ahmed','Ola Ali Soud Alsmadi','Areen Omar Jumaeian Altrabean','Marwa Mohammad Khaleel Aljanadyeh','Darin Haidar Mousa Alhawawreh','Sewar Faris Damin Alkhalafat','Razan Mohammad Ahmad Alhelatat','Salwa Yahia Hasan Abuafash','Seren Issam Hasan Abumueitic','Serena Odeh Mohammad Alnaanah','Zakieh Mohammad Jaser Saleh','Ther Abdelbaset Shafiq Altakhainen','Alaa Saleh Saeed Alnajjar','Esraa Asem Ahmad Aloran','Omnia Zeyad Ahmad Alsawalq','Lama Amer Abdel Fattah Ibrahim','Alzahra Jamal Salem Mousa','Maymona Hassan Ibrahim Alrowwad','Rama Ahmed Muslim Alshoubaki'],
+  'Carlos Rivera':                        ['Ezikiel Chester Simbulan Salon'],
+  'Ana Garcia':   ['Ansam Hamoudeh','Rahmeh Hammad Odeh','Tala Mohammad Eisa AlArjeh','Dyala ZuheIr Musbah AlSalhi','Esraa Belal Mahmoood Zabout','Eman Kamel Yousef Alkudari','Shahinaz Thib Mohammed Aqabawi','Roaa Hamdan','Sajeda Hani Jum Ah Al Marafi','Abeer Abedalmajed Abdelatef Abdelnabi','Manar Abdallah Ali Abuawali','Maria Ali Mohammad Albasouny','Raneem Ibrahim Mahmoud Shehadeh','Rana Omar Khaleel Almsadien','Nabaa Mahd Rashid Yasin','Hadeel Ibrahim Ismail Alnamrouti','Yasmine Nedal Rushdi Barhom','Tuleen Moujeebalkahman Saleh Al Qaryouti','Roa Hamdhan','Arj Mohammed Mohammed Shehadeh','Islam Okath Ismail Alazzeh','Khulud Ahmed Ali Garadah','Leen Adnan Mahmoud Abukheile','Lujain Fayiz Khalaf Alzidanin','Heba Abdulla Khalil Elgharably'],
 };
 
 function initModalListeners() {
@@ -4494,7 +4484,7 @@ function buildIntelligence(fp, ft, fc) {
   }
 
   // 4. Team Heatmap — filter by country/proj if active; show relevant TLs
-  const ALL_TLS = ['Walid Bouzidi','Walid Hassan Eissa','Mustafa Yusef Hamid Mohammed Ali','Lotfi Hamrouni','Duaa Ismail Odeh Abumansour','Ahmad Alsmadi','Akshay Munde','Haneen Akram Eid Alsharari','Jay-Ar Pautan','Salsabeel Azmi Mahmoud Aldardasawi'];
+  const ALL_TLS = ['James Mitchell','Sofia Reyes','David Kim','Omar Nasser','Lisa Chen','Maria Santos','John Park','Emma Wilson','Carlos Rivera','Ana Garcia'];
   const TLS = ft!=='all' ? [ft] : ALL_TLS;
   const filteredHistory = (evalHistoryToPatternData(_evalHistory)).filter(e =>
     (fp==='all' || e.proj===fp) &&
@@ -4617,7 +4607,7 @@ const PAGE_TITLES = {
 };
 
 // Current logged-in QA — matches sidebar footer name
-const CURRENT_QA = 'Younes Sid';
+const CURRENT_QA = 'Alex Morgan';
 const IS_MANAGER = true; // Will be overridden dynamically on login
 
 // QA filter for history page
@@ -4625,7 +4615,7 @@ let _histQAFilter = 'all';
 
 function setHistQAFilter(filter) {
   _histQAFilter = filter;
-  const tabs = { all:'hist-tab-all', 'Younes Sid':'hist-tab-younes', 'Shahd Mohamed':'hist-tab-shahd' };
+  const tabs = { all:'hist-tab-all', 'Alex Morgan':'hist-tab-younes', 'Dr. Jane Watson':'hist-tab-shahd' };
   Object.entries(tabs).forEach(([key, id]) => {
     const btn = document.getElementById(id);
     if (!btn) return;
@@ -5411,7 +5401,7 @@ function renderHistory() {
       const c = err.t==='nc'?'var(--gold)':err.t==='cc'?'var(--red)':'var(--orange)';
       return `<span style="background:${c}22;color:${c};border-radius:6px;padding:2px 6px;font-size:10px;">${err.t.toUpperCase()}</span>`;
     }).join('') + (e.errors.length > 2 ? `<span style="color:var(--muted);font-size:10px;"> +${e.errors.length-2}</span>` : '');
-    const qaCol = e.qa === 'Younes Sid' ? 'var(--purple-l)' : 'var(--blue-l)';
+    const qaCol = e.qa === 'Alex Morgan' ? 'var(--purple-l)' : 'var(--blue-l)';
 
     return `<tr>
       <td><input type="checkbox" class="hist-row-check" data-uid="${e.uid}" onchange="updateBulkBar()" style="accent-color:var(--purple);width:15px;height:15px;cursor:pointer;"></td>
@@ -6595,7 +6585,7 @@ function resetRepFilters() {
 function downloadMonthlySummary() {
   const date = new Date().toLocaleDateString('en-GB').replace(/\//g,'-');
   const headers = ['Project','Total Agents','Avg Score','NC Avg','CC Avg','CB Avg','Status'];
-  const projects = ['MOPH_MCI','PHCC','MOPH'];
+  const projects = ['Tech Support','Telecom','MOPH'];
   const rows = projects.map(p => {
     const d = getLiveAgents().filter(a => a.proj===p);
     if(!d.length) return null;
@@ -9282,11 +9272,11 @@ function downloadTemplate() {
   const headers = [...ALL_COLS];
   const example = {
     'Case Number':   'CASE-001',
-    'Agent Name':    'Chaimaa Belhadj',
-    'TL Name':       'Duaa Ismail Odeh Abumansour',
-    'Project':       'PHCC',
+    'Agent Name':    'Emma Davis',
+    'TL Name':       'Lisa Chen',
+    'Project':       'Telecom',
     'Language':      'Arabic',
-    'Assessor':      'Younes Sid',
+    'Assessor':      'Alex Morgan',
     'Date':          new Date().toLocaleDateString('en-GB'),
     // NC attributes — Yes = pass, No = error
     'NC - Call Opening/Closure':                 'Yes',
@@ -9330,9 +9320,9 @@ function downloadTemplate() {
     ['Case Number', 'Your CRM case or ticket number', 'Any text e.g. CASE-001'],
     ['Agent Name', 'Full name of the agent', 'Must match agent name in system'],
     ['TL Name', 'Team Lead name', 'Walid / Mustafa / Lotfi / Duaa'],
-    ['Project', 'Project code', 'MOPH_MCI / PHCC / MOPH'],
+    ['Project', 'Project code', 'Tech Support / Telecom / MOPH'],
     ['Language', 'Call language', 'Arabic / English'],
-    ['Assessor', 'QA who did the evaluation', 'Younes Sid / Shahd Mohamed'],
+    ['Assessor', 'QA who did the evaluation', 'Alex Morgan / Dr. Jane Watson'],
     ['Date', 'Date of evaluation', 'DD/MM/YYYY'],
     [''],
     ['NC / CC / CB columns', 'One column per attribute', 'Yes = No error found  |  No = Error found  |  N/A = Not Applicable'],
@@ -9365,17 +9355,17 @@ const USERS = {
   demoqa:       { name:'Dr. Jane Watson',    role:'qa',        pin:'1111', tl:null,             initials:'JW', color:'var(--blue-l)' },
   demotl:       { name:'James Mitchell',     role:'tl',        pin:'2222', tl:'James Mitchell', initials:'JM', color:'var(--gold)' },
   demoagent:    { name:'Sarah Mitchell',     role:'agent',     pin:'3333', tl:'James Mitchell', initials:'SM', color:'var(--green)' },
-  younes:       { name:'Younes Sid',        role:'manager',   pin:'1111', tl:null,      initials:'YS', color:'var(--purple)' },
-  shahd:        { name:'Shahd Mohamed',     role:'qa',        pin:'2222', tl:null,      initials:'SM', color:'var(--blue-l)' },
-  walidb:       { name:'Walid Bouzidi',                    role:'tl', pin:'1001', tl:'Walid Bouzidi',                    initials:'WB', color:'var(--gold)' },
-  walidh:       { name:'Walid Hassan Eissa',               role:'tl', pin:'1002', tl:'Walid Hassan Eissa',               initials:'WH', color:'var(--gold)' },
-  lotfi:        { name:'Lotfi Hamrouni',                   role:'tl', pin:'1003', tl:'Lotfi Hamrouni',                   initials:'LO', color:'var(--gold)' },
-  duaa:         { name:'Duaa Ismail Odeh Abumansour',      role:'tl', pin:'1004', tl:'Duaa Ismail Odeh Abumansour',      initials:'DU', color:'var(--gold)' },
-  mustafa:      { name:'Mustafa Yusef Hamid Mohammed Ali', role:'tl', pin:'1005', tl:'Mustafa Yusef Hamid Mohammed Ali', initials:'MU', color:'var(--gold)' },
-  ramzi:        { name:'Ramzi Haddad',       role:'agent',     pin:'4444', tl:'Duaa Ismail Odeh Abumansour', initials:'RH', color:'var(--red)'    },
-  abdelrahman:  { name:'Abdelrahman Mohamed Mizar Ibrahim', role:'agent', pin:'4444', tl:'Lotfi Hamrouni', initials:'AM', color:'var(--green)'  },
-  hind:         { name:'Hind Yahya',        role:'agent',     pin:'4444', tl:'Mustafa Yusef Hamid Mohammed Ali', initials:'HY', color:'var(--green)'  },
-  chaimaa:      { name:'Chaimaa Belhadj',   role:'agent',     pin:'4444', tl:'Duaa Ismail Odeh Abumansour', initials:'CB', color:'var(--green)'  },
+  younes:       { name:'Alex Morgan',        role:'manager',   pin:'1111', tl:null,      initials:'YS', color:'var(--purple)' },
+  shahd:        { name:'Dr. Jane Watson',     role:'qa',        pin:'2222', tl:null,      initials:'SM', color:'var(--blue-l)' },
+  walidb:       { name:'James Mitchell',                    role:'tl', pin:'1001', tl:'James Mitchell',                    initials:'WB', color:'var(--gold)' },
+  walidh:       { name:'Sofia Reyes',               role:'tl', pin:'1002', tl:'Sofia Reyes',               initials:'WH', color:'var(--gold)' },
+  lotfi:        { name:'Omar Nasser',                   role:'tl', pin:'1003', tl:'Omar Nasser',                   initials:'LO', color:'var(--gold)' },
+  duaa:         { name:'Lisa Chen',      role:'tl', pin:'1004', tl:'Lisa Chen',      initials:'DU', color:'var(--gold)' },
+  mustafa:      { name:'David Kim', role:'tl', pin:'1005', tl:'David Kim', initials:'MU', color:'var(--gold)' },
+  ramzi:        { name:'Carlos Rivera',       role:'agent',     pin:'4444', tl:'Lisa Chen', initials:'RH', color:'var(--red)'    },
+  abdelrahman:  { name:'David Chen', role:'agent', pin:'4444', tl:'Omar Nasser', initials:'AM', color:'var(--green)'  },
+  hind:         { name:'Maya Patel',        role:'agent',     pin:'4444', tl:'David Kim', initials:'HY', color:'var(--green)'  },
+  chaimaa:      { name:'Emma Davis',   role:'agent',     pin:'4444', tl:'Lisa Chen', initials:'CB', color:'var(--green)'  },
 };
 
 const ROLE_CONFIG = {
