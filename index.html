@@ -7191,14 +7191,15 @@ function getCoachingPendingCount() {
   loadCoaching();
   const role = _currentUser?.role || '';
   const name = _currentUser?.name || '';
+  const active = _coachingData.filter(c => !c._deleted);
   if (role === 'manager') {
-    return _coachingData.filter(c => c.status === 'pending_comment' || c.status === 'disputed').length;
+    return active.filter(c => c.status === 'pending_comment' || c.status === 'disputed').length;
   } else if (role === 'qa') {
-    return _coachingData.filter(c => c.qaAuthor === name && (c.status === 'pending_comment' || c.status === 'disputed')).length;
+    return active.filter(c => c.qaAuthor === name && (c.status === 'pending_comment' || c.status === 'disputed')).length;
   } else if (role === 'tl') {
-    return _coachingData.filter(c => c.tl === name && c.status === 'pending_tl').length;
+    return active.filter(c => c.tl === name && c.status === 'pending_tl').length;
   } else if (role === 'agent') {
-    return _coachingData.filter(c => c.agent === name && (c.status === 'pending_agent' || c.status === 'pending_tl')).length;
+    return active.filter(c => c.agent === name && (c.status === 'pending_agent' || c.status === 'pending_tl')).length;
   }
   return 0;
 }
@@ -7508,8 +7509,9 @@ function renderCoaching() {
   const role = _currentUser?.role || '';
   const name = _currentUser?.name || '';
 
-  // Filter by role
+  // Filter by role (exclude deleted items)
   let items = _coachingData.filter(c => {
+    if (c._deleted) return false;
     if (role === 'manager') return true;
     if (role === 'qa')      return c.qaAuthor === name;
     if (role === 'tl')      return c.tl === name;
@@ -7626,8 +7628,9 @@ function renderCoaching() {
 
 function deleteCoachingItem(id) {
   if (!confirm('Delete this coaching item? This cannot be undone.')) return;
-  // Remove from local data
-  _coachingData = _coachingData.filter(c => String(c.id) !== String(id));
+  // Mark as deleted (keep in memory so sync doesn't re-add it from Sheets)
+  const idx = _coachingData.findIndex(c => String(c.id) === String(id));
+  if (idx > -1) _coachingData[idx]._deleted = true;
   saveCoaching();
   // Send delete to Google Sheets
   fetch(GOOGLE_SHEET_URL, {
