@@ -90,7 +90,7 @@ a { color:var(--purple-l); text-decoration:none; }
    SIDEBAR
    ============================================================ */
 .sidebar {
-  position:fixed; left:0; top:0; bottom:0; width:var(--sidebar-w);
+  position:fixed; left:0; top:32px; bottom:0; width:var(--sidebar-w);
   background:var(--surface); border-right:1px solid var(--border);
   display:flex; flex-direction:column; z-index:100;
   transition:transform .28s cubic-bezier(.4,0,.2,1);
@@ -144,7 +144,7 @@ a { color:var(--purple-l); text-decoration:none; }
    TOPBAR
    ============================================================ */
 .topbar {
-  position:fixed; top:0; left:var(--sidebar-w); right:0; height:var(--topbar-h);
+  position:fixed; top:32px; left:var(--sidebar-w); right:0; height:var(--topbar-h);
   background:var(--surface); border-bottom:1px solid var(--border);
   display:flex; align-items:center; justify-content:space-between;
   padding:0 28px; z-index:99; backdrop-filter:blur(8px);
@@ -572,32 +572,15 @@ a { color:var(--purple-l); text-decoration:none; }
       <div style="margin-bottom:16px;">
         <label style="font-size:10px;color:var(--text-2);text-transform:uppercase;letter-spacing:1.2px;display:block;margin-bottom:7px;font-weight:600;">Select Account</label>
         <select id="login-user" onchange="onLoginUserChange()" style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-s);padding:11px 13px;color:var(--text);font-size:13px;outline:none;font-family:var(--font-b);cursor:pointer;appearance:auto;">
-          <option value="">— Select your name —</option>
+          <option value="">— Select your account —</option>
           <optgroup label="─── 🎯 DEMO ACCOUNTS ───">
             <option value="demo">Alex Morgan (Manager)</option>
             <option value="demoqa">Dr. Jane Watson (QA)</option>
             <option value="demotl">James Mitchell (Team Lead)</option>
             <option value="demoagent">Sarah Mitchell (Agent)</option>
           </optgroup>
-          <optgroup label="─── Manager ───">
-            <option value="younes">Younes Sid</option>
           </optgroup>
-          <optgroup label="─── QA Assessor ───">
-            <option value="shahd">Shahd Mohamed</option>
-          </optgroup>
-          <optgroup label="─── Team Lead ───">
-            <option value="walidb">Walid Bouzidi</option>
-            <option value="walidh">Walid Hassan Eissa</option>
-            <option value="lotfi">Lotfi Hamrouni</option>
-            <option value="duaa">Duaa Ismail Odeh Abumansour</option>
-            <option value="mustafa">Mustafa Yusef Hamid Mohammed Ali</option>
-          </optgroup>
-          <optgroup label="─── Agent ───">
-            <option value="ramzi">Ramzi Haddad</option>
-            <option value="abdelrahman">Abdelrahman Mizar</option>
-            <option value="hind">Hind Yahya</option>
-            <option value="chaimaa">Chaimaa Belhadj</option>
-          </optgroup>
+          
         </select>
       </div>
 
