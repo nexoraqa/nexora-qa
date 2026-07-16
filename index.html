@@ -10338,6 +10338,7 @@ function loadFromGoogleSheets() {
               caseNumber:r.caseNumber || r.case_number || r['case number'] || r['Case Number'] || r['caseNumber'] || '',
             };
           });
+          try { localStorage.setItem('nexora_op_history', JSON.stringify(window._operationHistory)); } catch(e) {}
         } catch(e) {}
       }
     })
