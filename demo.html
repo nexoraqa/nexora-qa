@@ -6842,7 +6842,7 @@ function renderMoM() {
 }
 
 
-const COACHING_KEY = 'nexora_coaching_v1';
+const COACHING_KEY = 'demo_coaching_v1';
 let _coachingData  = [];
 let _coachingTab   = 'all';
 let _coachingModal = null;
@@ -11561,12 +11561,13 @@ function updateCalibBadge() {
 (function injectDemoData() {
   // Always reset to ensure no real data ever shows
   localStorage.removeItem('demo_eval_history');
+  localStorage.removeItem('demo_coaching_v1');
   localStorage.removeItem('demo_coaching');
   localStorage.removeItem('demo_op_history');
   localStorage.removeItem('demo_version');
 
   const DEMO_EVAL_KEY = 'demo_eval_history';
-  const DEMO_COACH_KEY = 'demo_coaching';
+  const DEMO_COACH_KEY = 'demo_coaching_v1';
   const DEMO_OP_KEY = 'demo_op_history';
 
   const evals = [
