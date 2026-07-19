@@ -10616,6 +10616,7 @@ function switchCalibTab(tab) {
 }
 
 function renderCalibTracker() {
+  loadCalibSessions();
   const el = document.getElementById('calib-tracker-content');
   if (!el) return;
   const sessions = (_calibSessions||[]).filter(s => s.verdict || s.status === 'complete' || s.status === 'completed' || s.report);
