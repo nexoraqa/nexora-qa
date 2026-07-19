@@ -917,7 +917,7 @@ a { color:var(--purple-l); text-decoration:none; }
             </div>
             <div class="field" id="field-tl">
               <label>TL Name <span style="color:var(--red);">*</span></label>
-              <select id="c-tl" onchange="clearFieldError('field-tl')"><option value="">Select TL</option><option>Walid Bouzidi</option><option>Walid Hassan Eissa</option><option>Mustafa Yusef Hamid Mohammed Ali</option><option>Lotfi Hamrouni</option><option>Duaa Ismail Odeh Abumansour</option><option>Ahmad Alsmadi</option><option>Akshay Munde</option><option>Haneen Akram Eid Alsharari</option><option>Jay-Ar Pautan</option><option>Salsabeel Azmi Mahmoud Aldardasawi</option></select>
+              <select id="c-tl" onchange="clearFieldError('field-tl');populateAgents(this.value)"><option value="">Select TL</option><option>Walid Bouzidi</option><option>Walid Hassan Eissa</option><option>Mustafa Yusef Hamid Mohammed Ali</option><option>Lotfi Hamrouni</option><option>Duaa Ismail Odeh Abumansour</option><option>Ahmad Alsmadi</option><option>Akshay Munde</option><option>Haneen Akram Eid Alsharari</option><option>Jay-Ar Pautan</option><option>Salsabeel Azmi Mahmoud Aldardasawi</option></select>
               <div class="field-err" id="err-tl" style="display:none;font-size:11px;color:var(--red);margin-top:5px;"><span class="si si-cross"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.7 3.86a2 2 0 00-3.4 0z"/></svg></span> Please select a TL</div>
             </div>
             <div class="field" id="field-agent">
@@ -3525,6 +3525,18 @@ const AGENT_MAP = {
   'Jay-Ar Pautan':                        ['Ezikiel Chester Simbulan Salon'],
   'Salsabeel Azmi Mahmoud Aldardasawi':   ['Ansam Hamoudeh','Rahmeh Hammad Odeh','Tala Mohammad Eisa AlArjeh','Dyala ZuheIr Musbah AlSalhi','Esraa Belal Mahmoood Zabout','Eman Kamel Yousef Alkudari','Shahinaz Thib Mohammed Aqabawi','Roaa Hamdan','Sajeda Hani Jum Ah Al Marafi','Abeer Abedalmajed Abdelatef Abdelnabi','Manar Abdallah Ali Abuawali','Maria Ali Mohammad Albasouny','Raneem Ibrahim Mahmoud Shehadeh','Rana Omar Khaleel Almsadien','Nabaa Mahd Rashid Yasin','Hadeel Ibrahim Ismail Alnamrouti','Yasmine Nedal Rushdi Barhom','Tuleen Moujeebalkahman Saleh Al Qaryouti','Roa Hamdhan','Arj Mohammed Mohammed Shehadeh','Islam Okath Ismail Alazzeh','Khulud Ahmed Ali Garadah','Leen Adnan Mahmoud Abukheile','Lujain Fayiz Khalaf Alzidanin','Heba Abdulla Khalil Elgharably'],
 };
+
+function populateAgents(tlName) {
+  const sel = document.getElementById('c-agent');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Select agent</option>';
+  (AGENT_MAP[tlName] || []).forEach(function(a) {
+    const o = document.createElement('option');
+    o.value = a; o.textContent = a;
+    sel.appendChild(o);
+  });
+  if (typeof liveCalc === 'function') liveCalc();
+}
 
 function initModalListeners() {
   const profModal   = document.getElementById('prof-modal');
