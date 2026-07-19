@@ -10489,7 +10489,7 @@ function updateNavBadges() {
   }
 
   // Coaching badge — always show pending (TL needs to act)
-  const pendingCoaching = _coachingData.filter(c => c.status === 'pending_tl' || c.status === 'open').length;
+  const pendingCoaching = getCoachingPendingCount();
   const coachBadge = document.getElementById('coaching-badge');
   if (coachBadge) {
     if (pendingCoaching > 0) { coachBadge.textContent = pendingCoaching; coachBadge.style.display = 'inline'; }
