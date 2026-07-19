@@ -9420,9 +9420,9 @@ function doLogin() {
     return;
   }
 
-  // Success — save session so refresh doesn't log out
-  localStorage.setItem('nexora_session', key);
+  // Success — login
   _currentUser = { key, ...user };
+  resetInactivityTimer();
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('sidebar').classList.remove('open');
   applyRoleAccess(_currentUser);
@@ -10083,6 +10083,7 @@ function renderAgentDashboard(user) {
 }
 
 function switchUser() {
+  clearTimeout(_inactivityTimer);
   _currentUser = null;
   window._sessionIsManager = false;
   localStorage.removeItem('nexora_session');
@@ -10091,7 +10092,6 @@ function switchUser() {
   document.getElementById('login-pin').value  = '';
   document.getElementById('login-error').style.display = 'none';
   document.getElementById('login-role-preview').style.display = 'none';
-  // Reset nav to show all items (will be re-filtered on next login)
   document.querySelectorAll('.nav-item').forEach(i => i.style.display = 'flex');
 }
 
@@ -10439,16 +10439,6 @@ document.addEventListener('DOMContentLoaded', function() {
       applyRoleAccess(_currentUser);
       nav('home', document.querySelector('.nav-item'));
     }
-  } else {
-    // Restore session from last login so refresh doesn't log out
-    const savedKey = localStorage.getItem('nexora_session');
-    if (savedKey && USERS[savedKey]) {
-      _currentUser = { key: savedKey, ...USERS[savedKey] };
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('sidebar').classList.remove('open');
-      applyRoleAccess(_currentUser);
-      nav('home', document.querySelector('.nav-item'));
-    }
   }
   try { filtered = [...getLiveAgents()]; } catch(e) { filtered = []; }
   try { setTopDate(); }           catch(e) {}
@@ -10485,6 +10475,29 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ── NAV BADGES ──────────────────────────────────────────────
+// ── INACTIVITY TIMER — auto-logout after 20 minutes ──────────
+const INACTIVITY_LIMIT = 20 * 60 * 1000; // 20 minutes
+let _inactivityTimer = null;
+
+function resetInactivityTimer() {
+  if (!_currentUser) return;
+  clearTimeout(_inactivityTimer);
+  _inactivityTimer = setTimeout(function() {
+    if (!_currentUser) return;
+    switchUser();
+    const errEl = document.getElementById('login-error');
+    if (errEl) {
+      errEl.textContent = '⏱ You were logged out after 20 minutes of inactivity.';
+      errEl.style.display = 'block';
+    }
+  }, INACTIVITY_LIMIT);
+}
+
+// Reset timer on any user activity
+['click','keydown','mousemove','touchstart','scroll'].forEach(function(evt) {
+  document.addEventListener(evt, resetInactivityTimer, { passive: true });
+});
+
 function updateNavBadges() {
   const allPatterns = buildPatterns(evalHistoryToPatternData(_evalHistory));
   const escalateCount = allPatterns.filter(p => p.level.key === 'escalate').length;
