@@ -5388,7 +5388,7 @@ function renderHistory() {
       const c = err.t==='nc'?'var(--gold)':err.t==='cc'?'var(--red)':'var(--orange)';
       return `<span style="background:${c}22;color:${c};border-radius:6px;padding:2px 6px;font-size:10px;">${err.t.toUpperCase()}</span>`;
     }).join('') + (e.errors.length > 2 ? `<span style="color:var(--muted);font-size:10px;"> +${e.errors.length-2}</span>` : '');
-    const qaCol = e.qa === 'Younes Sid' ? 'var(--purple-l)' : 'var(--blue-l)';
+    const qaCol = e.qa === (_currentUser?.name||'') ? 'var(--purple-l)' : 'var(--blue-l)';
 
     return `<tr>
       <td><input type="checkbox" class="hist-row-check" data-uid="${e.uid}" onchange="updateBulkBar()" style="accent-color:var(--purple);width:15px;height:15px;cursor:pointer;"></td>
@@ -6444,10 +6444,23 @@ function renderTrendChart() {
   canvas.style.display='block'; if(empty) empty.style.display='none';
 
   // Group evals by period
+  function parseDate(dateStr) {
+    if (!dateStr) return null;
+    // Handle "15 Jul 2026" format (Safari-safe)
+    const m = String(dateStr).match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})$/);
+    if (m) {
+      const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+      const mo = months[m[2].slice(0,3)];
+      if (mo !== undefined) return new Date(Number(m[3]), mo, Number(m[1]));
+    }
+    const d = new Date(dateStr);
+    return isNaN(d) ? null : d;
+  }
+
   function getPeriodKey(dateStr) {
     try {
-      const d = new Date(dateStr);
-      if (isNaN(d)) return null;
+      const d = parseDate(dateStr);
+      if (!d) return null;
       if (period === 'month') return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
       // Week: use ISO week
       const day = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -9259,11 +9272,11 @@ function downloadTemplate() {
   const headers = [...ALL_COLS];
   const example = {
     'Case Number':   'CASE-001',
-    'Agent Name':    'Chaimaa Belhadj',
-    'TL Name':       'Duaa Ismail Odeh Abumansour',
-    'Project':       'PHCC',
+    'Agent Name':    'Agent Full Name',
+    'TL Name':       'Team Lead Name',
+    'Project':       'Project Name',
     'Language':      'Arabic',
-    'Assessor':      'Younes Sid',
+    'Assessor':      'QA Name',
     'Date':          new Date().toLocaleDateString('en-GB'),
     // NC attributes — Yes = pass, No = error
     'NC - Call Opening/Closure':                 'Yes',
@@ -9306,10 +9319,10 @@ function downloadTemplate() {
     ['Column', 'Description', 'Valid Values'],
     ['Case Number', 'Your CRM case or ticket number', 'Any text e.g. CASE-001'],
     ['Agent Name', 'Full name of the agent', 'Must match agent name in system'],
-    ['TL Name', 'Team Lead name', 'Walid / Mustafa / Lotfi / Duaa'],
-    ['Project', 'Project code', 'MOPH_MCI / PHCC / MOPH'],
+    ['TL Name', 'Team Lead name', 'Your team lead full name'],
+    ['Project', 'Project code', 'Your project name'],
     ['Language', 'Call language', 'Arabic / English'],
-    ['Assessor', 'QA who did the evaluation', 'Younes Sid / Shahd Mohamed'],
+    ['Assessor', 'QA who did the evaluation', 'Your QA name'],
     ['Date', 'Date of evaluation', 'DD/MM/YYYY'],
     [''],
     ['NC / CC / CB columns', 'One column per attribute', 'Yes = No error found  |  No = Error found  |  N/A = Not Applicable'],
