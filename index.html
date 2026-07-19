@@ -10284,6 +10284,7 @@ function loadFromGoogleSheets() {
             }
           });
           saveCalibSessions();
+          try { renderCalibTracker(); } catch(e) {}
         } catch(e) {}
       }
 
